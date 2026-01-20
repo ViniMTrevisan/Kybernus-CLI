@@ -1,0 +1,10 @@
+from fastapi import FastAPI
+from app.infrastructure.http import auth_controller
+
+app = FastAPI(title="{{projectName}} - Clean Architecture")
+
+app.include_router(auth_controller.router, prefix="/api/auth", tags=["Auth"])
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "architecture": "clean"}

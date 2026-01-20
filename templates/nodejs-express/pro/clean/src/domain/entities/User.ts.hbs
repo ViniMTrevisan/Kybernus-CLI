@@ -1,0 +1,38 @@
+/**
+* User Entity - Domain Layer
+* Pure business logic, no framework dependencies
+*/
+export interface UserProps {
+    id?: string;
+    email: string;
+    name: string;
+    password: string;
+    stripeCustomerId?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
+
+export class User {
+    private props: UserProps;
+
+    private constructor(props: UserProps) {
+        this.props = {
+            ...props,
+            createdAt: props.createdAt || new Date(),
+            updatedAt: props.updatedAt || new Date(),
+        };
+    }
+
+    static create(props: UserProps): User {
+        // Domain validation
+        if (!props.email || !props.email.includes('@')) {
+            throw new Error('Invalid email format');
+        }
+        if (!props.password || props.password.length < 8) { throw new Error('Password must be at least 8 characters'); } return
+        new User(props); } static restore(props: UserProps): User { return new User(props); } get id(): string | undefined {
+            return this.props.id; } get email(): string { return this.props.email; } get name(): string { return
+            this.props.name; } get password(): string { return this.props.password; } get stripeCustomerId(): string | undefined
+            { return this.props.stripeCustomerId; } setStripeCustomerId(customerId: string): void {
+                this.props.stripeCustomerId=customerId; this.props.updatedAt=new Date(); } toJSON() { return { id: this.props.id,
+                email: this.props.email, name: this.props.name, stripeCustomerId: this.props.stripeCustomerId, createdAt:
+                this.props.createdAt, updatedAt: this.props.updatedAt, }; } }

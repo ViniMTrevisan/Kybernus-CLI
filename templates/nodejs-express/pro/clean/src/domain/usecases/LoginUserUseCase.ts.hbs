@@ -1,0 +1,39 @@
+import { User } from '../entities/User';
+import { IUserRepository } from '../repositories/IUserRepository';
+
+export interface LoginUserInput {
+    email: string;
+    password: string;
+}
+
+export interface LoginUserOutput {
+    user: User;
+    token: string;
+}
+
+/**
+* Login User Use Case - Domain Layer
+*/
+export class LoginUserUseCase {
+    constructor(
+        private userRepository: IUserRepository,
+        private passwordHasher: { compare: (password: string, hash: string) => Promise<boolean> },
+        private tokenGenerator: { generate: (userId: string, email: string) => string }
+    ) {}
+
+    async execute(input: LoginUserInput): Promise<LoginUserOutput> {
+        const user = await this.userRepository.findByEmail(input.email);
+        if (!user) {
+            throw new Error('Invalid credentials');
+        }
+
+        const isValidPassword = await this.passwordHasher.compare(input.password, user.password);
+        if (!isValidPassword) {
+            throw new Error('Invalid credentials');
+        }
+
+        const token = this.tokenGenerator.generate(user.id!, user.email);
+
+        return { user, token };
+    }
+}

@@ -1,0 +1,28 @@
+/**
+* User Entity - Core Domain
+* Hexagonal Architecture: This is the heart of the hexagon
+*/
+export class User {
+    constructor(
+        public readonly id: string | undefined,
+        public readonly email: string,
+        public readonly name: string,
+        public readonly password: string,
+        public readonly stripeCustomerId?: string,
+        public readonly createdAt: Date = new Date()
+    ) {
+        this.validateEmail(email);
+        this.validatePassword(password);
+    }
+
+    private validateEmail(email: string): void {
+        if (!email || !email.includes('@')) {
+            throw new Error('Invalid email format');
+        }
+    }
+
+    private validatePassword(password: string): void {
+        if (!password || password.length < 8) { throw new Error('Password must be at least 8 characters'); } } withId(id:
+        string): User { return new User(id, this.email, this.name, this.password, this.stripeCustomerId, this.createdAt); }
+        withStripeCustomerId(customerId: string): User { return new User(this.id, this.email, this.name, this.password,
+        customerId, this.createdAt); } }

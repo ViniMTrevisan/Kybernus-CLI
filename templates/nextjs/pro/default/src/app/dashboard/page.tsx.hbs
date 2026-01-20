@@ -1,0 +1,52 @@
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "../api/auth/[...nextauth]/route";
+
+export default async function DashboardPage() {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        redirect("/api/auth/signin");
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50 py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4">Welcome, {session.user?.name || session.user?.email}!</h2>
+        <p className="text-gray-600">
+        This is a protected page. Only authenticated users can see this content.
+        </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-medium mb-2">Subscription</h3>
+        <p className="text-gray-600 mb-4">Manage your subscription</p>
+        <a href="/api/portal" className="text-blue-600 hover:underline">
+        Manage Billing →
+        </a>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-medium mb-2">Profile</h3>
+        <p className="text-gray-600 mb-4">Update your profile settings</p>
+        <a href="/settings" className="text-blue-600 hover:underline">
+        Edit Profile →
+        </a>
+        </div>
+
+        <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-medium mb-2">API Keys</h3>
+        <p className="text-gray-600 mb-4">Manage your API keys</p>
+        <a href="/api-keys" className="text-blue-600 hover:underline">
+        View Keys →
+        </a>
+        </div>
+        </div>
+        </div>
+        </div>
+    );
+}

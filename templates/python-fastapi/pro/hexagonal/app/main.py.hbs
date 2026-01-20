@@ -1,0 +1,22 @@
+from fastapi import FastAPI
+from app.core.service import AuthService
+from app.adapters.inbound.http_adapter import setup_auth_routes
+
+app = FastAPI(title="{{projectName}} - Hexagonal Architecture")
+
+# Setup dependencies (in production use DI container)
+from app.infrastructure.database import InMemoryUserRepository
+from app.infrastructure.security import BcryptHasher, JwtGenerator
+
+repo = InMemoryUserRepository()
+hasher = BcryptHasher()
+token_gen = JwtGenerator()
+auth_service = AuthService(repo, hasher, token_gen)
+
+# Setup routes
+auth_router = setup_auth_routes(auth_service)
+app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "architecture": "hexagonal"}

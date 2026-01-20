@@ -1,0 +1,28 @@
+from app.core.ports import IAuthPort, IUserRepositoryPort
+from app.core.domain.user import User
+import uuid
+
+class AuthService(IAuthPort):
+    """Core Service - Business Logic"""
+    def __init__(self, repo: IUserRepositoryPort, hasher, token_gen):
+        self.repo = repo
+        self.hasher = hasher
+        self.token_gen = token_gen
+    
+    async def register(self, email: str, name: str, password: str):
+        existing = await self.repo.find_by_email(email)
+        if existing:
+            raise ValueError("User exists")
+        
+        hashed = self.hasher.hash(password)
+        user = User(email=email, name=name, password=hashed, id=str(uuid.uuid4()))
+        await self.repo.save(user)
+        token = self.token_gen.generate(user.id, user.email)
+        return {"user": user, "token": token}
+    
+    async def login(self, email: str, password: str):
+        user = await self.repo.find_by_email(email)
+        if not user or not self.hasher.verify(password, user.password):
+            raise ValueError("Invalid credentials")
+        token = self.token_gen.generate(user.id, user.email)
+        return {"user": user, "token": token}

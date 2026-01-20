@@ -1,0 +1,11 @@
+import { User } from '../../domain/entities/User';
+
+/**
+* Auth Port - Inbound (Driving) Port
+* Defines what the application CAN DO (use cases)
+*/
+export interface IAuthPort {
+    register(email: string, name: string, password: string): Promise<{ user: User; token: string }>;
+    login(email: string, password: string): Promise<{ user: User; token: string }>;
+    validateToken(token: string): Promise<User | null>;
+}

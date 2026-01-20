@@ -1,0 +1,13 @@
+import { Injectable } from '@nestjs/common';
+import { IUserRepositoryPort } from '../../core/ports/ports';
+import { User } from '../../core/domain/user.entity';
+
+@Injectable()
+export class PersistenceAdapter implements IUserRepositoryPort {
+    private users: User[] = [];
+
+    async save(user: User): Promise<User> {
+        this.users.push(user);
+        return user;
+    }
+}

@@ -1,0 +1,23 @@
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Optional
+import uuid
+
+@dataclass
+class User:
+    """User Entity - Domain Layer"""
+    email: str
+    name: str
+    password: str
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    stripe_customer_id: Optional[str] = None
+    created_at: datetime = field(default_factory=datetime.now)
+    
+    def __post_init__(self):
+        if "@" not in self.email:
+            raise ValueError("Invalid email format")
+        if len(self.password) < 8:
+            raise ValueError("Password must be at least 8 characters")
+    
+    def set_stripe_customer_id(self, customer_id: str):
+        self.stripe_customer_id = customer_id

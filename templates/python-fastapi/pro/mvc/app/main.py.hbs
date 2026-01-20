@@ -1,0 +1,20 @@
+from fastapi import FastAPI
+from app.controllers import health, auth, items, payments
+
+app = FastAPI(title="{{projectName}}")
+
+# Health check
+app.include_router(health.router, tags=["Health"])
+
+# Auth
+app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+
+# Items
+app.include_router(items.router, prefix="/api/items", tags=["Items"])
+
+# Payments
+app.include_router(payments.router, prefix="/api/payments", tags=["Payments"])
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

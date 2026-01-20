@@ -1,0 +1,14 @@
+{
+  "name": "Java Spring Boot MVC",
+  "tier": "free",
+  "stack": "java-spring",
+  "version": "1.0.0",
+  "description": "Spring Boot 4 REST API with Java 21 and MVC architecture",
+  "targetVersions": {
+    "java": "21",
+    "springBoot": "^4.0.0",
+    "maven": "^3.9.0"
+  },
+  "requiredConfig": ["projectName", "packageName"],
+  "optionalConfig": ["useAI", "buildTool"]
+}

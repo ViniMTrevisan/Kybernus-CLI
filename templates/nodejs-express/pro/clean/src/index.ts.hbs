@@ -1,0 +1,40 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
+
+import authRoutes from './infrastructure/http/controllers/AuthController';
+
+dotenv.config();
+
+const app = express();
+
+// Security
+app.use(helmet());
+app.use(cors());
+app.use(morgan('dev'));
+
+// Body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Health check
+app.get('/health', (_, res) => res.json({ status: 'ok' }));
+
+// Routes
+app.use('/api/auth', authRoutes);
+
+// Error handling
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Internal server error' });
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`🚀 {{pascalCase projectName}} running on port ${PORT}`);
+    console.log(`📐 Architecture: Clean Architecture`);
+    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+});

@@ -1,96 +1,75 @@
-# Kybernus
+# Kybernus CLI 🚀
 
-> Do grego *Kybernetes* (piloto/governador) — raiz etimológica de Kubernetes e Cybernetics
-
-**Kybernus** é uma CLI Open Core que acelera o desenvolvimento de projetos backend e fullstack, gerando código pronto para produção em minutos.
-
-## 🚀 Quick Start
-
-```bash
-# Com npx (recomendado - sempre usa a versão mais recente)
-npx kybernus init
-
-# Ou instale globalmente
-npm install -g kybernus
-kybernus init
-```
-
-## ✨ Features
-
-### Free (Open Source)
-- ✅ **Next.js Fullstack** - App Router + Prisma + Tailwind
-- ✅ **Java Spring Boot** - Spring Boot 4 + Java 21 (MVC)
-- ✅ **Node.js Express** - Express.js + TypeScript (MVC)
-- ✅ Banco de dados: H2 (memória) + MySQL básico
-- ✅ Docker Compose para banco de dados
-- ✅ Documentação gerada por IA (Google Gemini BYOK)
-
-### Pro
-- 🌟 **Python FastAPI** - FastAPI + Pydantic
-- 🌟 **NestJS** - NestJS + TypeScript
-- 🌟 **Arquiteturas Avançadas** - Clean Architecture + Hexagonal
-- 🌟 **DevOps Completo** - Dockerfile + CI/CD + Terraform (AWS)
-- 🌟 **Integrações SaaS** - Stripe + NextAuth + Keycloak
-
-## 📋 Requisitos
-
-- **Node.js** >= 18.0.0
-- **macOS** ou **Linux** (Windows em breve)
-
-## 🎯 Como Funciona
-
-1. Execute `npx kybernus init`
-2. Responda ao wizard interativo
-3. Receba um projeto estruturado e pronto para desenvolver
-
-## 🏗️ Estrutura de Projeto Gerada
-
-### Java Spring Boot (MVC - Free)
-```
-meu-projeto/
-├── pom.xml
-├── src/main/java/com/usuario/projeto/
-│   ├── Application.java
-│   ├── controller/
-│   ├── service/
-│   ├── repository/
-│   └── model/
-└── docker-compose.yml (banco de dados)
-```
-
-### Java Spring Boot (Clean Architecture - Pro)
-```
-meu-projeto/
-├── pom.xml
-├── Dockerfile
-├── docker-compose.yml (app + banco)
-├── .github/workflows/ci-cd.yml
-├── terraform/
-└── src/main/java/com/usuario/projeto/
-    ├── domain/
-    ├── application/
-    └── infrastructure/
-```
-
-## 🤝 Contribuindo
-
-Kybernus é **Open Core**:
-- Templates Free são open source (neste repo)
-- Templates Pro são privados
-- Contribuições são bem-vindas! Veja [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## 📄 Licença
-
-- **CLI e Templates Free**: MIT License
-- **Templates Pro**: Commercial License
-
-## 🔗 Links
-
-- 🌐 **Website**: https://kybernus.dev
-- 📚 **Documentação**: https://docs.kybernus.dev
-- 💬 **Discord**: https://discord.gg/kybernus
-- 🐦 **Twitter**: [@kybernus](https://twitter.com/kybernus)
+**The Ultimate Backend Scaffolding Tool for Modern Developers.**
+Build production-ready applications in minutes, not days. Kybernus automates the setup of robust, scalable backend and fullstack architectures with industry best practices built-in.
 
 ---
 
-**Made with ❤️ by [Vini Trevisan](https://github.com/vinitrevisan)**
+## Why Kybernus?
+
+Stop wasting time on boilerplate. Kybernus generates professional project structures tailored to your stack and needed complexity level.
+
+*   **Production-Ready Patterns**: MVC, Clean Architecture, and Hexagonal Architecture out of the box.
+*   **Multi-Stack Support**: Node.js, NestJS, Java Spring Boot, Python FastAPI, Next.js.
+*   **DevOps Included**: Docket, CI/CD pipelines, and Terraform configurations (Pro).
+*   **Cloud-Native**: AI-powered documentation generation using Google Gemini.
+
+## Getting Started
+
+### Installation
+
+Install Kybernus globally via npm:
+
+```bash
+npm install -g kybernus
+```
+
+### First Run
+
+Initialize your first project:
+
+```bash
+kybernus init
+```
+
+This interactive wizard will guide you through:
+1.  Naming your project.
+2.  Choosing your stack (e.g., NestJS, Spring Boot).
+3.  Selecting an architecture (MVC, Clean, Hexagonal).
+4.  Configuring DevOps tools and add-ons.
+
+### Account Registration
+
+Unlock the full power of Kybernus with a free account (includes 3 free Pro projects):
+
+```bash
+kybernus register
+```
+
+## Supported Stacks & Features
+
+| Feature | Free Tier | Pro Tier 🌟 |
+| :--- | :---: | :---: |
+| **Stacks** | Node.js (Express), Next.js, Java Spring | **+ NestJS, Python FastAPI** |
+| **Architectures** | MVC (Model-View-Controller) | **+ Clean Architecture, Hexagonal** |
+| **DevOps** | Basic Setup | **Docker, CI/CD, Terraform** |
+| **AI Docs** | Manual | **Automated via Gemini** |
+| **Project Limit** | Unlimited Free Projects | **Unlimited Pro Projects** |
+
+## Commands Reference
+
+*   `kybernus init`: Start the project generator wizard.
+*   `kybernus register`: Create a new account.
+*   `kybernus login`: Log in to an existing account.
+*   `kybernus status`: Check your license tier and usage limits.
+*   `kybernus upgrade`: Upgrade to a Pro lifetime license.
+*   `kybernus logout`: Sign out of the CLI.
+
+## Documentation
+
+For detailed guides, concepts, and tutorials, visit our **[Documentation Site](#)** (Coming Soon).
+
+---
+
+© 2026 Kybernus. All rights reserved.
+Code less, Build more.

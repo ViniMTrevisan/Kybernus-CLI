@@ -1,0 +1,26 @@
+from app.domain.repositories.user_repository import IUserRepository
+from app.domain.entities.user import User
+from typing import Optional
+
+class InMemoryUserRepository(IUserRepository):
+    """In-Memory User Repository - Infrastructure Layer"""
+    
+    def __init__(self):
+        self._users: dict[str, User] = {}
+    
+    async def find_by_id(self, user_id: str) -> Optional[User]:
+        return self._users.get(user_id)
+    
+    async def find_by_email(self, email: str) -> Optional[User]:
+        for user in self._users.values():
+            if user.email == email:
+                return user
+        return None
+    
+    async def save(self, user: User) -> User:
+        self._users[user.id] = user
+        return user
+    
+    async def delete(self, user_id: str) -> None:
+        if user_id in self._users:
+            del self._users[user_id]

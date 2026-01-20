@@ -1,0 +1,30 @@
+from app.domain.entities.user import User
+from app.domain.repositories.user_repository import IUserRepository
+from typing import Protocol
+
+class IPasswordHasher(Protocol):
+    def hash(self, password: str) -> str: ...
+    def verify(self, password: str, hashed: str) -> bool: ...
+
+class ITokenGenerator(Protocol):
+    def generate(self, user_id: str, email: str) -> str: ...
+
+class RegisterUserUseCase:
+    """Register User Use Case - Domain Layer"""
+    
+    def __init__(self, repository: IUserRepository, hasher: IPasswordHasher, token_gen: ITokenGenerator):
+        self.repository = repository
+        self.hasher = hasher
+        self.token_gen = token_gen
+    
+    async def execute(self, email: str, name: str, password: str):
+        existing = await self.repository.find_by_email(email)
+        if existing:
+            raise ValueError("User already exists")
+        
+        hashed = self.hasher.hash(password)
+        user = User(email=email, name=name, password=hashed)
+        saved_user = await self.repository.save(user)
+        token = self.token_gen.generate(saved_user.id, saved_user.email)
+        
+        return {"user": saved_user, "token": token}

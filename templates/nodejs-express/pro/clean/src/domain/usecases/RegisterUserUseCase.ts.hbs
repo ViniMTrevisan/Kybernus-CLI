@@ -1,0 +1,51 @@
+import { User } from '../entities/User';
+import { IUserRepository } from '../repositories/IUserRepository';
+
+export interface RegisterUserInput {
+    email: string;
+    name: string;
+    password: string;
+}
+
+export interface RegisterUserOutput {
+    user: User;
+    token: string;
+}
+
+/**
+* Register User Use Case - Domain Layer
+* Pure business logic for user registration
+*/
+export class RegisterUserUseCase {
+    constructor(
+        private userRepository: IUserRepository,
+        private passwordHasher: { hash: (password: string) => Promise<string> },
+        private tokenGenerator: { generate: (userId: string, email: string) => string }
+    ) {}
+
+    async execute(input: RegisterUserInput): Promise<RegisterUserOutput> {
+        // Check if user already exists
+        const existingUser = await this.userRepository.findByEmail(input.email);
+        if (existingUser) {
+            throw new Error('User already exists');
+        }
+
+        // Hash password
+        const hashedPassword = await this.passwordHasher.hash(input.password);
+
+        // Create user entity
+        const user = User.create({
+            email: input.email,
+            name: input.name,
+            password: hashedPassword,
+        });
+
+        // Persist user
+        const savedUser = await this.userRepository.save(user);
+
+        // Generate token
+        const token = this.tokenGenerator.generate(savedUser.id!, savedUser.email);
+
+        return { user: savedUser, token };
+    }
+}

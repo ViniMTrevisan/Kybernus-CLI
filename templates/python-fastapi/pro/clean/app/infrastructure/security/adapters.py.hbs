@@ -1,0 +1,23 @@
+from passlib.context import CryptContext
+from jose import jwt
+from datetime import datetime, timedelta
+import os
+
+SECRET_KEY = os.getenv("JWT_SECRET", "secret")
+ALGORITHM = "HS256"
+
+class BcryptHasher:
+    def __init__(self):
+        self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+    
+    def hash(self, password: str) -> str:
+        return self.pwd_context.hash(password)
+    
+    def verify(self, password: str, hashed: str) -> bool:
+        return self.pwd_context.verify(password, hashed)
+
+class JwtTokenGenerator:
+    def generate(self, user_id: str, email: str) -> str:
+        expire = datetime.utcnow() + timedelta(days=7)
+        to_encode = {"exp": expire, "sub": user_id, "email": email}
+        return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)

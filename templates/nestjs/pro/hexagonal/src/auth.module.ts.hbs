@@ -1,0 +1,19 @@
+import { Module } from '@nestjs/common';
+import { AuthService } from './core/auth.service';
+import { HttpAdapter } from './adapters/inbound/http.adapter';
+import { PersistenceAdapter } from './adapters/outbound/persistence.adapter';
+
+@Module({
+    providers: [
+        {
+            provide: 'IAuthPort',
+            useClass: AuthService,
+        },
+        {
+            provide: 'IUserRepositoryPort',
+            useClass: PersistenceAdapter,
+        },
+    ],
+    controllers: [HttpAdapter],
+})
+export class AuthModule {}

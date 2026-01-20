@@ -39,12 +39,20 @@ export async function statusCommand() {
 
     const statusLabel = result.status ? (statusMap[result.status] || result.status) : 'Unknown';
 
-    clack.note(
-        `License Key: ${key}\n` +
+    let details = `License Key: ${key}\n` +
         `Tier: ${result.tier}\n` +
-        `Status: ${statusLabel}\n` +
-        `Expires: ${result.expiration ? result.expiration.toLocaleDateString() : 'Never'}\n` +
-        `Message: ${result.message || ''}`,
+        `Status: ${statusLabel}\n`;
+
+    if (result.status === 'TRIAL' && result.limit !== undefined) {
+        details += `Usage: ${result.usage}/${result.limit} Projects\n`;
+    } else {
+        details += `Expires: ${result.expiration ? result.expiration.toLocaleDateString() : 'Never'}\n`;
+    }
+
+    details += `Message: ${result.message || ''}`;
+
+    clack.note(
+        details,
         'License Information'
     );
 

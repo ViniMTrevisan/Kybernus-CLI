@@ -1,0 +1,16 @@
+import { Injectable, Inject } from '@nestjs/common';
+import { IAuthPort, IUserRepositoryPort } from './ports/ports';
+import { User } from './domain/user.entity';
+
+@Injectable()
+export class AuthService implements IAuthPort {
+    constructor(
+        @Inject('IUserRepositoryPort')
+        private readonly userRepository: IUserRepositoryPort,
+    ) {}
+
+    async register(email: string, name: string, password: string): Promise<User> {
+        const user = new User(Date.now().toString(), email, name, password);
+        return this.userRepository.save(user);
+    }
+}

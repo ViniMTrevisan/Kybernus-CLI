@@ -1,0 +1,41 @@
+package {{packageName}}.infrastructure.web.controller;
+
+import {{packageName}}.application.service.AuthService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+
+    private final AuthService authService;
+
+    public AuthController(AuthService authService) {
+        this.authService = authService;
+    }
+
+    public record AuthRequest(String email, String name, String password) {}
+
+    @PostMapping("/register")
+    public ResponseEntity
+    <?> register(@RequestBody AuthRequest request) {
+        try {
+            var result = authService.register(request.email(), request.name(), request.password());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+        try {
+            var result = authService.login(request.email(), request.password());
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+        }
+    }
+}

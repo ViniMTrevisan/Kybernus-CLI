@@ -1,0 +1,16 @@
+import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { RegisterUseCase } from '../../domain/use-cases/register.use-case';
+
+@Controller('auth')
+export class AuthController {
+    constructor(private readonly registerUseCase: RegisterUseCase) {}
+
+    @Post('register')
+    async register(@Body() body: any) {
+        try {
+            return await this.registerUseCase.execute(body.email, body.name, body.password);
+        } catch (e: any) {
+            throw new BadRequestException(e.message);
+        }
+    }
+}

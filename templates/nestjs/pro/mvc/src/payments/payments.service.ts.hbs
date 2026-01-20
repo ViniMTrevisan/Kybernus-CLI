@@ -1,0 +1,43 @@
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import Stripe from 'stripe';
+
+@Injectable()
+export class PaymentsService {
+    private stripe: Stripe;
+
+    constructor(private configService: ConfigService) {
+        this.stripe = new Stripe(configService.get('STRIPE_SECRET_KEY', ''), {
+            apiVersion: '2024-12-18.acacia',
+        });
+    }
+
+    async createCheckoutSession(priceId: string, customerId?: string) {
+        const session = await this.stripe.checkout.sessions.create({
+            mode: 'subscription',
+            payment_method_types: ['card'],
+            line_items: [{ price: priceId, quantity: 1 }],
+            customer: customerId || undefined,
+            success_url: `${this.configService.get('FRONTEND_URL')}/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${this.configService.get('FRONTEND_URL')}/cancel`,
+        });
+
+        return session;
+    }
+
+    async handleWebhook(payload: Buffer, signature: string) {
+        const webhookSecret = this.configService.get('STRIPE_WEBHOOK_SECRET', '');
+        const event = this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+
+        switch (event.type) {
+            case 'checkout.session.completed':
+            console.log('Checkout completed:', event.data.object);
+            break;
+            case 'customer.subscription.updated':
+            console.log('Subscription updated:', event.data.object);
+            break;
+        }
+
+        return { received: true };
+    }
+}

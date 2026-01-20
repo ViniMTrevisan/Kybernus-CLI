@@ -25,7 +25,7 @@ export async function registerCommand() {
     }
 
     const email = await clack.text({
-        message: 'Enter your email address to start your 15-day Free Trial:',
+        message: 'Enter your email address to unlock 3 Free Pro Projects (Metered Trial):',
         placeholder: 'you@example.com',
         validate: (value) => {
             if (!value) return 'Email is required';
@@ -73,7 +73,7 @@ export async function registerCommand() {
         s.stop('Registration successful! 🎉');
 
         clack.note(
-            `License Key: ${data.licenseKey}\nTrial Ends: ${new Date(data.trialEndsAt).toLocaleDateString()}`,
+            `License Key: ${data.licenseKey}\nPlan: Metered Trial (3 Projects included)`,
             'Trial Activated'
         );
 

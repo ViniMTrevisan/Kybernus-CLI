@@ -1,0 +1,49 @@
+package {{packageName}}.controller;
+
+import {{packageName}}.service.StripeService;
+import com.stripe.exception.StripeException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/payments")
+public class PaymentsController {
+
+    private final StripeService stripeService;
+
+    public PaymentsController(StripeService stripeService) {
+        this.stripeService = stripeService;
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity
+    <?> createCheckout(@RequestBody Map<String, String> request) {
+        try {
+            var session = stripeService.createCheckoutSession(request.get("customerId"));
+            return ResponseEntity.ok(Map.of("url", session.getUrl()));
+        } catch (StripeException e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/portal")
+    public ResponseEntity<?> createPortal(@RequestBody Map<String, String> request) {
+        try {
+            var session = stripeService.createPortalSession(request.get("customerId"));
+            return ResponseEntity.ok(Map.of("url", session.getUrl()));
+        } catch (StripeException e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/webhook")
+    public ResponseEntity
+    <?> handleWebhook(@RequestBody String payload,
+    @RequestHeader("Stripe-Signature") String sigHeader) {
+        // TODO: Implement webhook verification and handling
+        // Use Stripe.webhooks.constructEvent to verify signature
+        return ResponseEntity.ok(Map.of("received", true));
+    }
+}

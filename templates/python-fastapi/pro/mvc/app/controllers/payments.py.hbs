@@ -1,0 +1,32 @@
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
+import os
+
+router = APIRouter()
+
+class CheckoutRequest(BaseModel):
+    price_id: str
+    customer_id: str | None = None
+
+@router.post("/checkout")
+async def create_checkout(data: CheckoutRequest):
+    # Stripe integration would go here
+    # For now, return mock data
+    return {
+        "checkout_url": f"https://checkout.stripe.com/session_{data.price_id}",
+        "session_id": "cs_test_1234567890"
+    }
+
+@router.post("/webhook")
+async def stripe_webhook(payload: dict):
+    # Handle Stripe webhook events
+    event_type = payload.get("type")
+    
+    if event_type == "checkout.session.completed":
+        # Handle successful checkout
+        pass
+    elif event_type == "customer.subscription.updated":
+        # Handle subscription update
+        pass
+    
+    return {"received": True}

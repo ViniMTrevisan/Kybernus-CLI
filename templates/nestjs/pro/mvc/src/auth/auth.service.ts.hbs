@@ -1,0 +1,55 @@
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
+
+interface User {
+    id: string;
+    email: string;
+    name: string;
+    password: string;
+}
+
+@Injectable()
+export class AuthService {
+    private users: Map<string, User> = new Map();
+
+    constructor(private jwtService: JwtService) {}
+
+    async register(email: string, name: string, password: string) {
+        if (this.users.has(email)) {
+            throw new Error('User already exists');
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user: User = {
+            id: Date.now().toString(),
+            email,
+            name,
+            password: hashedPassword,
+        };
+
+        this.users.set(email, user);
+        const token = this.jwtService.sign({ sub: user.id, email: user.email });
+
+        return { token, user: { id: user.id, email: user.email, name: user.name } };
+    }
+
+    async login(email: string, password: string) {
+        const user = this.users.get(email);
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            throw new Error('Invalid credentials');
+        }
+
+        const token = this.jwtService.sign({ sub: user.id, email: user.email });
+        return { token, user: { id: user.id, email: user.email, name: user.name } };
+    }
+
+    async validateUser(userId: string) {
+        for (const user of this.users.values()) {
+            if (user.id === userId) {
+                return { id: user.id, email: user.email, name: user.name };
+            }
+        }
+        return null;
+    }
+}

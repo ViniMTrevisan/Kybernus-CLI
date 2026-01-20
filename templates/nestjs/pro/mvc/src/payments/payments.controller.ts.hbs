@@ -1,0 +1,26 @@
+import { Controller, Post, Body, Headers, UseGuards, RawBodyRequest, Req } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { PaymentsService } from './payments.service';
+import { Request } from 'express';
+
+class CreateCheckoutDto {
+    priceId: string;
+    customerId?: string;
+}
+
+@Controller('payments')
+export class PaymentsController {
+    constructor(private paymentsService: PaymentsService) {}
+
+    @Post('checkout')
+    @UseGuards(AuthGuard('jwt'))
+    async createCheckout(@Body() dto: CreateCheckoutDto) {
+        const session = await this.paymentsService.createCheckoutSession(dto.priceId, dto.customerId);
+        return { url: session.url };
+    }
+
+    @Post('webhook')
+    async webhook(@Req() req: RawBodyRequest<Request>, @Headers('stripe-signature') signature: string) {
+        return this.paymentsService.handleWebhook(req.rawBody!, signature);
+    }
+}

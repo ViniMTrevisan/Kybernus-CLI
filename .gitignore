@@ -43,7 +43,3 @@ temp/
 # User data (for testing locally)
 .kybernus/
 
-# Private Templates (Pro)
-templates/**/pro/
-
-chave.txt

@@ -8,6 +8,8 @@ export interface ValidationResult {
     expiration?: Date;
     message?: string;
     status?: string;
+    usage?: number;
+    limit?: number;
 }
 
 export class LicenseValidator {
@@ -57,6 +59,8 @@ export class LicenseValidator {
                 expiration: data.trialEndsAt ? new Date(data.trialEndsAt) : undefined,
                 message: data.message,
                 status: data.status,
+                usage: data.usage,
+                limit: data.limit,
             };
 
         } catch (error: any) {

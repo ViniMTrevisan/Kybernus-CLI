@@ -1,8 +1,8 @@
 {
   "name": "kybernus",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
-  "description": "Open Core CLI for scaffolding production-ready backend and fullstack projects",
+  "description": "The Ultimate Backend Scaffolding CLI for Modern Developers",
   "main": "dist/index.js",
   "bin": {
     "kybernus": "dist/index.js"
@@ -11,7 +11,9 @@
     "build": "rimraf dist && tsc",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "validate:templates": "tsx scripts/validate-templates.ts",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -58,6 +60,7 @@
     "@types/node": "^25.0.9",
     "rimraf": "^6.1.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.17"
   }
 }

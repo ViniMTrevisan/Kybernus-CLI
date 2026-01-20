@@ -1,0 +1,41 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
+
+// Core
+import { AuthService } from './core/AuthService';
+
+// Adapters
+import { InMemoryUserAdapter } from './adapters/outbound/persistence/InMemoryUserAdapter';
+import { bcryptAdapter, jwtAdapter } from './adapters/outbound/SecurityAdapters';
+import { createAuthController } from './adapters/inbound/http/AuthController';
+
+dotenv.config();
+
+const app = express();
+
+// Middleware
+app.use(helmet());
+app.use(cors());
+app.use(morgan('dev'));
+app.use(express.json());
+
+// Dependency Injection - Wire up the hexagon
+const userRepository = new InMemoryUserAdapter();
+const authService = new AuthService(userRepository, bcryptAdapter, jwtAdapter);
+
+// Mount adapters
+app.use('/api/auth', createAuthController(authService));
+
+// Health check
+app.get('/health', (_, res) => res.json({ status: 'ok' }));
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`🚀 {{pascalCase projectName}} running on port ${PORT}`);
+    console.log(`⬡ Architecture: Hexagonal (Ports & Adapters)`);
+    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+});

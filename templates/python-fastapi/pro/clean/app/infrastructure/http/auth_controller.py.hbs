@@ -1,0 +1,26 @@
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel, EmailStr
+from app.domain.usecases.register_user import RegisterUserUseCase
+from app.infrastructure.database.in_memory_repository import InMemoryUserRepository
+from app.infrastructure.security.adapters import BcryptHasher, JwtTokenGenerator
+
+router = APIRouter()
+
+# Dependency Injection
+repo = InMemoryUserRepository()
+hasher = BcryptHasher()
+token_gen = JwtTokenGenerator()
+register_usecase = RegisterUserUseCase(repo, hasher, token_gen)
+
+class RegisterRequest(BaseModel):
+    email: EmailStr
+    name: str
+    password: str
+
+@router.post("/register")
+async def register(req: RegisterRequest):
+    try:
+        result = await register_usecase.execute(req.email, req.name, req.password)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

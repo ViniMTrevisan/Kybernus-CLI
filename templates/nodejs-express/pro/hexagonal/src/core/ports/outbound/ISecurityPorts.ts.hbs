@@ -1,0 +1,15 @@
+/**
+* Password Hasher Port - Outbound Port
+*/
+export interface IPasswordHasherPort {
+    hash(password: string): Promise<string>;
+    compare(password: string, hash: string): Promise<boolean>;
+}
+
+/**
+* Token Generator Port - Outbound Port
+*/
+export interface ITokenGeneratorPort {
+    generate(userId: string, email: string): string;
+    verify(token: string): { id: string; email: string } | null;
+}

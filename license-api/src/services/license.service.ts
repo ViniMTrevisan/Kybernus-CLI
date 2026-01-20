@@ -19,7 +19,8 @@ export class LicenseService {
      */
     async createTrialUser(email: string) {
         const licenseKey = this.generateLicenseKey('trial');
-        const trialEndsAt = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000); // 15 dias
+        // Trial praticamente eterno (100 anos), limitado por uso
+        const trialEndsAt = new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000);
 
         return await prisma.user.create({
             data: {
@@ -58,33 +59,16 @@ export class LicenseService {
 
         // Verifica status do trial
         if (user.status === 'TRIAL') {
-            if (user.trialEndsAt < new Date()) {
-                // Trial expirou
-                await prisma.user.update({
-                    where: { id: user.id },
-                    data: { status: 'TRIAL_EXPIRED' },
-                });
-
-                return {
-                    valid: false,
-                    status: 'TRIAL_EXPIRED',
-                    message: 'Trial has expired. Please upgrade to continue.',
-                    upgradeUrl: `${process.env.API_URL}/checkout`,
-                };
-            }
-
-            // Trial ainda ativo
-            const daysLeft = Math.ceil(
-                (user.trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-            );
+            // Removida verificação de tempo - Modelo Metered (3 projetos)
 
             return {
                 valid: true,
                 status: 'TRIAL',
-                tier: 'pro', // Trial users act as PRO
+                tier: 'pro',
                 trialEndsAt: user.trialEndsAt,
-                daysLeft,
-                message: `Trial active for ${daysLeft} more days`,
+                usage: user.projectUsage,
+                limit: user.projectLimit,
+                message: `Trial Active: ${user.projectUsage}/${user.projectLimit} projects used`,
             };
         }
 

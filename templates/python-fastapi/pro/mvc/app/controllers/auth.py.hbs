@@ -1,0 +1,46 @@
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel, EmailStr
+from app.middleware.security import hash_password, verify_password, create_access_token, get_current_user
+
+router = APIRouter()
+
+# In-memory user store (replace with database)
+users_db: dict = {}
+
+class UserRegister(BaseModel):
+    email: EmailStr
+    name: str
+    password: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+class AuthResponse(BaseModel):
+    token: str
+    user: dict
+
+@router.post("/register", response_model=AuthResponse)
+async def register(data: UserRegister):
+    if data.email in users_db:
+        raise HTTPException(status_code=400, detail="User already exists")
+    
+    hashed = hash_password(data.password)
+    user = {"id": str(len(users_db) + 1), "email": data.email, "name": data.name, "password": hashed}
+    users_db[data.email] = user
+    
+    token = create_access_token({"sub": user["id"], "email": user["email"]})
+    return {"token": token, "user": {"id": user["id"], "email": user["email"], "name": user["name"]}}
+
+@router.post("/login", response_model=AuthResponse)
+async def login(data: UserLogin):
+    user = users_db.get(data.email)
+    if not user or not verify_password(data.password, user["password"]):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    token = create_access_token({"sub": user["id"], "email": user["email"]})
+    return {"token": token, "user": {"id": user["id"], "email": user["email"], "name": user["name"]}}
+
+@router.get("/me")
+async def get_me(current_user: dict = Depends(get_current_user)):
+    return {"user": current_user}

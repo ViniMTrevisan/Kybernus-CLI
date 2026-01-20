@@ -1,0 +1,51 @@
+import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+    apiVersion: "2024-12-18.acacia",
+});
+
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
+
+export async function POST(request: NextRequest) {
+    const body = await request.text();
+    const signature = request.headers.get("stripe-signature") || "";
+
+    let event: Stripe.Event;
+
+    try {
+        event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    } catch (err: any) {
+        console.error(`Webhook signature verification failed: ${err.message}`);
+        return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    }
+
+    switch (event.type) {
+        case "checkout.session.completed":
+        const session = event.data.object as Stripe.Checkout.Session;
+        // TODO: Fulfill the purchase
+        console.log("Checkout completed:", session.id);
+        break;
+
+        case "customer.subscription.created":
+        case "customer.subscription.updated":
+        const subscription = event.data.object as Stripe.Subscription;
+        // TODO: Update user subscription status in database
+        console.log("Subscription updated:", subscription.id);
+        break;
+
+        case "customer.subscription.deleted":
+        const deletedSubscription = event.data.object as Stripe.Subscription;
+        // TODO: Handle subscription cancellation
+        console.log("Subscription deleted:", deletedSubscription.id);
+        break;
+
+        case "invoice.payment_failed":
+        const invoice = event.data.object as Stripe.Invoice;
+        // TODO: Handle failed payment
+        console.log("Payment failed:", invoice.id);
+        break;
+    }
+
+    return NextResponse.json({ received: true });
+}

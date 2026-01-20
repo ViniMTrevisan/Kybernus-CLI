@@ -1,0 +1,29 @@
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, EmailStr
+from app.core.ports import IAuthPort
+
+router = APIRouter()
+
+class RegisterRequest(BaseModel):
+    email: EmailStr
+    name: str
+    password: str
+
+def setup_auth_routes(auth_service: IAuthPort):
+    @router.post("/register")
+    async def register(req: RegisterRequest):
+        try:
+            result = await auth_service.register(req.email, req.name, req.password)
+            return result
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+    
+    @router.post("/login")
+    async def login(req: RegisterRequest):
+        try:
+            result = await auth_service.login(req.email, req.password)
+            return result
+        except ValueError as e:
+            raise HTTPException(status_code=401, detail=str(e))
+    
+    return router

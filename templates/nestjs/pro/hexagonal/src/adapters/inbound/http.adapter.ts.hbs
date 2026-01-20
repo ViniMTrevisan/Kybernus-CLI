@@ -1,0 +1,12 @@
+import { Controller, Post, Body } from '@nestjs/common';
+import { IAuthPort } from '../../core/ports/ports';
+
+@Controller('auth')
+export class HttpAdapter {
+    constructor(private readonly authPort: IAuthPort) {}
+
+    @Post('register')
+    async register(@Body() body: any) {
+        return this.authPort.register(body.email, body.name, body.password);
+    }
+}

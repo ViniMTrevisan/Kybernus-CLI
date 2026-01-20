@@ -21,33 +21,73 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
         switch (event.type) {
             case 'checkout.session.completed': {
                 const session = event.data.object as any;
-                const metadata = session.metadata;
+                const metadata = session.metadata || {};
 
-                console.log('[Webhook] Checkout completed:', metadata);
-
-                // Ativar upgrade
-                const user = await licenseService.activateUpgrade({
-                    licenseKey: metadata.licenseKey,
-                    tier: metadata.tier.toUpperCase(),
-                    stripeCustomerId: session.customer,
-                    stripeSubscriptionId: session.subscription || undefined,
-                });
-
-                // Se é subscription, criar registro
-                if (session.subscription) {
-                    await prisma.subscription.create({
-                        data: {
-                            userId: user.id,
-                            stripeSubscriptionId: session.subscription,
-                            stripePriceId: session.line_items?.data[0]?.price?.id || '',
-                            stripeStatus: 'active',
-                            currentPeriodStart: new Date(),
-                            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                        },
+                // Cenário 1: Upgrade via CLI (tem licenseKey no metadata)
+                if (metadata.licenseKey) {
+                    console.log('[Webhook] Upgrading existing user:', metadata.licenseKey);
+                    const user = await licenseService.activateUpgrade({
+                        licenseKey: metadata.licenseKey,
+                        tier: 'PRO', // Force Pro
+                        stripeCustomerId: session.customer,
+                        stripeSubscriptionId: session.subscription || undefined,
                     });
+                    console.log('[Webhook] User upgraded:', user.email);
+                }
+                // Cenário 2: Compra via Site (sem licenseKey, criar novo usuário)
+                else {
+                    const email = session.customer_details?.email || session.customer_email;
+                    console.log('[Webhook] New customer via Website:', email);
+
+                    if (email) {
+                        // Verifica se user já existe
+                        let user = await licenseService.findByEmail(email);
+
+                        if (!user) {
+                            // Cria novo usuário Pro direto
+                            user = await prisma.user.create({
+                                data: {
+                                    email,
+                                    licenseKey: `KYB-PRO-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
+                                    tier: 'PRO',
+                                    status: 'PRO_ACTIVE',
+                                    stripeCustomerId: session.customer,
+                                }
+                            });
+                            // TODO: Enviar email com a key (SendGrid/Resend)
+                            console.log('[Webhook] Created new PRO user:', user.licenseKey);
+                        } else {
+                            // Usuário existe mas comprou por fora (ex: estava no free)
+                            await licenseService.activateUpgrade({
+                                licenseKey: user.licenseKey,
+                                tier: 'PRO',
+                                stripeCustomerId: session.customer,
+                            });
+                            console.log('[Webhook] Upgraded existing user found by email:', user.email);
+                        }
+                    }
                 }
 
-                console.log('[Webhook] User upgraded:', user.email);
+                // Se é subscription, criar registro (Lógica comum)
+                if (session.subscription) {
+                    // Recupera user atualizado/criado para vincular
+                    const email = session.customer_details?.email || session.customer_email || session.metadata?.email;
+                    if (email) {
+                        const user = await licenseService.findByEmail(email);
+                        if (user) {
+                            await prisma.subscription.create({
+                                data: {
+                                    userId: user.id,
+                                    stripeSubscriptionId: session.subscription,
+                                    stripePriceId: session.line_items?.data[0]?.price?.id || '',
+                                    stripeStatus: 'active',
+                                    currentPeriodStart: new Date(),
+                                    currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                                },
+                            });
+                        }
+                    }
+                }
                 break;
             }
 

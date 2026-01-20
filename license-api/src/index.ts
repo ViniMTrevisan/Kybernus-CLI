@@ -7,6 +7,9 @@ import analyticsRouter from './routes/analytics.js';
 import webhooksRouter from './routes/webhooks.js';
 import checkoutRouter from './routes/checkout.js';
 import adminRouter from './routes/admin.js';
+import authRouter from './routes/auth.js';
+import { authenticate } from './middleware/auth.js';
+import { adminGuard } from './middleware/admin.guard.js';
 
 dotenv.config();
 
@@ -27,12 +30,12 @@ app.use('/webhooks', webhooksRouter);
 app.use(express.json());
 
 // Routes
-app.use('/api/auth', licensesRouter);
+app.use('/api/auth', [authRouter, licensesRouter]); // Merge auth routes
 app.use('/api/licenses', licensesRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/checkout', checkoutRouter);
 app.use('/checkout', checkoutRouter);
-app.use('/admin', adminRouter);
+app.use('/admin', authenticate, adminGuard, adminRouter); // Protected
 
 // Health check
 app.get('/health', (req, res) => {

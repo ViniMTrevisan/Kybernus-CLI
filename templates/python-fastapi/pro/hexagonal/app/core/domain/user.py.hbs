@@ -1,0 +1,15 @@
+from dataclasses import dataclass
+from typing import Optional
+
+@dataclass(frozen=True)
+class User:
+    """User Entity - Core Domain"""
+    email: str
+    name: str
+    password: str
+    id: Optional[str] = None
+    stripe_customer_id: Optional[str] = None
+    
+    def __post_init__(self):
+        if "@" not in self.email:
+            raise ValueError("Invalid email")

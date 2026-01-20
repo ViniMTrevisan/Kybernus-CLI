@@ -1,0 +1,9 @@
+import { User } from '../domain/user.entity';
+
+export interface IUserRepositoryPort {
+    save(user: User): Promise<User>;
+}
+
+export interface IAuthPort {
+    register(email: string, name: string, password: string): Promise<User>;
+}

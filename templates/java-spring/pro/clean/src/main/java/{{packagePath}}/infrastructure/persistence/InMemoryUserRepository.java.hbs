@@ -1,0 +1,41 @@
+package {{packageName}}.infrastructure.persistence;
+
+import {{packageName}}.domain.entity.User;
+import {{packageName}}.domain.repository.UserRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+* In-Memory User Repository - Infrastructure Layer
+* Replace with JPA implementation for production
+*/
+@Repository
+public class InMemoryUserRepository implements UserRepository {
+    private final Map<String, User> users = new ConcurrentHashMap<>();
+
+    @Override
+    public Optional<User> findById(String id) {
+        return Optional.ofNullable(users.get(id));
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return users.values().stream()
+        .filter(user -> user.getEmail().equals(email))
+        .findFirst();
+    }
+
+    @Override
+    public User save(User user) {
+        users.put(user.getId(), user);
+        return user;
+    }
+
+    @Override
+    public void delete(String id) {
+        users.remove(id);
+    }
+}

@@ -1,0 +1,14 @@
+package {{packageName}};
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class {{projectNamePascalCase}}Application {
+
+    public static void main(String[] args) {
+        SpringApplication.run({{projectNamePascalCase}}Application.class, args);
+        System.out.println("🚀 {{projectNamePascalCase}} running!");
+        System.out.println("📐 Architecture: Clean Architecture");
+    }
+}

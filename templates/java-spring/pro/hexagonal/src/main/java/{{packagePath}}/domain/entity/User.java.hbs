@@ -1,0 +1,77 @@
+package {{packageName}}.domain.entity;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+/**
+* User Entity - Domain Layer (Clean Architecture)
+* Pure business object with no framework dependencies
+*/
+public class User {
+    private final String id;
+    private final String email;
+    private final String name;
+    private final String password;
+    private String stripeCustomerId;
+    private final LocalDateTime createdAt;
+
+    private User(String id, String email, String name, String password, String stripeCustomerId, LocalDateTime createdAt) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.stripeCustomerId = stripeCustomerId;
+        this.createdAt = createdAt;
+    }
+
+    public static User create(String email, String name, String password) {
+        validateEmail(email);
+        validatePassword(password);
+        return new User(UUID.randomUUID().toString(), email, name, password, null, LocalDateTime.now());
+    }
+
+    public static User restore(String id, String email, String name, String password, String stripeCustomerId, LocalDateTime createdAt) {
+        return new User(id, email, name, password, stripeCustomerId, createdAt);
+    }
+
+    private static void validateEmail(String email) {
+        if (email == null || !email.contains("@")) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+    }
+
+    private static void validatePassword(String password) {
+        if (password == null || password.length() < 8) {
+            throw new IllegalArgumentException("Password must be at least 8 characters");
+        }
+    }
+
+    // Getters
+    public String getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getStripeCustomerId() {
+        return stripeCustomerId;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setStripeCustomerId(String stripeCustomerId) {
+        this.stripeCustomerId = stripeCustomerId;
+    }
+}

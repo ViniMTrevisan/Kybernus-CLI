@@ -1,0 +1,51 @@
+import { User } from '../domain/entities/User';
+import { IAuthPort } from '../ports/inbound/IAuthPort';
+import { IUserRepositoryPort } from '../ports/outbound/IUserRepositoryPort';
+import { IPasswordHasherPort, ITokenGeneratorPort } from '../ports/outbound/ISecurityPorts';
+
+/**
+* Auth Service - Application Core
+* Implements the inbound port using outbound ports
+*/
+export class AuthService implements IAuthPort {
+    constructor(
+        private readonly userRepository: IUserRepositoryPort,
+        private readonly passwordHasher: IPasswordHasherPort,
+        private readonly tokenGenerator: ITokenGeneratorPort
+    ) {}
+
+    async register(email: string, name: string, password: string): Promise<{ user: User; token: string }> {
+        const existingUser = await this.userRepository.findByEmail(email);
+        if (existingUser) {
+            throw new Error('User already exists');
+        }
+
+        const hashedPassword = await this.passwordHasher.hash(password);
+        const user = new User(undefined, email, name, hashedPassword);
+        const savedUser = await this.userRepository.save(user);
+        const token = this.tokenGenerator.generate(savedUser.id!, savedUser.email);
+
+        return { user: savedUser, token };
+    }
+
+    async login(email: string, password: string): Promise<{ user: User; token: string }> {
+        const user = await this.userRepository.findByEmail(email);
+        if (!user) {
+            throw new Error('Invalid credentials');
+        }
+
+        const isValid = await this.passwordHasher.compare(password, user.password);
+        if (!isValid) {
+            throw new Error('Invalid credentials');
+        }
+
+        const token = this.tokenGenerator.generate(user.id!, user.email);
+        return { user, token };
+    }
+
+    async validateToken(token: string): Promise<User | null> {
+        const decoded = this.tokenGenerator.verify(token);
+        if (!decoded) return null;
+        return this.userRepository.findById(decoded.id);
+    }
+}

@@ -1,0 +1,31 @@
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { IPasswordHasherPort, ITokenGeneratorPort } from '../../../core/ports/outbound/ISecurityPorts';
+
+/**
+* Bcrypt Password Hasher Adapter
+*/
+export const bcryptAdapter: IPasswordHasherPort = {
+    async hash(password: string): Promise<string> {
+        return bcrypt.hash(password, 10);
+    },
+    async compare(password: string, hash: string): Promise<boolean> {
+        return bcrypt.compare(password, hash);
+    },
+};
+
+/**
+* JWT Token Generator Adapter
+*/
+export const jwtAdapter: ITokenGeneratorPort = {
+    generate(userId: string, email: string): string {
+        return jwt.sign({ id: userId, email }, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+    },
+    verify(token: string): { id: string; email: string } | null {
+        try {
+            return jwt.verify(token, process.env.JWT_SECRET || 'secret') as { id: string; email: string };
+        } catch {
+            return null;
+        }
+    },
+};
