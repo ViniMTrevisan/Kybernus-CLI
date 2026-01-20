@@ -50,9 +50,14 @@ export function Navbar() {
                                 {link.name}
                             </a>
                         ))}
-                        <button className="px-5 py-2 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-cyber-blue hover:text-white transition-all active:scale-95">
-                            Launch App
-                        </button>
+                        <div className="flex items-center gap-4 pl-4 border-l border-white/10">
+                            <a href="/login" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-white transition-colors">
+                                Login
+                            </a>
+                            <a href="/register" className="px-5 py-2 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-cyber-blue hover:text-white transition-all active:scale-95">
+                                Sign Up
+                            </a>
+                        </div>
                     </div>
 
                     {/* Mobile Toggle */}
@@ -83,9 +88,14 @@ export function Navbar() {
                             {link.name}
                         </a>
                     ))}
-                    <button className="w-full mt-4 py-4 bg-white text-black font-black uppercase tracking-widest text-xs rounded-xl">
-                        Launch App
-                    </button>
+                    <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/10">
+                        <a href="/login" className="py-4 bg-white/5 text-white font-black uppercase tracking-widest text-xs rounded-xl flex items-center justify-center border border-white/10">
+                            Login
+                        </a>
+                        <a href="/register" className="py-4 bg-white text-black font-black uppercase tracking-widest text-xs rounded-xl flex items-center justify-center">
+                            Sign Up
+                        </a>
+                    </div>
                 </div>
             </motion.div>
         </nav>

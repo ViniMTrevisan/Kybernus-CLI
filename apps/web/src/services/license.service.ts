@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 import { LicenseTier } from '@prisma/client';
 
 export class LicenseService {
@@ -17,10 +18,15 @@ export class LicenseService {
     /**
      * Cria um novo usuário em trial
      */
-    async createTrialUser(email: string) {
+    async createTrialUser(email: string, password?: string) {
         const licenseKey = this.generateLicenseKey('trial');
         // Trial praticamente eterno (100 anos), limitado por uso
         const trialEndsAt = new Date(Date.now() + 100 * 365 * 24 * 60 * 60 * 1000);
+
+        let hashedPassword = undefined;
+        if (password) {
+            hashedPassword = await bcrypt.hash(password, 10);
+        }
 
         return await prisma.user.create({
             data: {
@@ -30,6 +36,7 @@ export class LicenseService {
                 status: 'TRIAL',
                 trialStartedAt: new Date(),
                 trialEndsAt,
+                password: hashedPassword, // Store hashed
             },
         });
     }

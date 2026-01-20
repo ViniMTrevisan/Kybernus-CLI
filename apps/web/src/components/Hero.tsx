@@ -111,7 +111,7 @@ export function Hero() {
                             className="flex flex-wrap justify-center gap-6 mb-20"
                         >
                             <a
-                                href="/docs/getting_started"
+                                href="/register"
                                 className="relative group px-10 py-5 bg-white text-black font-black uppercase tracking-widest text-sm rounded-xl transition-all hover:scale-105 active:scale-95 overflow-hidden shadow-[0_0_20px_rgba(255,255,255,0.2)] inline-flex"
                             >
                                 <span className="relative z-10 flex items-center gap-2">

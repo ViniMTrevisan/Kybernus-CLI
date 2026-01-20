@@ -4,7 +4,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-change-in-productio
 
 export interface AdminTokenPayload {
     email: string;
-    role: 'admin';
+    role: 'admin' | 'user'; // Extended to include user
     iat?: number;
     exp?: number;
 }
@@ -17,7 +17,23 @@ export function signAdminToken(email: string): string {
     );
 }
 
+export function signUserToken(email: string): string {
+    return jwt.sign(
+        { email, role: 'user' } as AdminTokenPayload,
+        JWT_SECRET,
+        { expiresIn: '7d' } // Users stay logged in longer
+    );
+}
+
 export function verifyAdminToken(token: string): AdminTokenPayload | null {
+    try {
+        return jwt.verify(token, JWT_SECRET) as AdminTokenPayload;
+    } catch (error) {
+        return null;
+    }
+}
+
+export function verifyUserToken(token: string): AdminTokenPayload | null {
     try {
         return jwt.verify(token, JWT_SECRET) as AdminTokenPayload;
     } catch (error) {

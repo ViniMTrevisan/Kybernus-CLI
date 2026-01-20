@@ -21,7 +21,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const { email } = await request.json();
+        const { email, password } = await request.json();
 
         if (!email || !email.includes('@')) {
             return NextResponse.json(
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
         }
 
         // Cria trial
-        const user = await licenseService.createTrialUser(email);
+        const user = await licenseService.createTrialUser(email, password);
 
         // Send welcome email with license key
         await emailService.sendWelcome(email, user.licenseKey);

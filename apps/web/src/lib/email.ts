@@ -1,12 +1,11 @@
 import { Resend } from 'resend';
 
-const resendApiKey = process.env.RESEND_API_KEY;
-const emailFrom = process.env.EMAIL_FROM || 'Kybernus <noreply@kybernus.com>';
-
 // Lazy initialization to avoid errors when API key is not set
 let resend: Resend | null = null;
 
 function getResend(): Resend | null {
+    const resendApiKey = process.env.RESEND_API_KEY;
+
     if (!resendApiKey) {
         console.warn('[Email] RESEND_API_KEY not configured, emails will be skipped');
         return null;
@@ -15,6 +14,10 @@ function getResend(): Resend | null {
         resend = new Resend(resendApiKey);
     }
     return resend;
+}
+
+function getEmailFrom(): string {
+    return process.env.EMAIL_FROM || 'Kybernus <noreply@kybernus.com>';
 }
 
 export const emailService = {
@@ -27,38 +30,46 @@ export const emailService = {
 
         try {
             await client.emails.send({
-                from: emailFrom,
+                from: getEmailFrom(),
                 to: email,
                 subject: '🎉 Your Kybernus PRO License Key',
                 html: `
-                    <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-                        <div style="text-align: center; margin-bottom: 40px;">
-                            <h1 style="color: #00f0ff; margin: 0;">⚡ KYBERNUS PRO</h1>
-                            <p style="color: #666; margin-top: 8px;">Your Ultimate CLI is Ready</p>
+                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; color: #1a1a1a; line-height: 1.6;">
+                        
+                        <!-- Header -->
+                        <div style="background: linear-gradient(to right, #000000, #1a1a1a); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h1 style="color: #00f0ff; margin: 0; font-size: 28px; letter-spacing: 2px;">KYBERNUS</h1>
+                            <p style="color: #a0a0a0; margin: 8px 0 0; font-size: 14px; text-transform: uppercase;">The Ultimate CLI for Developers</p>
                         </div>
                         
-                        <div style="background: #0a0a0a; border: 1px solid #333; border-radius: 16px; padding: 32px; margin-bottom: 32px;">
-                            <p style="color: #fff; margin: 0 0 16px 0;">Congratulations! Your PRO license is activated.</p>
-                            <p style="color: #888; margin: 0 0 24px 0;">Here's your license key:</p>
+                        <!-- Content -->
+                        <div style="padding: 40px 30px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 8px 8px;">
+                            <h2 style="color: #1a1a1a; margin-top: 0;">Your PRO License is Ready 🚀</h2>
+                            <p style="font-size: 16px; color: #4a4a4a;">
+                                Thank you for your purchase! You now have unlimited access to all Kybernus features, templates, and architectures.
+                            </p>
                             
-                            <div style="background: #111; border: 1px solid #00f0ff; border-radius: 8px; padding: 16px; text-align: center;">
-                                <code style="font-size: 18px; color: #00f0ff; font-weight: bold;">${licenseKey}</code>
+                            <!-- License Box -->
+                            <div style="background-color: #f5f7fa; border: 2px dashed #00f0ff; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                                <p style="margin: 0 0 10px; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Your License Key</p>
+                                <code style="display: block; font-size: 24px; font-weight: bold; color: #000; font-family: 'Courier New', monospace; letter-spacing: 1px;">${licenseKey}</code>
+                            </div>
+                            
+                            <h3 style="color: #1a1a1a; font-size: 18px;">How to Activate</h3>
+                            <div style="background-color: #f9fafb; border-radius: 8px; padding: 20px;">
+                                <ol style="margin: 0; padding-left: 20px; color: #4a4a4a;">
+                                    <li style="margin-bottom: 10px;">Run <code style="background: #e5e7eb; padding: 2px 6px; border-radius: 4px; color: #c026d3;">kybernus login</code> in your terminal</li>
+                                    <li style="margin-bottom: 10px;">Paste your license key when prompted</li>
+                                    <li>Start building with <code style="background: #e5e7eb; padding: 2px 6px; border-radius: 4px; color: #c026d3;">kybernus init</code></li>
+                                </ol>
                             </div>
                         </div>
                         
-                        <div style="background: #0a0a0a; border: 1px solid #333; border-radius: 16px; padding: 32px;">
-                            <h3 style="color: #fff; margin: 0 0 16px 0;">🚀 Quick Start</h3>
-                            <ol style="color: #ccc; margin: 0; padding-left: 20px; line-height: 2;">
-                                <li>Install: <code style="background: #222; padding: 2px 8px; border-radius: 4px;">npm install -g kybernus</code></li>
-                                <li>Login: <code style="background: #222; padding: 2px 8px; border-radius: 4px;">kybernus login</code></li>
-                                <li>Enter your license key when prompted</li>
-                                <li>Create: <code style="background: #222; padding: 2px 8px; border-radius: 4px;">kybernus init</code></li>
-                            </ol>
+                        <!-- Footer -->
+                        <div style="text-align: center; padding-top: 30px; font-size: 12px; color: #888;">
+                            <p>Need help? Reply to this email or contact support.</p>
+                            <p>&copy; ${new Date().getFullYear()} Kybernus. All rights reserved.</p>
                         </div>
-                        
-                        <p style="color: #666; font-size: 12px; text-align: center; margin-top: 40px;">
-                            Need help? Contact us at contact@kybernus.com
-                        </p>
                     </div>
                 `,
             });
@@ -79,31 +90,34 @@ export const emailService = {
 
         try {
             await client.emails.send({
-                from: emailFrom,
+                from: getEmailFrom(),
                 to: email,
-                subject: '✨ Your Kybernus Upgrade is Complete',
+                subject: '✨ Upgrade Complete: Welcome to PRO',
                 html: `
-                    <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-                        <h1 style="color: #00f0ff; text-align: center;">Upgrade Complete! 🎉</h1>
+                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; color: #1a1a1a; line-height: 1.6;">
                         
-                        <div style="background: #0a0a0a; border: 1px solid #333; border-radius: 16px; padding: 32px; margin: 32px 0;">
-                            <p style="color: #fff;">Your new PRO license key:</p>
-                            <div style="background: #111; border: 1px solid #00f0ff; border-radius: 8px; padding: 16px; text-align: center;">
-                                <code style="font-size: 18px; color: #00f0ff; font-weight: bold;">${licenseKey}</code>
-                            </div>
-                            <p style="color: #888; font-size: 14px; margin-top: 16px;">
-                                Run <code>kybernus login</code> and enter this new key to activate.
-                            </p>
+                        <div style="background: linear-gradient(to right, #000000, #1a1a1a); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h1 style="color: #00f0ff; margin: 0; font-size: 28px; letter-spacing: 2px;">KYBERNUS</h1>
                         </div>
                         
-                        <p style="color: #666;">You now have access to:</p>
-                        <ul style="color: #ccc;">
-                            <li>All technology stacks (NestJS, FastAPI, etc.)</li>
-                            <li>Clean & Hexagonal architectures</li>
-                            <li>AI documentation generation</li>
-                            <li>Production-ready DevOps templates</li>
-                            <li>Lifetime updates</li>
-                        </ul>
+                        <div style="padding: 40px 30px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 8px 8px;">
+                            <h2 style="color: #1a1a1a; margin-top: 0; text-align: center;">Upgrade Successful! 🎉</h2>
+                            <p style="font-size: 16px; color: #4a4a4a; text-align: center;">
+                                Your account has been upgraded to PRO. Here is your new license key:
+                            </p>
+                            
+                            <div style="background-color: #f5f7fa; border: 2px dashed #00f0ff; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+                                <code style="display: block; font-size: 24px; font-weight: bold; color: #000; font-family: 'Courier New', monospace; letter-spacing: 1px;">${licenseKey}</code>
+                            </div>
+                            
+                            <p style="text-align: center; color: #666; font-size: 14px;">
+                                Please run <code style="background: #e5e7eb; padding: 2px 6px; border-radius: 4px; color: #c026d3;">kybernus login</code> again to update your local CLI license.
+                            </p>
+                        </div>
+
+                        <div style="text-align: center; padding-top: 30px; font-size: 12px; color: #888;">
+                            <p>&copy; ${new Date().getFullYear()} Kybernus. All rights reserved.</p>
+                        </div>
                     </div>
                 `,
             });
@@ -124,27 +138,44 @@ export const emailService = {
 
         try {
             await client.emails.send({
-                from: emailFrom,
+                from: getEmailFrom(),
                 to: email,
-                subject: '🚀 Welcome to Kybernus - Your Trial is Active!',
+                subject: '🚀 Welcome to Kybernus - Trial Activated',
                 html: `
-                    <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-                        <h1 style="color: #00f0ff; text-align: center;">Welcome to Kybernus!</h1>
+                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; color: #1a1a1a; line-height: 1.6;">
                         
-                        <p style="color: #fff; text-align: center;">
-                            Your trial is active. You can create <strong>3 projects</strong> with full PRO access.
-                        </p>
-                        
-                        <div style="background: #0a0a0a; border: 1px solid #333; border-radius: 16px; padding: 32px; margin: 32px 0;">
-                            <p style="color: #888; margin: 0 0 16px 0;">Your license key:</p>
-                            <div style="background: #111; border: 1px solid #00f0ff; border-radius: 8px; padding: 16px; text-align: center;">
-                                <code style="font-size: 16px; color: #00f0ff;">${licenseKey}</code>
-                            </div>
+                        <div style="background: linear-gradient(to right, #000000, #1a1a1a); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h1 style="color: #00f0ff; margin: 0; font-size: 28px; letter-spacing: 2px;">KYBERNUS</h1>
                         </div>
                         
-                        <p style="color: #666; font-size: 14px; text-align: center;">
-                            Ready to build something amazing? Run <code>kybernus init</code>
-                        </p>
+                        <div style="padding: 40px 30px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 8px 8px;">
+                            <h2 style="color: #1a1a1a; margin-top: 0;">Welcome Aboard! ⚡</h2>
+                            <p style="font-size: 16px; color: #4a4a4a;">
+                                We're excited to have you. Your trial is now active with full PRO features.
+                            </p>
+                            
+                            <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                                <strong style="color: #166534; display: block; margin-bottom: 5px;">Trial Limits:</strong>
+                                <ul style="margin: 0; padding-left: 20px; color: #166534;">
+                                    <li>3 Projects Max</li>
+                                    <li>All Architectures Unlocked</li>
+                                </ul>
+                            </div>
+
+                            <div style="background-color: #f5f7fa; border-radius: 12px; padding: 20px; margin: 30px 0; text-align: center;">
+                                <p style="margin: 0 0 10px; font-size: 12px; color: #666; text-transform: uppercase; font-weight: bold;">Your Trial License Key</p>
+                                <code style="display: block; font-size: 20px; font-weight: bold; color: #2563eb; font-family: 'Courier New', monospace;">${licenseKey}</code>
+                            </div>
+                            
+                            <p style="font-size: 14px; color: #666;">
+                                To start, run: <br>
+                                <code style="background: #e5e7eb; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 5px;">kybernus init</code>
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; padding-top: 30px; font-size: 12px; color: #888;">
+                            <p>&copy; ${new Date().getFullYear()} Kybernus. All rights reserved.</p>
+                        </div>
                     </div>
                 `,
             });
@@ -168,26 +199,33 @@ export const emailService = {
 
         try {
             await client.emails.send({
-                from: emailFrom,
+                from: getEmailFrom(),
                 to: email,
-                subject: '🔐 Reset Your Kybernus Password',
+                subject: '🔐 Reset Your Password',
                 html: `
-                    <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-                        <h1 style="color: #fff; text-align: center;">Password Reset Request</h1>
+                   <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; color: #1a1a1a; line-height: 1.6;">
                         
-                        <p style="color: #ccc; text-align: center;">
-                            Click the button below to reset your password. This link expires in 1 hour.
-                        </p>
-                        
-                        <div style="text-align: center; margin: 40px 0;">
-                            <a href="${resetUrl}" style="background: #00f0ff; color: #000; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">
-                                Reset Password
-                            </a>
+                        <div style="background: linear-gradient(to right, #000000, #1a1a1a); padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h1 style="color: #fff; margin: 0; font-size: 24px;">Password Reset</h1>
                         </div>
                         
-                        <p style="color: #666; font-size: 12px; text-align: center;">
-                            If you didn't request this, you can safely ignore this email.
-                        </p>
+                        <div style="padding: 40px 30px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 8px 8px; text-align: center;">
+                            <p style="font-size: 16px; color: #4a4a4a; margin-bottom: 30px;">
+                                We received a request to reset your password. Click the button below to proceed:
+                            </p>
+                            
+                            <a href="${resetUrl}" style="display: inline-block; background-color: #2563eb; color: #ffffff; font-weight: bold; text-decoration: none; padding: 14px 30px; border-radius: 6px; font-size: 16px;">
+                                Reset Password
+                            </a>
+                            
+                            <p style="margin-top: 30px; font-size: 14px; color: #888;">
+                                This link expires in 1 hour. If you didn't request this, please ignore this email.
+                            </p>
+                        </div>
+                        
+                        <div style="text-align: center; padding-top: 30px; font-size: 12px; color: #888;">
+                            <p>&copy; ${new Date().getFullYear()} Kybernus. All rights reserved.</p>
+                        </div>
                     </div>
                 `,
             });
@@ -208,25 +246,32 @@ export const emailService = {
 
         try {
             await client.emails.send({
-                from: emailFrom,
+                from: getEmailFrom(),
                 to: email,
-                subject: '⚠️ Kybernus Trial: 1 Project Remaining',
+                subject: '⚠️ Kybernus Trial: Project Limit Warning',
                 html: `
-                    <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-                        <h1 style="color: #fbbf24; text-align: center;">1 Project Left!</h1>
+                    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; color: #1a1a1a; line-height: 1.6;">
                         
-                        <p style="color: #fff; text-align: center;">
-                            You've used <strong>${usage}/${limit}</strong> of your trial projects.
-                        </p>
+                        <div style="background: #f59e0b; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                            <h1 style="color: #fff; margin: 0; font-size: 24px;">Trial Limit Approaching</h1>
+                        </div>
                         
-                        <p style="color: #ccc; text-align: center;">
-                            Upgrade to PRO for unlimited projects and lifetime access.
-                        </p>
-                        
-                        <div style="text-align: center; margin: 40px 0;">
-                            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://kybernus.com'}/#pricing" style="background: #b026ff; color: #fff; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                        <div style="padding: 40px 30px; border: 1px solid #e5e5e5; border-top: none; border-radius: 0 0 8px 8px; text-align: center;">
+                            <p style="font-size: 18px; color: #4a4a4a;">
+                                You have used <strong>${usage} of ${limit}</strong> projects in your trial.
+                            </p>
+                            
+                            <p style="color: #666; margin-bottom: 30px;">
+                                Upgrade to PRO today for unlimited projects and lifetime updates.
+                            </p>
+                            
+                            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://kybernus.com'}/#pricing" style="display: inline-block; background-color: #1a1a1a; color: #ffffff; font-weight: bold; text-decoration: none; padding: 14px 30px; border-radius: 6px; font-size: 16px;">
                                 Upgrade to PRO - $97
                             </a>
+                        </div>
+                        
+                        <div style="text-align: center; padding-top: 30px; font-size: 12px; color: #888;">
+                            <p>&copy; ${new Date().getFullYear()} Kybernus. All rights reserved.</p>
                         </div>
                     </div>
                 `,

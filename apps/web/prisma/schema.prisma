@@ -24,6 +24,7 @@ enum LicenseStatus {
 model User {
   id              String         @id @default(cuid())
   email           String         @unique
+  password        String?        // Optional: for web dashboard access
   
   // Trial tracking
   trialStartedAt  DateTime       @default(now())
@@ -49,6 +50,7 @@ model User {
   
   subscription    Subscription?
   analytics       AnalyticsEvent[]
+  passwordResetTokens PasswordResetToken[]
   
   @@index([email])
   @@index([licenseKey])
@@ -100,10 +102,24 @@ model AnalyticsEvent {
   @@index([createdAt])
 }
 
+
 model AdminUser {
   id        String   @id @default(cuid())
   email     String   @unique
   password  String
   role      String   @default("admin")
   createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [email], references: [email], onDelete: Cascade)
+
+  @@index([email])
+  @@index([token])
 }
