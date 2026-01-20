@@ -6,13 +6,17 @@ const JWT_SECRET = new TextEncoder().encode(
     process.env.JWT_SECRET || 'default-secret-change-in-production'
 );
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+    console.log('[PROXY] Request to:', request.nextUrl.pathname);
+
     // Only protect /admin routes
     if (request.nextUrl.pathname.startsWith('/admin')) {
+        console.log('[PROXY] Admin route detected, checking token...');
         const token = request.cookies.get('admin-token')?.value;
+        console.log('[PROXY] Token present:', !!token);
 
         if (!token) {
-            return NextResponse.redirect(new URL('/admin-login-nao-acharao', request.url));
+            return NextResponse.redirect(new URL('/admin-login', request.url));
         }
 
         try {
@@ -20,7 +24,7 @@ export async function middleware(request: NextRequest) {
             await jose.jwtVerify(token, JWT_SECRET);
         } catch (error) {
             // Clear invalid cookie and redirect
-            const response = NextResponse.redirect(new URL('/admin-login-nao-acharao', request.url));
+            const response = NextResponse.redirect(new URL('/admin-login', request.url));
             response.cookies.delete('admin-token');
             return response;
         }
@@ -32,3 +36,5 @@ export async function middleware(request: NextRequest) {
 export const config = {
     matcher: ['/admin/:path*'],
 };
+
+export default proxy;

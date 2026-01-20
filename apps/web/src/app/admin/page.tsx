@@ -80,9 +80,13 @@ export default function AdminDashboard() {
         return () => clearInterval(interval);
     }, []);
 
-    const handleLogout = () => {
-        document.cookie = "admin-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        router.push("/admin-login-nao-acharao");
+    const handleLogout = async () => {
+        try {
+            await fetch("/api/auth/admin-logout", { method: "POST" });
+            router.push("/admin-login");
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
     };
 
     if (loading && !data) {

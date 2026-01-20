@@ -2,6 +2,8 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { verifyAdminToken } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AdminLayout({
     children,
 }: {
@@ -10,13 +12,15 @@ export default async function AdminLayout({
     const cookieStore = await cookies();
     const token = cookieStore.get('admin-token')?.value;
 
+    console.log('[AdminLayout] Checking access. Token present:', !!token);
+
     if (!token) {
-        redirect('/admin-login-nao-acharao');
+        redirect('/admin-login');
     }
 
     const payload = verifyAdminToken(token);
     if (!payload || payload.role !== 'admin') {
-        redirect('/admin-login-nao-acharao');
+        redirect('/admin-login');
     }
 
     return (
