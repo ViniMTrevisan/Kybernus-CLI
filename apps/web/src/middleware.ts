@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
         const token = request.cookies.get('admin-token')?.value;
 
         if (!token) {
-            return NextResponse.redirect(new URL('/login', request.url));
+            return NextResponse.redirect(new URL('/admin-login-nao-acharao', request.url));
         }
 
         try {
@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
             await jose.jwtVerify(token, JWT_SECRET);
         } catch (error) {
             // Clear invalid cookie and redirect
-            const response = NextResponse.redirect(new URL('/login', request.url));
+            const response = NextResponse.redirect(new URL('/admin-login-nao-acharao', request.url));
             response.cookies.delete('admin-token');
             return response;
         }
