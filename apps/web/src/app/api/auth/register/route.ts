@@ -1,11 +1,26 @@
 import { NextResponse } from 'next/server';
 import { licenseService } from '@/services/license.service';
+import { emailService } from '@/lib/email';
+import { rateLimit } from '@/lib/redis';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
     try {
+        // Rate limit: 5 registrations per minute per IP
+        const ip = request.headers.get('x-forwarded-for') ||
+            request.headers.get('x-real-ip') ||
+            'unknown';
+        const rateLimitResult = await rateLimit(`register:${ip}`, 5, 60);
+
+        if (!rateLimitResult.allowed) {
+            return NextResponse.json(
+                { error: 'Too many registration attempts. Please try again later.' },
+                { status: 429 }
+            );
+        }
+
         const { email } = await request.json();
 
         if (!email || !email.includes('@')) {
@@ -28,6 +43,9 @@ export async function POST(request: Request) {
         // Cria trial
         const user = await licenseService.createTrialUser(email);
 
+        // Send welcome email with license key
+        await emailService.sendWelcome(email, user.licenseKey);
+
         return NextResponse.json({
             success: true,
             licenseKey: user.licenseKey,
@@ -46,3 +64,4 @@ export async function POST(request: Request) {
         );
     }
 }
+

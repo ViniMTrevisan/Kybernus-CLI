@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { stripeService } from '@/lib/stripe';
 import { licenseService } from '@/services/license.service';
+import { emailService } from '@/lib/email';
+import { invalidateLicenseCache } from '@/lib/redis';
 import prisma from '@/lib/prisma';
 
 export const runtime = 'nodejs';
@@ -39,6 +41,12 @@ export async function POST(request: Request) {
                         stripeSubscriptionId: session.subscription || undefined,
                     });
                     console.log('[Webhook] User upgraded:', user.email);
+
+                    // Send upgrade confirmation email
+                    await emailService.sendUpgradeConfirmation(user.email, user.licenseKey);
+
+                    // Invalidate license cache
+                    await invalidateLicenseCache(user.licenseKey);
                 }
                 // Cenário 2: Compra via Site (sem licenseKey, criar novo usuário)
                 else {
@@ -60,8 +68,10 @@ export async function POST(request: Request) {
                                     stripeCustomerId: session.customer,
                                 }
                             });
-                            // TODO: Enviar email com a key (Resend)
-                            console.log('[Webhook] Created new PRO user:', user.licenseKey);
+
+                            // Send license key email - CRITICAL for UX
+                            await emailService.sendLicenseKey(user.email, user.licenseKey);
+                            console.log('[Webhook] Created new PRO user and sent license email:', user.licenseKey);
                         } else {
                             // Usuário existe mas comprou por fora
                             await licenseService.activateUpgrade({

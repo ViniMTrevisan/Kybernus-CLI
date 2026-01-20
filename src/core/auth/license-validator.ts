@@ -1,6 +1,6 @@
 import { ConfigManager } from '../config/config-manager.js';
 
-const API_URL = process.env.KYBERNUS_API_URL || 'http://localhost:3000/api';
+const API_URL = process.env.KYBERNUS_API_URL || 'http://localhost:3010/api';
 
 export interface ValidationResult {
     valid: boolean;

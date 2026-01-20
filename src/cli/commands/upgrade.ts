@@ -3,7 +3,7 @@ import { exec } from 'child_process';
 import { ConfigManager } from '../../core/config/config-manager.js';
 import { AnalyticsClient } from '../services/AnalyticsClient.js';
 
-const API_URL = process.env.KYBERNUS_API_URL || 'http://localhost:3000/api';
+const API_URL = process.env.KYBERNUS_API_URL || 'http://localhost:3010/api';
 
 export async function upgradeCommand() {
     console.clear();
@@ -35,7 +35,7 @@ export async function upgradeCommand() {
     s.start('Creating checkout session...');
 
     try {
-        const response = await fetch(`${API_URL}/checkout/create`, {
+        const response = await fetch(`${API_URL}/checkout`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

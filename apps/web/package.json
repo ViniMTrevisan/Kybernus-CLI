@@ -11,6 +11,7 @@
   "dependencies": {
     "@prisma/client": "^6.19.2",
     "@react-spring/web": "^10.0.3",
+    "@upstash/redis": "^1.36.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.27.3",
     "gray-matter": "^4.0.3",
@@ -24,6 +25,7 @@
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^16.1.0",
     "remark-gfm": "^4.0.1",
+    "resend": "^6.8.0",
     "stripe": "^20.2.0",
     "tailwind-merge": "^3.4.0"
   },
