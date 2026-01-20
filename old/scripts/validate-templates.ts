@@ -1,8 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { ProjectGenerator } from '../src/core/generator/project.js';
-import { ProjectConfig } from '../src/models/config.js';
+import { ProjectGenerator } from '../../src/core/generator/project.js';
+import { ProjectConfig } from '../../src/models/config.js';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
