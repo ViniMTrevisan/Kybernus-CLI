@@ -56,16 +56,68 @@ export class ProjectGenerator {
             // 4. Renderiza todos os templates
             await this.engine.renderTree(templatePath, projectPath, context);
 
-            // 5. Post-generation hooks (Java wrappers, etc)
+            // 5. Gera documentação com IA (se habilitado)
+            if (config.useAI && config.geminiKey) {
+                spinner.message('🤖 Gerando documentação com IA...');
+                await this.generateAIDocumentation(config, projectPath);
+            }
+
+            // 6. Post-generation hooks (Java wrappers, etc)
             await this.runPostGenerationHooks(config, projectPath);
 
             spinner.stop('✅ Projeto gerado com sucesso!');
 
-            // 5. Mostra próximos passos
+            // 7. Mostra próximos passos
             this.showNextSteps(config);
         } catch (error) {
             spinner.stop('❌ Erro ao gerar projeto');
             throw error;
+        }
+    }
+
+    /**
+     * Gera documentação usando IA (README.md e API.md)
+     */
+    private async generateAIDocumentation(config: ProjectConfig, projectPath: string): Promise<void> {
+        try {
+            const { DocumentationGenerator } = await import('../ai/documentation-generator.js');
+            const docGen = new DocumentationGenerator(config.geminiKey!);
+
+            // 1. Gera README.md
+            try {
+                const readme = await docGen.generateREADME(config);
+                await fs.writeFile(
+                    path.join(projectPath, 'README.md'),
+                    readme,
+                    'utf-8'
+                );
+                clack.log.success('  ├─ README.md gerado com IA');
+            } catch (error: any) {
+                clack.log.warn(`  ├─ Falha ao gerar README: ${error.message}`);
+                clack.log.info('  ├─ Usando README do template');
+            }
+
+            // 2. Gera API.md (apenas Pro tier com controllers)
+            if (config.licenseTier === 'pro') {
+                try {
+                    const controllers = await this.extractControllers(projectPath, config.stack);
+
+                    if (controllers.length > 0) {
+                        const apiDocs = await docGen.generateAPIDocumentation(config.stack, controllers);
+                        await fs.writeFile(
+                            path.join(projectPath, 'API.md'),
+                            apiDocs,
+                            'utf-8'
+                        );
+                        clack.log.success('  └─ API.md gerado com IA');
+                    }
+                } catch (error: any) {
+                    clack.log.warn(`  └─ Falha ao gerar API docs: ${error.message}`);
+                }
+            }
+        } catch (error: any) {
+            clack.log.error(`Erro ao gerar documentação com IA: ${error.message}`);
+            clack.log.info('Continuando com README do template...');
         }
     }
 
@@ -186,5 +238,90 @@ export class ProjectGenerator {
             console.warn(`⚠️  Erro ao instalar ${buildTool} wrapper:`, error);
             console.warn(`   O projeto foi gerado, mas você precisará instalar o wrapper manualmente.`);
         }
+    }
+
+    /**
+     * Extrai arquivos de controllers para documentação da API
+     */
+    private async extractControllers(projectPath: string, stack: string): Promise<Array<{ name: string, content: string }>> {
+        const controllers: Array<{ name: string, content: string }> = [];
+
+        const controllerPaths: Record<string, string> = {
+            'nodejs-express': 'src/controllers',
+            'nestjs': 'src',
+            'python-fastapi': 'app/controllers',
+            'java-spring': 'src/main/java',
+            'nextjs': 'src/app/api',
+        };
+
+        const controllerDir = controllerPaths[stack];
+        if (!controllerDir) return controllers;
+
+        const fullPath = path.join(projectPath, controllerDir);
+        if (!(await fs.pathExists(fullPath))) return controllers;
+
+        try {
+            // Encontra arquivos de controllers recursivamente
+            const files = await this.findControllerFiles(fullPath, stack);
+
+            // Lê conteúdo de cada controller (máximo 5 para não sobrecarregar)
+            for (const file of files.slice(0, 5)) {
+                try {
+                    const content = await fs.readFile(file, 'utf-8');
+                    const name = path.basename(file);
+                    controllers.push({ name, content });
+                } catch (error) {
+                    // Ignora arquivos que não podem ser lidos
+                }
+            }
+        } catch (error) {
+            // Se falhar, retorna array vazio
+        }
+
+        return controllers;
+    }
+
+    /**
+     * Busca arquivos de controllers baseado no stack
+     */
+    private async findControllerFiles(dir: string, stack: string): Promise<string[]> {
+        const extensions: Record<string, string[]> = {
+            'nodejs-express': ['.ts', '.js'],
+            'nestjs': ['.ts'],
+            'python-fastapi': ['.py'],
+            'java-spring': ['.java'],
+            'nextjs': ['.ts', '.tsx'],
+        };
+
+        const validExts = extensions[stack] || [];
+        const files: string[] = [];
+
+        const scan = async (currentDir: string) => {
+            const entries = await fs.readdir(currentDir, { withFileTypes: true });
+
+            for (const entry of entries) {
+                const fullPath = path.join(currentDir, entry.name);
+
+                if (entry.isDirectory()) {
+                    // Ignora node_modules, dist, etc
+                    if (!['node_modules', 'dist', 'build', '__pycache__'].includes(entry.name)) {
+                        await scan(fullPath);
+                    }
+                } else if (entry.isFile()) {
+                    const ext = path.extname(entry.name);
+                    const name = entry.name.toLowerCase();
+
+                    // Inclui apenas arquivos de controllers/routes
+                    if (validExts.includes(ext) &&
+                        (name.includes('controller') || name.includes('route') ||
+                            name.includes('auth') || name.includes('payment'))) {
+                        files.push(fullPath);
+                    }
+                }
+            }
+        };
+
+        await scan(dir);
+        return files;
     }
 }

@@ -21,9 +21,6 @@ export async function loginCommand(options: LoginOptions) {
             placeholder: 'KYB-PRO-XXXXXXXX',
             validate: (value) => {
                 if (!value) return 'License key is required';
-                if (!value.startsWith('KYB-PRO-')) {
-                    return 'Invalid key format. Pro keys start with KYB-PRO-';
-                }
             },
         });
 

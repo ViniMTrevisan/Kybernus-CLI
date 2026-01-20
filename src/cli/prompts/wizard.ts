@@ -103,7 +103,7 @@ export async function runWizard(licenseTier: LicenseTier): Promise<ProjectConfig
         if (licenseTier !== 'pro') return [];
 
         const selected = await clack.multiselect({
-          message: 'DevOps & Infraestrutura (opcional):',
+          message: "DevOps & Infraestrutura (marque o que desejar com Space ou 'A' para selecionar todos):",
           options: [
             { value: 'docker', label: 'Docker + Docker Compose' },
             { value: 'ci-cd', label: 'GitHub Actions CI/CD' },

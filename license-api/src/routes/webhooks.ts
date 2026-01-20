@@ -1,0 +1,116 @@
+import express from 'express';
+import stripeService from '../services/stripe.service.js';
+import { LicenseService } from '../services/license.service.js';
+import prisma from '../database/client.js';
+
+const router = express.Router();
+const licenseService = new LicenseService();
+
+/**
+ * POST /webhooks/stripe
+ * Recebe eventos do Stripe
+ */
+router.post('/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+    const sig = req.headers['stripe-signature'] as string;
+
+    try {
+        const event = stripeService.constructEvent(req.body, sig);
+
+        console.log(`[Webhook] Received: ${event.type}`);
+
+        switch (event.type) {
+            case 'checkout.session.completed': {
+                const session = event.data.object as any;
+                const metadata = session.metadata;
+
+                console.log('[Webhook] Checkout completed:', metadata);
+
+                // Ativar upgrade
+                const user = await licenseService.activateUpgrade({
+                    licenseKey: metadata.licenseKey,
+                    tier: metadata.tier.toUpperCase(),
+                    stripeCustomerId: session.customer,
+                    stripeSubscriptionId: session.subscription || undefined,
+                });
+
+                // Se é subscription, criar registro
+                if (session.subscription) {
+                    await prisma.subscription.create({
+                        data: {
+                            userId: user.id,
+                            stripeSubscriptionId: session.subscription,
+                            stripePriceId: session.line_items?.data[0]?.price?.id || '',
+                            stripeStatus: 'active',
+                            currentPeriodStart: new Date(),
+                            currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                        },
+                    });
+                }
+
+                console.log('[Webhook] User upgraded:', user.email);
+                break;
+            }
+
+            case 'customer.subscription.deleted': {
+                const subscription = event.data.object as any;
+
+                const user = await licenseService.findByStripeCustomerId(subscription.customer);
+                if (user) {
+                    await licenseService.cancelSubscription(user.licenseKey);
+                    console.log('[Webhook] Subscription cancelled:', user.email);
+                }
+                break;
+            }
+
+            case 'invoice.payment_failed': {
+                const invoice = event.data.object as any;
+
+                const user = await licenseService.findByStripeCustomerId(invoice.customer);
+                if (user) {
+                    await prisma.user.update({
+                        where: { id: user.id },
+                        data: { status: 'FREE_PAST_DUE' },
+                    });
+                    console.log('[Webhook] Payment failed:', user.email);
+                }
+                break;
+            }
+
+            case 'invoice.payment_succeeded': {
+                const invoice = event.data.object as any;
+
+                if (invoice.billing_reason === 'subscription_cycle') {
+                    // Atualiza período da subscription
+                    const sub = await prisma.subscription.findUnique({
+                        where: { stripeSubscriptionId: invoice.subscription },
+                    });
+
+                    if (sub) {
+                        await prisma.subscription.update({
+                            where: { id: sub.id },
+                            data: {
+                                currentPeriodStart: new Date(invoice.period_start * 1000),
+                                currentPeriodEnd: new Date(invoice.period_end * 1000),
+                            },
+                        });
+
+                        // Reative se estava past_due
+                        await prisma.user.update({
+                            where: { id: sub.userId },
+                            data: { status: 'FREE_ACTIVE' },
+                        });
+                    }
+                }
+                break;
+            }
+        }
+
+        res.json({ received: true });
+
+    } catch (error: any) {
+        console.error('[Webhook] Error:', error.message);
+        return res.status(400).send(`Webhook Error: ${error.message}`);
+    }
+});
+
+export default router;

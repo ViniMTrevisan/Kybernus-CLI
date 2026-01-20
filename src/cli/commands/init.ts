@@ -4,6 +4,7 @@ import { ProjectGenerator } from '../../core/generator/project.js';
 import { LicenseTier } from '../../models/config.js';
 import { ConfigManager } from '../../core/config/config-manager.js';
 import { LicenseValidator } from '../../core/auth/license-validator.js';
+import { AnalyticsClient } from '../services/AnalyticsClient.js';
 
 interface InitOptions {
     name?: string;
@@ -57,9 +58,41 @@ export async function initCommand(options: InitOptions) {
     // Executar wizard interativo (ou usar options se non-interactive)
     const config = await runWizard(licenseTier);
 
+    // Validate project limit (Metered Trial)
+    if (licenseTier === 'pro' && licenseKey) {
+        const spinner = clack.spinner();
+        spinner.start('Validando cota de projetos...');
+
+        const creditCheck = await validator.consumeCredit(licenseKey);
+
+        spinner.stop('Cota verificada');
+
+        if (!creditCheck.authorized) {
+            clack.log.error(creditCheck.message || 'Criação de projeto bloqueada por limite da licença.');
+            if (creditCheck.message?.includes('Trial limit')) {
+                clack.note('🔓 Desbloqueie projetos ilimitados com Kybernus Pro lifetime.\nExecute: kybernus upgrade', 'Limite Atingido');
+            }
+            return; // Stop generation
+        }
+
+        if (creditCheck.remaining !== undefined && creditCheck.remaining >= 0) {
+            clack.log.info(`Créditos Trial: ${creditCheck.usage}/${creditCheck.limit} utilizados. (${creditCheck.remaining} restantes)`);
+        }
+    }
+
     // Gerar projeto
     const generator = new ProjectGenerator();
     await generator.generate(config, process.cwd());
+
+    // Track generation
+    const analytics = new AnalyticsClient();
+    analytics.track('project_generated', {
+        name: config.projectName,
+        stack: config.stack,
+        architecture: config.architecture,
+        tier: licenseTier,
+        command: 'init'
+    });
 
     clack.outro('🎉 Projeto criado com sucesso! Bom desenvolvimento!');
 }

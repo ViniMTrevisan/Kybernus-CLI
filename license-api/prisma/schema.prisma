@@ -1,0 +1,109 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum LicenseTier {
+  FREE
+  PRO
+}
+
+enum LicenseStatus {
+  TRIAL
+  TRIAL_EXPIRED
+  FREE_ACTIVE
+  FREE_PAST_DUE
+  PRO_ACTIVE
+  CANCELLED
+}
+
+model User {
+  id              String         @id @default(cuid())
+  email           String         @unique
+  
+  // Trial tracking
+  trialStartedAt  DateTime       @default(now())
+  trialEndsAt     DateTime       @default(dbgenerated("NOW() + INTERVAL '15 days'"))
+  
+  // License
+  licenseKey      String         @unique
+  tier            LicenseTier    @default(FREE)
+  status          LicenseStatus  @default(TRIAL)
+  
+  // Stripe
+  stripeCustomerId String?       @unique
+
+  // Project Limits
+  projectUsage    Int            @default(0)
+  projectLimit    Int            @default(3)
+  
+  // Timestamps
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  lastLoginAt     DateTime?
+  lastValidatedAt DateTime?
+  
+  subscription    Subscription?
+  analytics       AnalyticsEvent[]
+  
+  @@index([email])
+  @@index([licenseKey])
+  @@index([status])
+  @@index([tier])
+}
+
+model Subscription {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  stripeSubscriptionId String   @unique
+  stripePriceId        String
+  stripeStatus         String
+  
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean  @default(false)
+  canceledAt           DateTime?
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@index([stripeSubscriptionId])
+  @@index([stripeStatus])
+}
+
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  event       String
+  tier        String?
+  stack       String?
+  architecture String?
+  command     String?
+  
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([userId])
+  @@index([event])
+  @@index([tier])
+  @@index([createdAt])
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+}

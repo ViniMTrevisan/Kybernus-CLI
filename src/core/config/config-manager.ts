@@ -1,9 +1,12 @@
 import Conf from 'conf';
+import crypto from 'crypto';
 
 interface KybernusConfig {
     licenseKey?: string;
     licenseTier?: 'FREE' | 'PRO';
     licenseExpiration?: string;
+    machineId?: string;
+    email?: string;
 }
 
 export class ConfigManager {
@@ -42,10 +45,28 @@ export class ConfigManager {
         this.config.set('licenseExpiration', expiration);
     }
 
+    getMachineId(): string {
+        let machineId = this.config.get('machineId');
+        if (!machineId) {
+            machineId = crypto.randomUUID();
+            this.config.set('machineId', machineId);
+        }
+        return machineId;
+    }
+
+    getEmail(): string | undefined {
+        return this.config.get('email');
+    }
+
+    setEmail(email: string): void {
+        this.config.set('email', email);
+    }
+
     clearLicense(): void {
         this.config.delete('licenseKey');
         this.config.delete('licenseTier');
         this.config.delete('licenseExpiration');
+        this.config.delete('email');
         this.config.set('licenseTier', 'FREE');
     }
 

@@ -5,10 +5,10 @@ export async function logoutCommand() {
     clack.intro('🔓 Kybernus Logout');
 
     const configManager = new ConfigManager();
-    const currentTier = configManager.getLicenseTier();
+    const currentKey = configManager.getLicenseKey();
 
-    if (currentTier === 'FREE') {
-        clack.log.warn('No active Pro license found');
+    if (!currentKey) {
+        clack.log.warn('No active license found');
         clack.outro('Already in Free mode');
         return;
     }

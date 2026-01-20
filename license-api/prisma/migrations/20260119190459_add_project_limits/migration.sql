@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "projectLimit" INTEGER NOT NULL DEFAULT 3,
+ADD COLUMN     "projectUsage" INTEGER NOT NULL DEFAULT 0,
+ALTER COLUMN "trialEndsAt" SET DEFAULT NOW() + INTERVAL '15 days';
