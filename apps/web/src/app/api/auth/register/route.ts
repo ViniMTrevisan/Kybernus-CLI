@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { licenseService } from '@/services/license.service';
 import { emailService } from '@/lib/email';
 import { rateLimit } from '@/lib/redis';
+import { registerSchema } from '@/lib/validations/auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,14 +22,17 @@ export async function POST(request: Request) {
             );
         }
 
-        const { email, password } = await request.json();
+        const body = await request.json();
 
-        if (!email || !email.includes('@')) {
+        const validation = registerSchema.safeParse(body);
+        if (!validation.success) {
             return NextResponse.json(
-                { error: 'Valid email is required' },
+                { error: validation.error.message },
                 { status: 400 }
             );
         }
+
+        const { email, password } = validation.data;
 
         // Verifica se já existe
         const existing = await licenseService.findByEmail(email);

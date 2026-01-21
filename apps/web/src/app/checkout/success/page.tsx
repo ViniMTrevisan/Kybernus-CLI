@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { CheckCircle, Terminal, Copy, ArrowRight } from "lucide-react";
+import { CheckCircle, Terminal, Copy, ArrowRight, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useState, Suspense } from "react";
 
@@ -18,78 +18,89 @@ function SuccessContent() {
     };
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
+        <div className="min-h-screen bg-tech-black flex items-center justify-center px-4 relative overflow-hidden font-sans">
             {/* Background Effects */}
-            <div className="absolute inset-0 bg-gradient-to-br from-neon-green/5 via-transparent to-cyber-blue/5" />
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-neon-green/10 rounded-full blur-[120px]" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyber-blue/10 rounded-full blur-[120px]" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-tech-success/10 via-transparent to-tech-blue/5 pointer-events-none" />
 
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6 }}
-                className="relative z-10 max-w-lg w-full text-center"
-            >
-                {/* Success Icon */}
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                    className="inline-flex p-6 rounded-full bg-neon-green/10 border border-neon-green/20 mb-8"
-                >
-                    <CheckCircle className="w-16 h-16 text-neon-green" />
-                </motion.div>
+            <div className="relative z-10 max-w-lg w-full">
+                <div className="text-center mb-8">
+                    <div className="flex justify-center mb-6">
+                        <div className="p-4 border border-tech-success/30 bg-tech-success/10 relative">
+                            <div className="absolute top-0 left-0 w-1 h-1 bg-tech-success" />
+                            <div className="absolute bottom-0 right-0 w-1 h-1 bg-tech-success" />
+                            <ShieldCheck className="w-12 h-12 text-tech-success" />
+                        </div>
+                    </div>
 
-                <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4">
-                    Payment <span className="text-neon-green">Successful!</span>
-                </h1>
+                    <h1 className="text-3xl md:text-4xl font-bold font-space uppercase tracking-tight mb-2 text-white">
+                        Transaction <span className="text-tech-success">Complete</span>
+                    </h1>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-tech-success/10 border border-tech-success/30 rounded-full mb-4">
+                        <div className="w-1.5 h-1.5 bg-tech-success animate-pulse rounded-full" />
+                        <span className="text-[10px] font-mono font-bold text-tech-success uppercase tracking-widest">
+                            Access Granted
+                        </span>
+                    </div>
+                </div>
 
-                <p className="text-lg text-muted-foreground mb-8">
-                    Your Kybernus CLI license has been activated. Check your email for your new license key.
-                </p>
+                <div className="bg-tech-gray/20 backdrop-blur-xl border border-white/10 p-8 shadow-2xl relative mb-8">
+                    {/* Tech Borders */}
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/30" />
+                    <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/30" />
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/30" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/30" />
 
-                {/* Instructions Card */}
-                <div className="glass-dark border border-white/10 rounded-2xl p-8 mb-8 text-left">
-                    <h3 className="text-sm font-black uppercase tracking-widest text-cyber-blue mb-4">
-                        Next Steps
+                    <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-tech-blue mb-6 border-b border-white/5 pb-2">
+                        Initialization Sequence
                     </h3>
 
-                    <div className="space-y-4">
-                        <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-cyber-blue/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <span className="text-xs font-bold text-cyber-blue">1</span>
-                            </div>
-                            <p className="text-sm text-muted-foreground">
-                                Check your email for your new license key
-                            </p>
-                        </div>
-
-                        <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-cyber-blue/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <span className="text-xs font-bold text-cyber-blue">2</span>
+                    <div className="space-y-6">
+                        <div className="flex items-start gap-4">
+                            <div className="flex flex-col items-center">
+                                <div className="w-6 h-6 rounded-none border border-tech-blue/50 bg-tech-blue/10 flex items-center justify-center text-xs font-mono font-bold text-tech-blue">
+                                    01
+                                </div>
+                                <div className="w-[1px] h-full bg-white/10 my-1" />
                             </div>
                             <div>
-                                <p className="text-sm text-muted-foreground mb-2">
-                                    Run this command in your terminal:
+                                <h4 className="text-sm font-bold text-white mb-1">Check Inbox</h4>
+                                <p className="text-xs text-muted-foreground font-mono">
+                                    License key dispatched to registered email.
                                 </p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-start gap-4">
+                            <div className="flex flex-col items-center">
+                                <div className="w-6 h-6 rounded-none border border-tech-blue/50 bg-tech-blue/10 flex items-center justify-center text-xs font-mono font-bold text-tech-blue">
+                                    02
+                                </div>
+                                <div className="w-[1px] h-full bg-white/10 my-1" />
+                            </div>
+                            <div className="w-full">
+                                <h4 className="text-sm font-bold text-white mb-2">Execute Login</h4>
                                 <button
                                     onClick={handleCopy}
-                                    className="flex items-center gap-2 px-4 py-3 bg-black/50 rounded-lg border border-white/10 hover:border-cyber-blue/30 transition-all group w-full"
+                                    className="flex items-center gap-2 px-4 py-3 bg-black/50 border border-white/10 hover:border-tech-success/50 transition-all group w-full text-left"
                                 >
-                                    <Terminal className="w-4 h-4 text-cyber-blue" />
-                                    <code className="text-sm text-neon-green flex-1 text-left">kybernus login</code>
-                                    <Copy className={`w-4 h-4 transition-colors ${copied ? 'text-neon-green' : 'text-muted-foreground group-hover:text-white'}`} />
+                                    <Terminal className="w-3 h-3 text-tech-success" />
+                                    <code className="text-sm font-mono text-white flex-1">kybernus login</code>
+                                    <Copy className={`w-3 h-3 transition-colors ${copied ? 'text-tech-success' : 'text-muted-foreground group-hover:text-white'}`} />
                                 </button>
                             </div>
                         </div>
 
-                        <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-cyber-blue/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <span className="text-xs font-bold text-cyber-blue">3</span>
+                        <div className="flex items-start gap-4">
+                            <div className="w-6 h-6 rounded-none border border-tech-blue/50 bg-tech-blue/10 flex items-center justify-center text-xs font-mono font-bold text-tech-blue shrink-0">
+                                03
                             </div>
-                            <p className="text-sm text-muted-foreground">
-                                Enter your new license key when prompted
-                            </p>
+                            <div>
+                                <h4 className="text-sm font-bold text-white mb-1">Authenticate</h4>
+                                <p className="text-xs text-muted-foreground font-mono">
+                                    Input license key when prompted by CLI.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -97,19 +108,19 @@ function SuccessContent() {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link
                         href="/docs"
-                        className="px-6 py-3 bg-cyber-blue text-white font-black uppercase tracking-widest text-sm rounded-xl hover:bg-cyber-blue/90 transition-all flex items-center justify-center gap-2"
+                        className="px-6 py-3 bg-tech-blue text-black font-mono font-bold uppercase tracking-widest text-xs hover:bg-white transition-all flex items-center justify-center gap-2 group"
                     >
-                        View Documentation
-                        <ArrowRight className="w-4 h-4" />
+                        Documentation
+                        <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                     </Link>
                     <Link
                         href="/"
-                        className="px-6 py-3 bg-white/5 text-white font-black uppercase tracking-widest text-sm rounded-xl hover:bg-white/10 transition-all border border-white/10"
+                        className="px-6 py-3 bg-transparent border border-white/10 text-white font-mono font-bold uppercase tracking-widest text-xs hover:bg-white/5 transition-all"
                     >
                         Return Home
                     </Link>
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 }
@@ -117,8 +128,8 @@ function SuccessContent() {
 export default function CheckoutSuccessPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-cyber-blue/30 border-t-cyber-blue rounded-full animate-spin" />
+            <div className="min-h-screen bg-tech-black flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-tech-blue/30 border-t-tech-blue rounded-full animate-spin" />
             </div>
         }>
             <SuccessContent />

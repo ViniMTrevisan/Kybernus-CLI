@@ -2,17 +2,17 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { verifyUserToken } from '@/lib/auth';
 import prisma from '@/lib/prisma';
-import DashboardClient from './DashboardClient';
+import ProfileClient from './ProfileClient';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Command Center | Kybernus',
-    description: 'Manage your Kybernus licenses and projects.',
+    title: 'Profile Config | Kybernus',
+    description: 'Manage your Kybernus account settings.',
 };
 
 export const dynamic = 'force-dynamic';
 
-export default async function DashboardPage() {
+export default async function ProfilePage() {
     const cookieStore = await cookies();
     const token = cookieStore.get('user-token')?.value;
 
@@ -29,18 +29,12 @@ export default async function DashboardPage() {
         where: { email: payload.email },
         select: {
             email: true,
-            licenseKey: true,
-            tier: true,
-            status: true,
-            projectUsage: true,
-            projectLimit: true,
-            trialEndsAt: true,
         },
     });
 
     if (!user) {
-        redirect('/login'); // Or clear cookie and redirect
+        redirect('/login');
     }
 
-    return <DashboardClient user={user} />;
+    return <ProfileClient user={user} />;
 }

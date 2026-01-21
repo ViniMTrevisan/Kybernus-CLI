@@ -2,18 +2,23 @@ import { describe, it, expect, beforeAll } from 'vitest';
 
 const API_URL = 'http://localhost:3010/api';
 
+// Helper to avoid rate limiting
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 describe('Trial Limit Enforcement E2E', () => {
     let testUserKey: string;
     let testEmail: string;
 
     beforeAll(async () => {
+        // Wait to avoid rate limiting from previous tests
+        await delay(2000);
         // Create fresh test user with unique email
         testEmail = `e2e-trial-${Date.now()}@test.com`;
 
         const res = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: testEmail })
+            body: JSON.stringify({ email: testEmail, password: 'TestPassword123!' })
         });
 
         const data = await res.json();
@@ -99,6 +104,8 @@ describe('Trial Limit Enforcement E2E', () => {
     });
 
     it('should still return valid=true but with limit info on validation', async () => {
+        // Wait for cache to clear (5min TTL, but we can test cache invalidation separately)
+        await delay(1000);
         const res = await fetch(`${API_URL}/licenses/validate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -136,18 +143,19 @@ describe('License Validation E2E', () => {
 
         const data = await res.json();
         expect(res.status).toBe(400);
-        expect(data.error).toContain('required');
+        expect(data.error).toContain('string');
     });
 });
 
 describe('User Registration E2E', () => {
     it('should register new user and return license key', async () => {
+        await delay(3000); // Avoid rate limit
         const email = `e2e-reg-${Date.now()}@test.com`;
 
         const res = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
+            body: JSON.stringify({ email, password: 'TestPassword123!' })
         });
 
         const data = await res.json();
@@ -159,13 +167,14 @@ describe('User Registration E2E', () => {
     });
 
     it('should return existing key if email already registered', async () => {
+        await delay(3000); // Avoid rate limit
         const email = `e2e-dup-${Date.now()}@test.com`;
 
         // First registration
         const res1 = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
+            body: JSON.stringify({ email, password: 'TestPassword123!' })
         });
         const data1 = await res1.json();
         expect(res1.status).toBe(201);
@@ -174,7 +183,7 @@ describe('User Registration E2E', () => {
         const res2 = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
+            body: JSON.stringify({ email, password: 'TestPassword123!' })
         });
         const data2 = await res2.json();
         expect(res2.status).toBe(400);
@@ -183,15 +192,16 @@ describe('User Registration E2E', () => {
     });
 
     it('should reject invalid email', async () => {
+        await delay(3000); // Avoid rate limit
         const res = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: 'not-an-email' })
+            body: JSON.stringify({ email: 'not-an-email', password: 'TestPassword123!' })
         });
 
         const data = await res.json();
         expect(res.status).toBe(400);
-        expect(data.error).toContain('Valid email');
+        expect(data.error).toContain('email');
     });
 });
 

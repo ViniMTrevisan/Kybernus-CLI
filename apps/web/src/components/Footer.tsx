@@ -2,81 +2,96 @@ import { Twitter, Linkedin, Terminal, Mail } from "lucide-react";
 
 export function Footer() {
     return (
-        <footer className="relative border-t border-white/5 bg-black py-20 overflow-hidden">
-            {/* Decorative Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-cyber-blue/20 to-transparent" />
+        <footer className="relative border-t border-white/5 bg-tech-black py-20 overflow-hidden">
+            {/* Tech Grid Background */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
-            <div className="container px-4 relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16 max-w-7xl mx-auto">
+            <div className="container max-w-7xl mx-auto px-6 relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
                     {/* Brand */}
                     <div className="space-y-6">
-                        <div className="flex items-center gap-2">
-                            <Terminal className="w-6 h-6 text-cyber-blue" />
-                            <span className="text-xl font-black uppercase tracking-tighter text-white">Kybernus</span>
+                        <div className="flex items-center gap-3">
+                            <div className="p-1.5 bg-tech-blue text-black">
+                                <Terminal className="w-5 h-5" />
+                            </div>
+                            <span className="text-2xl font-space font-bold text-white tracking-tight">KYBERNUS</span>
                         </div>
-                        <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-                            The ultimate CLI orchestrator for architects.
-                            Built for speed, engineering excellence, and lifetime
-                            scalability.
+                        <p className="text-sm font-mono text-muted-foreground leading-relaxed max-w-xs">
+                            // SYSTEM_STATUS: OPERATIONAL<br />
+                            Powering the next generation of scalable backend architectures.
                         </p>
                         <div className="flex gap-4">
-                            <a href="#" className="p-2 rounded-lg bg-white/5 text-muted-foreground hover:text-white hover:bg-white/10 transition-all">
-                                <Twitter className="w-5 h-5" />
+                            <a href="#" className="p-2 border border-white/10 text-muted-foreground hover:text-white hover:border-tech-blue hover:bg-tech-blue/10 transition-all">
+                                <Twitter className="w-4 h-4" />
                             </a>
-                            <a href="#" className="p-2 rounded-lg bg-white/5 text-muted-foreground hover:text-white hover:bg-white/10 transition-all">
-                                <Linkedin className="w-5 h-5" />
+                            <a href="#" className="p-2 border border-white/10 text-muted-foreground hover:text-white hover:border-tech-blue hover:bg-tech-blue/10 transition-all">
+                                <Linkedin className="w-4 h-4" />
                             </a>
                         </div>
                     </div>
 
                     {/* Product */}
                     <div className="space-y-6">
-                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white">Product</h4>
-                        <ul className="space-y-4">
-                            <li><a href="#stacks" className="text-sm text-muted-foreground hover:text-cyber-blue transition-colors uppercase font-bold tracking-tighter">Tech Stacks</a></li>
-                            <li><a href="#architecture" className="text-sm text-muted-foreground hover:text-cyber-blue transition-colors uppercase font-bold tracking-tighter">Architectures</a></li>
-                            <li><a href="#features" className="text-sm text-muted-foreground hover:text-cyber-blue transition-colors uppercase font-bold tracking-tighter">Capabilities</a></li>
-                            <li><a href="#pricing" className="text-sm text-muted-foreground hover:text-cyber-blue transition-colors uppercase font-bold tracking-tighter">Pricing</a></li>
+                        <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                            <span className="w-2 h-2 bg-tech-blue" />
+                            Product
+                        </h4>
+                        <ul className="space-y-3">
+                            <li><a href="#stacks" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">Tech Stacks</a></li>
+                            <li><a href="#architecture" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">Architectures</a></li>
+                            <li><a href="#features" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">Features</a></li>
+                            <li><a href="#pricing" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">Pricing</a></li>
                         </ul>
                     </div>
 
                     {/* Developers */}
                     <div className="space-y-6">
-                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white">Developers</h4>
-                        <ul className="space-y-4">
-                            <li><a href="/docs/getting-started" className="text-sm text-muted-foreground hover:text-cyber-blue transition-colors uppercase font-bold tracking-tighter">Getting Started</a></li>
-                            <li><a href="/docs/cli-reference" className="text-sm text-muted-foreground hover:text-cyber-blue transition-colors uppercase font-bold tracking-tighter">CLI Reference</a></li>
-                            <li><a href="/docs" className="text-sm text-muted-foreground hover:text-cyber-blue transition-colors uppercase font-bold tracking-tighter">Documentation</a></li>
+                        <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                            <span className="w-2 h-2 bg-tech-purple" />
+                            Developers
+                        </h4>
+                        <ul className="space-y-3">
+                            <li><a href="/docs/getting-started" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">Getting Started</a></li>
+                            <li><a href="/docs/cli-reference" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">CLI Reference</a></li>
+                            <li><a href="/docs" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">Documentation</a></li>
+                            <li><a href="#" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">API Status</a></li>
                         </ul>
                     </div>
 
-                    {/* Contact */}
+                    {/* Connect */}
                     <div className="space-y-6">
-                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-white">Connect</h4>
+                        <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                            <span className="w-2 h-2 bg-tech-success" />
+                            Connect
+                        </h4>
                         <div className="space-y-4">
                             <a href="mailto:contact@kybernus.com" className="flex items-center gap-3 group">
-                                <div className="p-2 rounded-lg bg-white/5 group-hover:bg-cyber-blue/10 transition-colors">
-                                    <Mail className="w-4 h-4 text-muted-foreground group-hover:text-cyber-blue" />
-                                </div>
-                                <span className="text-sm text-muted-foreground group-hover:text-white transition-colors font-bold tracking-tighter">contact@kybernus.com</span>
+                                <Mail className="w-4 h-4 text-muted-foreground group-hover:text-tech-blue transition-colors" />
+                                <span className="text-sm font-mono text-muted-foreground group-hover:text-white transition-colors">contact@kybernus.com</span>
                             </a>
-                            <div className="p-6 rounded-2xl bg-cyber-blue/5 border border-cyber-blue/10">
-                                <div className="text-[10px] font-black uppercase tracking-widest text-cyber-blue mb-2">Pro Update</div>
-                                <p className="text-xs text-muted-foreground leading-relaxed">
-                                    Join 500+ architects on our monthly engineering newsletter.
+
+                            <div className="p-4 bg-tech-gray border border-white/5 relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-tech-blue/10 blur-2xl group-hover:bg-tech-blue/20 transition-all" />
+                                <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-tech-blue mb-2">NEWSLETTER</div>
+                                <p className="text-xs text-muted-foreground mb-3">
+                                    Join 500+ architects.
                                 </p>
+                                <div className="flex gap-2">
+                                    <input type="email" placeholder="Email..." className="w-full bg-black border border-white/10 px-2 py-1 text-xs text-white focus:border-tech-blue outline-none" />
+                                    <button className="bg-white text-black px-2 py-1 text-xs font-bold hover:bg-tech-blue transition-colors">→</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                        © {new Date().getFullYear()} KYBERNUS ORCHESTRATOR. ALL RIGHTS RESERVED.
+                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+                        © {new Date().getFullYear()} KYBERNUS INC. // SYSTEM ID: KIB-9000
                     </p>
                     <div className="flex gap-8">
-                        <a href="#" className="text-[10px] font-black text-muted-foreground hover:text-white uppercase tracking-widest transition-colors">Privacy Policy</a>
-                        <a href="#" className="text-[10px] font-black text-muted-foreground hover:text-white uppercase tracking-widest transition-colors">Terms of Service</a>
+                        <a href="#" className="text-[10px] font-mono text-muted-foreground hover:text-white uppercase tracking-wider transition-colors">Privacy Policy</a>
+                        <a href="#" className="text-[10px] font-mono text-muted-foreground hover:text-white uppercase tracking-wider transition-colors">Terms of Service</a>
                     </div>
                 </div>
             </div>

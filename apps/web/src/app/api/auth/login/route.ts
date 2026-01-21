@@ -2,20 +2,40 @@ import { NextResponse } from 'next/server';
 import { signUserToken } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcrypt';
+import { loginSchema } from '@/lib/validations/auth';
+import { rateLimit } from '@/lib/redis';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
     try {
-        const { email, password } = await request.json();
+        // Rate limit: 10 failed attempts per minute per IP to prevent brute force
+        // But allow legitimate users to retry reasonably
+        const ip = request.headers.get('x-forwarded-for') ||
+            request.headers.get('x-real-ip') ||
+            'unknown';
 
-        if (!email || !password) {
+        const rateLimitResult = await rateLimit(`login:${ip}`, 10, 60);
+        if (!rateLimitResult.allowed) {
             return NextResponse.json(
-                { error: 'Email and password are required' },
+                { error: 'Too many login attempts. Please try again later.' },
+                { status: 429 }
+            );
+        }
+
+        const body = await request.json();
+
+        // Validate input
+        const validation = loginSchema.safeParse(body);
+        if (!validation.success) {
+            return NextResponse.json(
+                { error: validation.error.message },
                 { status: 400 }
             );
         }
+
+        const { email, password } = validation.data;
 
         // Find user
         const user = await prisma.user.findUnique({
@@ -52,6 +72,7 @@ export async function POST(request: Request) {
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
             maxAge: 60 * 60 * 24 * 7, // 7 days
+            expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             path: '/',
         });
 

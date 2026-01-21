@@ -33,63 +33,70 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen bg-tech-black flex items-center justify-center p-4 relative overflow-hidden">
             {/* Background Effects */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-black to-black pointer-events-none" />
-            <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] opacity-20 pointer-events-none" />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-tech-blue/10 rounded-full blur-[150px] opacity-40" />
 
             <div className="w-full max-w-md relative z-10">
                 <div className="mb-8 text-center">
-                    <Link href="/" className="inline-flex items-center text-zinc-400 hover:text-white transition-colors mb-8">
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Back to Home
+                    <Link href="/login" className="inline-flex items-center text-muted-foreground hover:text-white transition-colors mb-8 font-mono text-xs uppercase tracking-widest group">
+                        <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+                        Back to Login
                     </Link>
-                    <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-600 mb-2">
-                        Reset Password
+                    <h1 className="text-3xl font-space font-bold uppercase tracking-tight mb-2 text-white">
+                        Reset <span className="text-tech-blue">Password</span>
                     </h1>
-                    <p className="text-zinc-400">
-                        Enter your email to receive recovery instructions
+                    <p className="text-muted-foreground font-mono text-xs">
+                        // Enter your email to begin recovery
                     </p>
                 </div>
 
-                <div className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-2xl p-8 shadow-2xl">
+                <div className="bg-tech-gray/20 backdrop-blur-xl border border-white/10 p-8 relative overflow-hidden group">
+                    {/* Tech Borders */}
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20" />
+                    <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/20" />
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/20" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20" />
+
                     {submitted ? (
-                        <div className="text-center py-4">
-                            <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-500/20">
-                                <Mail className="w-6 h-6 text-green-500" />
+                        <div className="text-center py-4 relative z-10">
+                            <div className="w-16 h-16 bg-tech-success/10 rounded-none flex items-center justify-center mx-auto mb-6 border border-tech-success/20 relative">
+                                <div className="absolute inset-0 border border-tech-success/20 scale-75" />
+                                <Mail className="w-8 h-8 text-tech-success" />
                             </div>
-                            <h3 className="text-xl font-semibold text-white mb-2">Check your email</h3>
-                            <p className="text-zinc-400 mb-6">
-                                We've sent a password reset link to <br />
-                                <span className="text-white font-medium">{email}</span>
+                            <h3 className="text-xl font-space font-bold text-white mb-2 uppercase">Execution Successful</h3>
+                            <p className="text-muted-foreground font-mono text-xs mb-8 leading-relaxed">
+                                We've transmitted a password reset link to: <br />
+                                <span className="text-tech-success">{email}</span>
                             </p>
                             <Link
                                 href="/login"
-                                className="inline-flex w-full justify-center items-center py-3 px-4 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition-all font-medium border border-zinc-700 hover:border-zinc-600"
+                                className="inline-flex w-full justify-center items-center py-3 px-4 bg-white/5 hover:bg-white/10 text-white transition-all font-mono font-bold uppercase text-xs tracking-widest border border-white/10 hover:border-white/20"
                             >
-                                Return to Login
+                                Return to Authenticate
                             </Link>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
                             {error && (
-                                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-                                    {error}
+                                <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 font-mono text-xs flex items-center gap-2">
+                                    <span className="font-bold">ERROR:</span> {error}
                                 </div>
                             )}
 
                             <div>
-                                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                                <label className="block text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground mb-2">
                                     Email Address
                                 </label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-3 w-5 h-5 text-zinc-500" />
+                                <div className="relative group/input">
+                                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-tech-blue transition-colors" />
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         required
-                                        className="w-full bg-black/50 border border-zinc-800 rounded-lg py-3 pl-10 pr-4 text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                                        className="w-full pl-10 pr-4 py-3 bg-black/50 border border-white/10 text-white placeholder:text-muted-foreground/50 font-mono text-sm focus:outline-none focus:border-tech-blue/50 focus:ring-1 focus:ring-tech-blue/20 transition-all"
                                         placeholder="you@company.com"
                                     />
                                 </div>
@@ -98,15 +105,15 @@ export default function ForgotPasswordPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium py-3 rounded-lg flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-900/20"
+                                className="w-full bg-tech-blue text-black font-mono font-bold uppercase tracking-widest text-xs hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center py-4"
                             >
                                 {isLoading ? (
                                     <>
                                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        Sending...
+                                        Transmitting...
                                     </>
                                 ) : (
-                                    'Send Reset Link'
+                                    'Initialize Reset'
                                 )}
                             </button>
                         </form>

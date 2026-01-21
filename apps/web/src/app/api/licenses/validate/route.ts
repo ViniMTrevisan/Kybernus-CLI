@@ -1,20 +1,37 @@
 import { NextResponse } from 'next/server';
 import { licenseService } from '@/services/license.service';
-import { getCachedLicense, setCachedLicense } from '@/lib/redis';
+import { getCachedLicense, setCachedLicense, rateLimit } from '@/lib/redis';
+import { licenseValidateSchema } from '@/lib/validations/license';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
     try {
-        const { licenseKey } = await request.json();
+        // Rate limit: 60 validations per minute per IP (high volume allowed for frequent checks)
+        const ip = request.headers.get('x-forwarded-for') ||
+            request.headers.get('x-real-ip') ||
+            'unknown';
 
-        if (!licenseKey) {
+        const rateLimitResult = await rateLimit(`validate:${ip}`, 60, 60);
+        if (!rateLimitResult.allowed) {
             return NextResponse.json(
-                { error: 'License key is required' },
+                { error: 'Too many requests. Please try again later.' },
+                { status: 429 }
+            );
+        }
+
+        const body = await request.json();
+
+        const validation = licenseValidateSchema.safeParse(body);
+        if (!validation.success) {
+            return NextResponse.json(
+                { error: validation.error.message },
                 { status: 400 }
             );
         }
+
+        const { licenseKey } = validation.data;
 
         // Check cache first (5 min TTL for valid licenses)
         const cached = await getCachedLicense(licenseKey);

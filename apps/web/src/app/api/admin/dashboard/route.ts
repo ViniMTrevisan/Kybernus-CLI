@@ -2,15 +2,16 @@ import { NextResponse } from 'next/server';
 import { analyticsService } from '@/services/analytics.service';
 import { verifyAdminToken } from '@/lib/auth';
 
+import { cookies } from 'next/headers';
+
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
     try {
         // Verify admin token from cookie
-        const cookieHeader = request.headers.get('cookie') || '';
-        const tokenMatch = cookieHeader.match(/admin-token=([^;]+)/);
-        const token = tokenMatch ? tokenMatch[1] : null;
+        const cookieStore = await cookies();
+        const token = cookieStore.get('admin-token')?.value;
 
         if (!token) {
             return NextResponse.json(

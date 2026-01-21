@@ -35,150 +35,128 @@ export function Hero() {
     }, []);
 
     return (
-        <section ref={containerRef} className="relative min-h-screen flex items-center justify-center overflow-hidden py-24">
-            {/* Premium Background */}
-            <div className="absolute inset-0 z-0">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,240,255,0.1),transparent_50%)]" />
-                <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+        <section ref={containerRef} className="relative min-h-screen flex items-center justify-center overflow-hidden py-32 bg-tech-black">
+            {/* Grid Background */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-tech-black via-transparent to-tech-black" />
 
-                {/* Animated Mesh Gradients */}
-                <motion.div
-                    animate={{
-                        scale: [1, 1.2, 1],
-                        rotate: [0, 90, 0],
-                        x: [0, 100, 0],
-                        y: [0, -50, 0]
-                    }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-cyber-blue/20 blur-[120px] rounded-full"
-                />
-                <motion.div
-                    animate={{
-                        scale: [1.2, 1, 1.2],
-                        rotate: [0, -90, 0],
-                        x: [0, -100, 0],
-                        y: [0, 50, 0]
-                    }}
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-cyber-purple/20 blur-[120px] rounded-full"
-                />
-            </div>
-
-            {/* Particle Effect (CSS Only) */}
-            <div className="absolute inset-0 z-0 pointer-events-none">
-                <div className="absolute h-1 w-1 bg-white rounded-full top-[10%] left-[20%] animate-pulse shadow-[0_0_10px_white]" />
-                <div className="absolute h-1.5 w-1.5 bg-cyber-blue rounded-full top-[40%] left-[80%] animate-float shadow-[0_0_15px_#00f0ff]" />
-                <div className="absolute h-1 w-1 bg-cyber-purple rounded-full top-[70%] left-[15%] animate-pulse shadow-[0_0_10px_#b026ff]" />
-            </div>
+            {/* Accent Glows */}
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-tech-blue/10 rounded-full blur-[150px] animate-pulse-slow" />
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-tech-purple/10 rounded-full blur-[150px] animate-pulse-slow delay-1000" />
 
             <div className="container relative z-10 px-4">
-                <div className="flex flex-col items-center text-center max-w-5xl mx-auto">
+                <div className="flex flex-col items-center text-center max-w-6xl mx-auto">
                     <motion.div style={{ y, opacity }} className="flex flex-col items-center">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.6 }}
-                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-blue/10 border border-cyber-blue/20 mb-8"
+                            className="inline-flex items-center gap-3 px-4 py-1.5 rounded bg-tech-gray border border-white/10 mb-10 overflow-hidden relative group"
                         >
-                            <div className="w-2 h-2 rounded-full bg-cyber-blue animate-pulse" />
-                            <span className="text-xs font-bold tracking-widest uppercase text-cyber-blue">Available Now: v1.0.0</span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-tech-blue/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="w-1.5 h-1.5 rounded-sm bg-tech-success animate-pulse" />
+                            <span className="text-xs font-mono font-bold tracking-widest uppercase text-white">System v1.0.0 Online</span>
                         </motion.div>
 
                         <motion.h1
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
-                            className="text-6xl md:text-9xl font-black mb-8 leading-[0.8] tracking-tight uppercase"
+                            className="text-5xl md:text-8xl font-space font-bold mb-8 leading-[0.9] tracking-tight uppercase text-white"
                         >
-                            CODE <span className="text-cyber-blue text-glow">LESS</span>
+                            CODE <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/50">LESS.</span>
                             <br />
-                            BUILD <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyber-blue to-cyber-purple">MORE</span>
+                            BUILD <span className="text-transparent bg-clip-text bg-gradient-to-r from-tech-blue to-tech-purple">MORE.</span>
                         </motion.h1>
 
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.3 }}
-                            className="text-xl text-muted-foreground mb-12 max-w-2xl leading-relaxed"
+                            className="text-lg md:text-xl font-mono text-muted-foreground mb-12 max-w-3xl leading-relaxed"
                         >
-                            The ultimate CLI orchestrator for scaffolding production-ready backend architectures. MVC, Clean, or Hexagonal—in seconds.
+                            // The ultimate CLI orchestrator for production-ready backend architectures. <br className="hidden md:block" />
+                            <span className="text-tech-blue">MVC</span>, <span className="text-tech-purple">Clean</span>, or <span className="text-tech-success">Hexagonal</span> — generate instantly.
                         </motion.p>
 
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.4 }}
-                            className="flex flex-wrap justify-center gap-6 mb-20"
+                            className="flex flex-wrap justify-center gap-6 mb-24"
                         >
                             <a
                                 href="/register"
-                                className="relative group px-10 py-5 bg-white text-black font-black uppercase tracking-widest text-sm rounded-xl transition-all hover:scale-105 active:scale-95 overflow-hidden shadow-[0_0_20px_rgba(255,255,255,0.2)] inline-flex"
+                                className="group relative px-8 py-4 bg-tech-blue text-black font-mono font-bold uppercase tracking-widest text-sm transition-all hover:bg-white overflow-hidden clip-path-polygon"
                             >
                                 <span className="relative z-10 flex items-center gap-2">
-                                    Get Started <ArrowRight className="w-5 h-5" />
+                                    Initialize Project <ArrowRight className="w-4 h-4" />
                                 </span>
-                                <div className="absolute inset-0 bg-gradient-to-r from-cyber-blue to-cyber-purple opacity-0 group-hover:opacity-100 transition-opacity" />
                             </a>
                         </motion.div>
                     </motion.div>
 
                     {/* Premium Terminal Area */}
-                    <div className="w-full max-w-4xl perspective-2000 mt-12">
+                    <div className="w-full max-w-4xl perspective-2000">
                         <motion.div
-                            initial={{ opacity: 0, y: 50, rotateX: 20 }}
-                            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                            initial={{ opacity: 0, scale: 0.95, y: 50, rotateX: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
                             transition={{ duration: 1, delay: 0.5 }}
                             className="relative group"
                         >
                             {/* Outer Glow */}
-                            <div className="absolute -inset-2 bg-gradient-to-r from-cyber-blue to-cyber-purple rounded-3xl blur-[40px] opacity-10 group-hover:opacity-30 transition duration-1000" />
+                            <div className="absolute -inset-1 bg-gradient-to-r from-tech-blue to-tech-purple rounded shadow-2xl blur-xl opacity-20 group-hover:opacity-40 transition duration-1000" />
 
-                            <div className="relative glass-dark rounded-2xl border border-white/10 overflow-hidden shadow-2xl shadow-black/80">
-                                {/* Header */}
-                                <div className="h-12 bg-white/5 border-b border-white/10 flex items-center px-6 justify-between">
+                            <div className="relative bg-[#0d0d0d] rounded-lg border border-white/10 overflow-hidden shadow-2xl">
+                                {/* Mac-style Header */}
+                                <div className="h-10 bg-[#1a1a1a] border-b border-white/5 flex items-center px-4 justify-between">
                                     <div className="flex gap-2">
-                                        <div className="w-3 h-3 rounded-full bg-red-500/50" />
-                                        <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
-                                        <div className="w-3 h-3 rounded-full bg-green-500/50" />
+                                        <div className="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]" />
+                                        <div className="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]" />
+                                        <div className="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29]" />
                                     </div>
-                                    <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground tracking-widest uppercase">
-                                        <TerminalIcon className="w-4 h-4" /> bash — 120x40
+                                    <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground opacity-50">
+                                        <Command className="w-3 h-3" /> kybernus-cli — node — 80x24
                                     </div>
                                 </div>
 
                                 {/* Content */}
-                                <div className="p-10 font-mono text-base min-h-[460px] text-left">
-                                    <div className="space-y-4">
+                                <div className="p-8 font-mono text-sm md:text-base min-h-[400px] text-left bg-black/80 backdrop-blur-xl">
+                                    <div className="space-y-3">
                                         {terminalLines.slice(0, currentLine).map((line, i) => (
                                             <motion.div
                                                 key={i}
-                                                initial={{ opacity: 0, x: -10 }}
+                                                initial={{ opacity: 0, x: -5 }}
                                                 animate={{ opacity: 1, x: 0 }}
                                                 className={cn(
-                                                    "flex gap-4",
-                                                    line.type === "command" && "text-white",
-                                                    line.type === "input" && "text-cyber-blue",
-                                                    line.type === "info" && "text-muted-foreground",
-                                                    line.type === "success" && "text-neon-green"
+                                                    "flex gap-3",
+                                                    line.type === "command" && "text-blue-400",
+                                                    line.type === "input" && "text-white font-bold",
+                                                    line.type === "info" && "text-gray-500",
+                                                    line.type === "success" && "text-green-400"
                                                 )}
                                             >
-                                                <span className="shrink-0 select-none opacity-50 font-bold">
+                                                <span className="shrink-0 select-none opacity-50">
                                                     {line.type === "command" ? ">" : line.type === "input" ? "?" : " "}
                                                 </span>
-                                                <span className="font-bold">{line.text}</span>
+                                                <span>{line.text}</span>
                                             </motion.div>
                                         ))}
                                         {currentLine < terminalLines.length && (
                                             <div className="flex gap-2">
-                                                <span className="text-white animate-pulse font-bold">_</span>
+                                                <span className="text-tech-blue animate-pulse">▊</span>
                                             </div>
                                         )}
                                     </div>
+                                </div>
 
-                                    {/* Visual Decoration */}
-                                    <div className="absolute bottom-6 right-8 text-white/5 pointer-events-none uppercase font-black text-8xl select-none italic">
-                                        KYBERNUS
+                                {/* Status Bar */}
+                                <div className="h-8 bg-[#1a1a1a] border-t border-white/5 flex items-center px-4 justify-between text-[10px] font-mono text-muted-foreground">
+                                    <div className="flex gap-4">
+                                        <span>Running Task: scaffold</span>
+                                        <span>CPU: 12%</span>
                                     </div>
+                                    <span>TypeScript</span>
                                 </div>
                             </div>
                         </motion.div>

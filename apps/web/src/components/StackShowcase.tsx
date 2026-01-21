@@ -56,30 +56,33 @@ const stacks = [
 
 export function StackShowcase() {
     return (
-        <section id="stacks" className="py-24 relative overflow-hidden bg-white/[0.02]">
-            <div className="container px-4">
-                <div className="text-center mb-20 max-w-2xl mx-auto">
+        <section id="stacks" className="py-32 relative overflow-hidden bg-tech-black">
+            {/* Background Grid */}
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+
+            <div className="container relative z-10 px-4">
+                <div className="text-center mb-20 max-w-3xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-blue/10 border border-cyber-blue/20 mb-4"
+                        className="inline-flex items-center gap-2 px-3 py-1 bg-tech-gray border border-white/10 mb-6"
                     >
-                        <div className="w-2 h-2 rounded-full bg-cyber-blue animate-pulse" />
-                        <span className="text-xs font-bold tracking-widest uppercase text-cyber-blue">Tech Ecosystem</span>
+                        <Cpu className="w-3 h-3 text-tech-blue" />
+                        <span className="text-xs font-mono font-bold tracking-widest uppercase text-tech-blue">Tech Ecosystem</span>
                     </motion.div>
-                    <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6 uppercase">
-                        SUPPORTED <span className="text-cyber-blue">STACKS</span>
+                    <h2 className="text-4xl md:text-6xl font-space font-bold tracking-tight mb-6 uppercase text-white">
+                        SUPPORTED <span className="text-transparent bg-clip-text bg-gradient-to-r from-tech-blue to-tech-purple">STACKS</span>
                     </h2>
-                    <p className="text-xl text-muted-foreground leading-relaxed italic">
-                        Kybernus configures the best tools for your mission.
-                        <span className="block mt-2 text-sm not-italic font-bold text-cyber-purple">
-                            Note: Advanced architectures (Clean/Hexagonal) require a PRO license for all stacks.
+                    <p className="text-xl font-mono text-muted-foreground leading-relaxed">
+                        // Kybernus configures the best tools for your mission. <br />
+                        <span className="text-sm font-bold text-tech-purple mt-2 block">
+                            Note: Advanced architectures (Clean/Hexagonal) require a PRO license.
                         </span>
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto justify-items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                     {stacks.map((stack, index) => (
                         <motion.div
                             key={index}
@@ -87,36 +90,43 @@ export function StackShowcase() {
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.5, delay: index * 0.1 }}
-                            whileHover={{ scale: 1.05 }}
-                            className="group relative glass-dark p-8 rounded-3xl border border-white/5 hover:border-white/20 transition-all duration-300"
+                            whileHover={{ y: -5 }}
+                            className="group relative bg-tech-gray/20 backdrop-blur-sm p-8 border border-white/5 hover:border-tech-blue/50 transition-all duration-300"
                         >
+                            {/* Tech Borders */}
+                            <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/10 group-hover:border-tech-blue transition-colors" />
+                            <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/10 group-hover:border-tech-blue transition-colors" />
+
                             <div className="flex items-center justify-between mb-6">
-                                <div className={`p-4 rounded-2xl ${stack.bg} group-hover:scale-110 transition-transform`}>
+                                <div className={`p-4 bg-tech-black border border-white/10 group-hover:border-tech-blue/50 transition-colors`}>
                                     <stack.icon className={`w-8 h-8 ${stack.color}`} />
                                 </div>
-                                <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded border ${stack.tier === 'Pro'
-                                    ? 'border-cyber-blue/50 text-cyber-blue bg-cyber-blue/5'
-                                    : 'border-white/10 text-white/50 bg-white/5'
+                                <span className={`text-[10px] font-mono font-bold uppercase tracking-widest px-2 py-1 border ${stack.tier === 'Pro'
+                                    ? 'border-tech-blue/30 text-tech-blue bg-tech-blue/5'
+                                    : 'border-white/10 text-muted-foreground bg-white/5'
                                     }`}>
                                     {stack.tier}
                                 </span>
                             </div>
 
-                            <h3 className="text-2xl font-bold mb-3 text-white">{stack.name}</h3>
-                            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                            <h3 className="text-2xl font-space font-bold mb-3 text-white group-hover:text-tech-blue transition-colors">{stack.name}</h3>
+                            <p className="text-sm font-mono text-muted-foreground leading-relaxed mb-6 border-t border-white/5 pt-4">
                                 {stack.description}
                             </p>
 
                             <div className="flex gap-2">
-                                <div className="h-1 flex-1 rounded-full bg-white/5 overflow-hidden">
+                                <div className="h-0.5 flex-1 bg-white/5 overflow-hidden">
                                     <motion.div
                                         initial={{ width: 0 }}
                                         whileInView={{ width: "100%" }}
                                         transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                                        className={`h-full ${stack.tier === 'Pro' ? 'bg-cyber-blue' : 'bg-white/40'}`}
+                                        className={`h-full ${stack.tier === 'Pro' ? 'bg-tech-blue' : 'bg-white/20'}`}
                                     />
                                 </div>
                             </div>
+
+                            {/* Hover Scan Effect */}
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-tech-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                         </motion.div>
                     ))}
                 </div>

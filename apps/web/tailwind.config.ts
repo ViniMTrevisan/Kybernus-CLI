@@ -14,6 +14,11 @@ const config: Config = {
             },
         },
         extend: {
+            fontFamily: {
+                sans: ['var(--font-inter)'],
+                space: ['var(--font-space)'],
+                mono: ['var(--font-mono)'],
+            },
             colors: {
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
@@ -34,16 +39,23 @@ const config: Config = {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
-                'cyber-blue': '#00f0ff',
-                'cyber-purple': '#b026ff',
-                'cyber-pink': '#ff006e',
-                'neon-green': '#39ff14',
+                'tech-black': '#0a0a0b',
+                'tech-gray': '#18181b',
+                'tech-zinc': '#27272a',
+                'tech-blue': '#00f0ff',
+                'tech-purple': '#b026ff',
+                'tech-success': '#22c55e',
+                'tech-warning': '#f59e0b',
+                'tech-error': '#ef4444',
+            },
+            backgroundImage: {
+                'grid-pattern': "linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)",
+                'scanner': 'linear-gradient(to bottom, transparent, rgba(0, 240, 255, 0.5), transparent)',
             },
             animation: {
                 'float': 'float 6s ease-in-out infinite',
                 'glow': 'glow 2s ease-in-out infinite alternate',
-                'gradient': 'gradient 8s linear infinite',
-                'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'scan': 'scan 2s linear infinite',
             },
             keyframes: {
                 float: {
@@ -51,16 +63,13 @@ const config: Config = {
                     '50%': { transform: 'translateY(-20px)' },
                 },
                 glow: {
-                    '0%': { boxShadow: '0 0 5px #00f0ff, 0 0 10px #00f0ff' },
-                    '100%': { boxShadow: '0 0 20px #00f0ff, 0 0 40px #00f0ff' },
+                    '0%': { boxShadow: '0 0 5px rgba(0, 240, 255, 0.2), 0 0 10px rgba(0, 240, 255, 0.2)' },
+                    '100%': { boxShadow: '0 0 20px rgba(0, 240, 255, 0.6), 0 0 30px rgba(0, 240, 255, 0.6)' },
                 },
-                gradient: {
-                    '0%, 100%': { backgroundPosition: '0% 50%' },
-                    '50%': { backgroundPosition: '100% 50%' },
-                },
-            },
-            backdropBlur: {
-                xs: '2px',
+                scan: {
+                    '0%': { transform: 'translateY(-100%)' },
+                    '100%': { transform: 'translateY(100%)' },
+                }
             },
         },
     },

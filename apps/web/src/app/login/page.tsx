@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Terminal, Lock, Mail, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
@@ -12,6 +12,17 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        // Check if already logged in
+        fetch('/api/user/me')
+            .then((res) => {
+                if (res.ok) router.push('/dashboard');
+            })
+            .catch(() => {
+                // Not logged in, stay on page
+            });
+    }, [router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -41,11 +52,10 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
+        <div className="min-h-screen bg-tech-black flex items-center justify-center px-4 relative overflow-hidden">
             {/* Background Effects */}
-            <div className="absolute inset-0 bg-gradient-to-br from-cyber-purple/5 via-transparent to-cyber-blue/5" />
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyber-purple/10 rounded-full blur-[120px]" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyber-blue/10 rounded-full blur-[120px]" />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-tech-blue/10 rounded-full blur-[150px] opacity-40" />
 
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -56,43 +66,51 @@ export default function LoginPage() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
-                        <Terminal className="w-8 h-8 text-cyber-blue" />
-                        <span className="text-2xl font-black uppercase tracking-tighter text-white">Kybernus</span>
+                        <div className="p-2 border border-white/10 bg-black/50">
+                            <Terminal className="w-6 h-6 text-tech-blue" />
+                        </div>
+                        <span className="text-xl font-space font-bold uppercase tracking-tight text-white">Kybernus</span>
                     </Link>
-                    <h1 className="text-3xl font-black uppercase tracking-tight mb-2 text-white">
-                        Welcome <span className="text-cyber-purple">Back</span>
+                    <h1 className="text-3xl font-space font-bold uppercase tracking-tight mb-2 text-white">
+                        Welcome <span className="text-tech-blue">Back</span>
                     </h1>
-                    <p className="text-muted-foreground text-sm">
-                        Sign in to manage your account
+                    <p className="text-muted-foreground font-mono text-xs">
+                        // Sign in to access your dashboard
                     </p>
                 </div>
 
                 {/* Login Card */}
-                <div className="glass-dark border border-white/10 rounded-3xl p-8 bg-black/40 backdrop-blur-xl">
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="bg-tech-gray/20 backdrop-blur-xl border border-white/10 p-8 relative overflow-hidden group">
+                    {/* Tech Borders */}
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20" />
+                    <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/20" />
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/20" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20" />
+
+                    <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
                         {error && (
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20"
+                                className="flex items-center gap-3 p-3 bg-red-500/10 border border-red-500/20 text-red-400 font-mono text-xs"
                             >
-                                <AlertCircle className="w-5 h-5 text-red-400" />
-                                <span className="text-sm text-red-400">{error}</span>
+                                <AlertCircle className="w-4 h-4" />
+                                <span>{error}</span>
                             </motion.div>
                         )}
 
                         <div className="space-y-2">
-                            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+                            <label className="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground">
                                 Email
                             </label>
-                            <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                            <div className="relative group/input">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-tech-blue transition-colors" />
                                 <input
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="you@example.com"
-                                    className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-muted-foreground focus:outline-none focus:border-cyber-purple/50 focus:ring-2 focus:ring-cyber-purple/20 transition-all"
+                                    className="w-full pl-10 pr-4 py-3 bg-black/50 border border-white/10 text-white placeholder:text-muted-foreground/50 font-mono text-sm focus:outline-none focus:border-tech-blue/50 focus:ring-1 focus:ring-tech-blue/20 transition-all"
                                     required
                                 />
                             </div>
@@ -100,24 +118,24 @@ export default function LoginPage() {
 
                         <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+                                <label className="text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground">
                                     Password
                                 </label>
                                 <Link
                                     href="/forgot-password"
-                                    className="text-xs text-cyber-blue hover:text-cyber-purple transition-colors"
+                                    className="text-[10px] font-mono text-tech-blue hover:text-white transition-colors uppercase tracking-wider"
                                 >
                                     Forgot password?
                                 </Link>
                             </div>
-                            <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                            <div className="relative group/input">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within/input:text-tech-blue transition-colors" />
                                 <input
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-muted-foreground focus:outline-none focus:border-cyber-purple/50 focus:ring-2 focus:ring-cyber-purple/20 transition-all"
+                                    className="w-full pl-10 pr-4 py-3 bg-black/50 border border-white/10 text-white placeholder:text-muted-foreground/50 font-mono text-sm focus:outline-none focus:border-tech-blue/50 focus:ring-1 focus:ring-tech-blue/20 transition-all"
                                     required
                                 />
                             </div>
@@ -126,13 +144,13 @@ export default function LoginPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-4 rounded-xl bg-cyber-purple text-white font-black uppercase tracking-widest text-sm hover:bg-cyber-purple/90 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-cyber-purple/20"
+                            className="w-full py-4 bg-tech-blue text-black font-mono font-bold uppercase tracking-widest text-xs hover:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             {loading ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
+                                <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
                                 <>
-                                    Sign In
+                                    Authenticate
                                     <ArrowRight className="w-4 h-4" />
                                 </>
                             )}

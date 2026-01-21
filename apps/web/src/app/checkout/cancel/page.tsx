@@ -1,56 +1,65 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { XCircle, ArrowRight } from "lucide-react";
+import { XCircle, ArrowRight, ShieldAlert, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 
 export default function CheckoutCancelPage() {
     return (
-        <div className="min-h-screen bg-background flex items-center justify-center px-4 relative overflow-hidden">
+        <div className="min-h-screen bg-tech-black flex items-center justify-center px-4 relative overflow-hidden font-sans">
             {/* Background Effects */}
-            <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 via-transparent to-cyber-blue/5" />
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-[120px]" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-tech-error/10 via-transparent to-black pointer-events-none" />
 
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6 }}
-                className="relative z-10 max-w-lg w-full text-center"
-            >
-                {/* Cancel Icon */}
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                    className="inline-flex p-6 rounded-full bg-white/5 border border-white/10 mb-8"
-                >
-                    <XCircle className="w-16 h-16 text-muted-foreground" />
-                </motion.div>
+            <div className="relative z-10 max-w-lg w-full text-center">
+                <div className="flex justify-center mb-6">
+                    <div className="p-4 border border-tech-error/30 bg-tech-error/10 relative">
+                        <div className="absolute top-0 left-0 w-1 h-1 bg-tech-error" />
+                        <div className="absolute bottom-0 right-0 w-1 h-1 bg-tech-error" />
+                        <AlertTriangle className="w-12 h-12 text-tech-error" />
+                    </div>
+                </div>
 
-                <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tight mb-4">
-                    Payment <span className="text-muted-foreground">Cancelled</span>
+                <h1 className="text-3xl md:text-4xl font-bold font-space uppercase tracking-tight mb-2 text-white">
+                    Transaction <span className="text-tech-error">Aborted</span>
                 </h1>
 
-                <p className="text-lg text-muted-foreground mb-8">
-                    No worries! You can try again anytime. Your trial access is still active.
-                </p>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-tech-error/10 border border-tech-error/30 rounded-full mb-8">
+                    <div className="w-1.5 h-1.5 bg-tech-error animate-pulse rounded-full" />
+                    <span className="text-[10px] font-mono font-bold text-tech-error uppercase tracking-widest">
+                        Process Terminated
+                    </span>
+                </div>
+
+                <div className="bg-tech-gray/20 backdrop-blur-xl border border-white/10 p-8 shadow-2xl relative mb-8">
+                    {/* Tech Borders */}
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/30" />
+                    <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/30" />
+                    <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/30" />
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/30" />
+
+                    <p className="text-sm text-muted-foreground font-mono leading-relaxed">
+                        // Payment sequence interrupted by user or system.<br />
+                        Trial protocols remain active. You may re-initiate the upgrade sequence at any time.
+                    </p>
+                </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Link
                         href="/#pricing"
-                        className="px-6 py-3 bg-cyber-purple text-white font-black uppercase tracking-widest text-sm rounded-xl hover:bg-cyber-purple/90 transition-all flex items-center justify-center gap-2"
+                        className="px-6 py-3 bg-white text-black font-mono font-bold uppercase tracking-widest text-xs hover:bg-tech-gray transition-all flex items-center justify-center gap-2 group"
                     >
-                        View Pricing
-                        <ArrowRight className="w-4 h-4" />
+                        Review Pricing
+                        <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                     </Link>
                     <Link
                         href="/"
-                        className="px-6 py-3 bg-white/5 text-white font-black uppercase tracking-widest text-sm rounded-xl hover:bg-white/10 transition-all border border-white/10"
+                        className="px-6 py-3 bg-transparent border border-white/10 text-white font-mono font-bold uppercase tracking-widest text-xs hover:bg-white/5 transition-all"
                     >
                         Return Home
                     </Link>
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 }

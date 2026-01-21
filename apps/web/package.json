@@ -6,7 +6,9 @@
     "dev": "next dev --port 3010",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",
@@ -14,6 +16,7 @@
     "@types/bcrypt": "^6.0.0",
     "@upstash/redis": "^1.36.1",
     "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.27.3",
@@ -30,10 +33,12 @@
     "remark-gfm": "^4.0.1",
     "resend": "^6.8.0",
     "stripe": "^20.2.0",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
+    "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -45,6 +50,7 @@
     "eslint-config-next": "16.1.4",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.0.17"
   }
 }
