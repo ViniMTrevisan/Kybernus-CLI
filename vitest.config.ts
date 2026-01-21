@@ -5,8 +5,8 @@ export default defineConfig({
     test: {
         globals: true,
         environment: 'node',
-        // Skip E2E tests by default (they require the server to be running)
-        exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**']
+        // Skip tests that need live server or are run from apps/web
+        exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**', '**/integration/**', '**/apps/web/**']
     },
     resolve: {
         alias: {

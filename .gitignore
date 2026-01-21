@@ -42,5 +42,7 @@ temp/
 
 # User data (for testing locally)
 .kybernus/
+npmjs.txt
 
 old/
+
