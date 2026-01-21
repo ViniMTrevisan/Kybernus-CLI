@@ -2,7 +2,7 @@
   "name": "kybernus",
   "version": "1.0.0",
   "type": "module",
-  "description": "The Ultimate Backend Scaffolding CLI for Modern Developers",
+  "description": "The Ultimate Scaffolding CLI for Modern Developers",
   "main": "dist/index.js",
   "bin": {
     "kybernus": "dist/index.js"
