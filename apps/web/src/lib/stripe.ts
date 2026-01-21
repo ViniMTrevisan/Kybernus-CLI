@@ -2,24 +2,35 @@ import Stripe from 'stripe';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
-if (!stripeSecretKey) {
+if (!stripeSecretKey && process.env.NODE_ENV !== 'production') {
     console.warn('STRIPE_SECRET_KEY not set - Stripe functionality will be disabled');
 }
 
-export const stripe = stripeSecretKey
-    ? new Stripe(stripeSecretKey, {
-        apiVersion: '2025-12-15.clover',
-    })
-    : null;
+// Lazy initialization - only create Stripe instance when needed
+let stripeInstance: Stripe | null = null;
+
+export function getStripe(): Stripe | null {
+    if (!stripeSecretKey) return null;
+    if (!stripeInstance) {
+        stripeInstance = new Stripe(stripeSecretKey, {
+            apiVersion: '2025-12-15.clover',
+        });
+    }
+    return stripeInstance;
+}
+
+// For backward compatibility
+export const stripe = stripeSecretKey ? getStripe() : null;
 
 export class StripeService {
     private stripe: Stripe;
 
     constructor() {
-        if (!stripe) {
-            throw new Error('Stripe is not configured');
+        const s = getStripe();
+        if (!s) {
+            throw new Error('Stripe is not configured - STRIPE_SECRET_KEY is missing');
         }
-        this.stripe = stripe;
+        this.stripe = s;
     }
 
     /**
@@ -112,4 +123,17 @@ export class StripeService {
     }
 }
 
-export const stripeService = new StripeService();
+// Lazy singleton - only instantiated when first accessed
+let stripeServiceInstance: StripeService | null = null;
+
+export function getStripeService(): StripeService {
+    if (!stripeServiceInstance) {
+        stripeServiceInstance = new StripeService();
+    }
+    return stripeServiceInstance;
+}
+
+// IMPORTANT: Do not instantiate at module load time!
+// Use getStripeService() in API routes instead of stripeService
+// This export is only for backward compatibility and will be null during build
+export const stripeService = null as unknown as StripeService;

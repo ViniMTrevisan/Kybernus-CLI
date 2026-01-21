@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { stripeService } from '@/lib/stripe';
+import { getStripeService } from '@/lib/stripe';
 import { licenseService } from '@/services/license.service';
 import { emailService } from '@/lib/email';
 import { invalidateLicenseCache } from '@/lib/redis';
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
         // Read raw body
         const rawBody = await request.text();
 
-        const event = stripeService.constructEvent(rawBody, sig);
+        const event = getStripeService().constructEvent(rawBody, sig);
 
         console.log(`[Webhook] Received: ${event.type}`);
 

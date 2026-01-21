@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { stripeService } from '@/lib/stripe';
+import { getStripeService } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
 
 export const runtime = 'nodejs';
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
                 );
             }
 
-            const session = await stripeService.createCheckoutSession({
+            const session = await getStripeService().createCheckoutSession({
                 licenseKey,
                 tier,
                 email: user.email,
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         }
 
         // Caso contrário, é compra via website (novo cliente)
-        const session = await stripeService.createWebCheckoutSession({
+        const session = await getStripeService().createWebCheckoutSession({
             tier,
             email,
         });
