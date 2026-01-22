@@ -25,6 +25,7 @@ export interface ProjectConfig {
         terraform: boolean;
     };
     licenseTier: LicenseTier;
+    licenseKey?: string; // Required for Pro template downloads
 }
 
 export interface TemplateContext {

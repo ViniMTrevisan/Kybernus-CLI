@@ -43,7 +43,11 @@
   },
   "files": [
     "dist",
-    "templates",
+    "templates/java-spring/free",
+    "templates/nestjs/free",
+    "templates/nextjs/free",
+    "templates/nodejs-express/free",
+    "templates/python-fastapi/free",
     "README.md",
     "LICENSE"
   ],

@@ -7,6 +7,7 @@ import * as clack from '@clack/prompts';
 import { ProjectConfig } from '../../models/config.js';
 import { TemplateEngine } from '../templates/engine.js';
 import { buildTemplateContext } from './context-builder.js';
+import { templateDownloader } from '../templates/downloader.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -38,8 +39,17 @@ export class ProjectGenerator {
                 throw new Error(`Diretório "${config.projectName}" já existe!`);
             }
 
-            // 2. Determina o caminho do template
-            const templatePath = this.getTemplatePath(config);
+            // 2. Determina o caminho do template (diferente para Pro vs Free)
+            let templatePath: string;
+
+            if (config.licenseTier === 'pro') {
+                // Pro templates: download from API or use cache
+                spinner.message('📦 Verificando templates Pro...');
+                templatePath = await this.getProTemplatePath(config, spinner);
+            } else {
+                // Free templates: use local bundled templates
+                templatePath = this.getLocalTemplatePath(config);
+            }
 
             // Verifica se template existe
             if (!(await fs.pathExists(templatePath))) {
@@ -73,6 +83,47 @@ export class ProjectGenerator {
             spinner.stop('❌ Erro ao gerar projeto');
             throw error;
         }
+    }
+
+    /**
+     * Get Pro template path - downloads from API if not cached
+     */
+    private async getProTemplatePath(config: ProjectConfig, spinner: ReturnType<typeof clack.spinner>): Promise<string> {
+        const architecture = config.architecture || 'clean';
+
+        // Check cache first
+        const cachedPath = await templateDownloader.getCachedTemplate(config.stack, architecture);
+        if (cachedPath) {
+            return cachedPath;
+        }
+
+        // Download from API
+        spinner.message('⬇️  Baixando templates Pro...');
+
+        const result = await templateDownloader.downloadProTemplate(
+            config.licenseKey!,
+            config.stack,
+            architecture
+        );
+
+        if (!result.success || !result.files) {
+            throw new Error(result.error || 'Failed to download Pro template');
+        }
+
+        // Cache the downloaded template
+        await templateDownloader.cacheTemplate(config.stack, architecture, result.files);
+
+        // Return cache path
+        return await templateDownloader.getCachedTemplate(config.stack, architecture) || '';
+    }
+
+    /**
+     * Get local template path for Free tier (bundled with npm package)
+     */
+    private getLocalTemplatePath(config: ProjectConfig): string {
+        const templatesRoot = path.join(__dirname, '../../../templates');
+        const architecture = config.architecture || 'mvc';
+        return path.join(templatesRoot, config.stack, 'free', architecture);
     }
 
     /**

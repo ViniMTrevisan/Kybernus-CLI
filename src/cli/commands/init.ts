@@ -56,7 +56,12 @@ export async function initCommand(options: InitOptions) {
     }
 
     // Executar wizard interativo (ou usar options se non-interactive)
-    const config = await runWizard(licenseTier);
+    const config = await runWizard(licenseTier, options);
+
+    // Inject licenseKey into config if available
+    if (licenseKey) {
+        config.licenseKey = licenseKey;
+    }
 
     // Validate project limit (Metered Trial)
     if (licenseTier === 'pro' && licenseKey) {
