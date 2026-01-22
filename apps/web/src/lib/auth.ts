@@ -1,6 +1,13 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-change-in-production';
+const JWT_SECRET_RAW = process.env.JWT_SECRET;
+
+if (!JWT_SECRET_RAW) {
+    throw new Error('CRITICAL: JWT_SECRET environment variable is required for security');
+}
+
+// TypeScript now knows this is definitely a string
+const JWT_SECRET: string = JWT_SECRET_RAW;
 
 export interface AdminTokenPayload {
     email: string;

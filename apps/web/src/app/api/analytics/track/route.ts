@@ -1,11 +1,25 @@
 import { NextResponse } from 'next/server';
 import { analyticsService } from '@/services/analytics.service';
+import { rateLimit } from '@/lib/redis';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
     try {
+        // Rate limit: 100 events per minute per IP
+        const ip = request.headers.get('x-forwarded-for') ||
+            request.headers.get('x-real-ip') ||
+            'unknown';
+
+        const rateLimitResult = await rateLimit(`analytics:${ip}`, 100, 60);
+        if (!rateLimitResult.allowed) {
+            return NextResponse.json(
+                { error: 'Too many requests' },
+                { status: 429 }
+            );
+        }
+
         const body = await request.json();
         const { licenseKey, event, tier, stack, architecture, command, metadata } = body;
 

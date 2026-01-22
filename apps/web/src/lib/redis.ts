@@ -6,6 +6,19 @@ const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 // Lazy initialization
 let redis: Redis | null = null;
 
+// In-memory fallback rate limiter for when Redis is unavailable
+const memoryRateLimiter = new Map<string, { count: number; resetAt: number }>();
+
+// Cleanup old entries every 5 minutes to prevent memory leaks
+setInterval(() => {
+    const now = Date.now();
+    for (const [key, value] of memoryRateLimiter.entries()) {
+        if (value.resetAt < now) {
+            memoryRateLimiter.delete(key);
+        }
+    }
+}, 5 * 60 * 1000);
+
 function getRedis(): Redis | null {
     if (!redisUrl || !redisToken) {
         // Redis is optional - just skip caching/rate limiting if not configured
@@ -22,8 +35,7 @@ function getRedis(): Redis | null {
 
 /**
  * Rate limiter for API endpoints
- * Only applied to external/CLI endpoints to prevent abuse
- * Website endpoints are NOT rate limited for better UX
+ * Uses Redis when available, falls back to in-memory for critical paths
  */
 export async function rateLimit(
     identifier: string,
@@ -32,9 +44,25 @@ export async function rateLimit(
 ): Promise<{ allowed: boolean; remaining: number; resetIn: number }> {
     const client = getRedis();
 
-    // If Redis not configured, always allow (no rate limiting)
+    // If Redis not configured, use in-memory fallback for security-critical paths
     if (!client) {
-        return { allowed: true, remaining: limit, resetIn: 0 };
+        const now = Date.now();
+        const key = `rate:${identifier}`;
+        const existing = memoryRateLimiter.get(key);
+
+        if (!existing || existing.resetAt < now) {
+            // Start new window
+            memoryRateLimiter.set(key, { count: 1, resetAt: now + windowSeconds * 1000 });
+            return { allowed: true, remaining: limit - 1, resetIn: windowSeconds };
+        }
+
+        existing.count++;
+        const allowed = existing.count <= limit;
+        return {
+            allowed,
+            remaining: Math.max(0, limit - existing.count),
+            resetIn: Math.ceil((existing.resetAt - now) / 1000),
+        };
     }
 
     try {
@@ -51,9 +79,23 @@ export async function rateLimit(
             resetIn: windowSeconds,
         };
     } catch (error) {
-        // On Redis error, allow request (fail open)
-        console.error('[Redis] Rate limit error:', error);
-        return { allowed: true, remaining: limit, resetIn: 0 };
+        // On Redis error, use in-memory fallback instead of failing open
+        console.error('[Redis] Rate limit error, using memory fallback:', error);
+        const now = Date.now();
+        const key = `rate:${identifier}`;
+        const existing = memoryRateLimiter.get(key);
+
+        if (!existing || existing.resetAt < now) {
+            memoryRateLimiter.set(key, { count: 1, resetAt: now + windowSeconds * 1000 });
+            return { allowed: true, remaining: limit - 1, resetIn: windowSeconds };
+        }
+
+        existing.count++;
+        return {
+            allowed: existing.count <= limit,
+            remaining: Math.max(0, limit - existing.count),
+            resetIn: Math.ceil((existing.resetAt - now) / 1000),
+        };
     }
 }
 

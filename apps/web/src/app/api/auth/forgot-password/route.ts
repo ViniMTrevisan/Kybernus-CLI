@@ -2,12 +2,26 @@ import { NextResponse } from 'next/server';
 import { emailService } from '@/lib/email';
 import prisma from '@/lib/prisma';
 import crypto from 'crypto';
+import { rateLimit } from '@/lib/redis';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
     try {
+        // Rate limit by IP: 10 requests per hour
+        const ip = request.headers.get('x-forwarded-for') ||
+            request.headers.get('x-real-ip') ||
+            'unknown';
+
+        const ipRateLimit = await rateLimit(`forgot-password:ip:${ip}`, 10, 3600);
+        if (!ipRateLimit.allowed) {
+            return NextResponse.json(
+                { error: 'Too many requests. Please try again later.' },
+                { status: 429 }
+            );
+        }
+
         const { email } = await request.json();
 
         if (!email || !email.includes('@')) {

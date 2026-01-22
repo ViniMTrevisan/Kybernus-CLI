@@ -1,12 +1,26 @@
 import { NextResponse } from 'next/server';
 import { getStripeService } from '@/lib/stripe';
 import prisma from '@/lib/prisma';
+import { rateLimit } from '@/lib/redis';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
     try {
+        // Rate limit: 10 checkout attempts per minute per IP
+        const ip = request.headers.get('x-forwarded-for') ||
+            request.headers.get('x-real-ip') ||
+            'unknown';
+
+        const rateLimitResult = await rateLimit(`checkout:${ip}`, 10, 60);
+        if (!rateLimitResult.allowed) {
+            return NextResponse.json(
+                { error: 'Too many requests. Please try again later.' },
+                { status: 429 }
+            );
+        }
+
         const { licenseKey, tier, email } = await request.json();
 
         // Validação

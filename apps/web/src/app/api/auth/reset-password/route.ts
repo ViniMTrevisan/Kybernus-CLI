@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,10 +37,13 @@ export async function POST(request: Request) {
             );
         }
 
+        // Hash password before storing
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         // Update user password
         await prisma.user.update({
             where: { email: resetToken.email },
-            data: { password }, // TODO: Add hashing for production
+            data: { password: hashedPassword },
         });
 
         // Delete token
