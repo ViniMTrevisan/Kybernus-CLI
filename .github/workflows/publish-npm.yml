@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*.*.*'
 
+permissions:
+  contents: write
+
 jobs:
   publish:
     name: Build and Publish CLI to NPM
@@ -41,12 +44,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          generate_release_notes: true
           body: |
             ## 🚀 Kybernus CLI Release
             
@@ -54,8 +54,3 @@ jobs:
             ```bash
             npm install -g kybernus
             ```
-            
-            ## 📝 Changes
-            See commit history for details.
-          draft: false
-          prerelease: false

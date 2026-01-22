@@ -1,0 +1,15 @@
+# Ignore Pro templates - they are paid features!
+templates/*/pro/
+
+# Other ignores
+node_modules/
+.git/
+.github/
+tests/
+coverage/
+.env*
+*.log
+.DS_Store
+old/
+apps/
+docs/
