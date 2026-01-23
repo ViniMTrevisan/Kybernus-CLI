@@ -42,7 +42,7 @@ kybernus register
 
 ```bash
 kybernus init       # Generate a new project
-kybernus register   # Start a free trial (15 days)
+kybernus register   # Start a free trial (3 projects)
 kybernus login      # Login with your license key
 kybernus status     # Check license and usage
 kybernus upgrade    # Upgrade to Pro ($49 lifetime)
