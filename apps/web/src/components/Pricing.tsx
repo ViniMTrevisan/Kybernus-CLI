@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const tiers = [
     {
         name: "Kybernus Architect",
-        price: "$7",
+        price: "$9",
         period: "/month",
         description: "Ideal for individual developers and rapid prototyping.",
         tier: "free" as const,
@@ -23,13 +23,15 @@ const tiers = [
             { text: "Full CI/CD Pipelines", included: false },
             { text: "AI-Powered API Docs", included: false },
         ],
-        cta: "Start Building Free",
+        cta: "Get Architect",
+        secondaryCta: "Start Building Free",
+        secondaryLink: "/register",
         highlighted: false,
         accent: "tech-blue",
     },
     {
         name: "Kybernus Pro",
-        price: "$97",
+        price: "$49",
         period: "lifetime",
         description: "The ultimate weapon for enterprise-grade engineering.",
         tier: "pro" as const,
@@ -149,10 +151,6 @@ function PricingCard({ tier, index }: { tier: any, index: number }) {
     const [loading, setLoading] = useState(false);
 
     const handleClick = async () => {
-        if (tier.tier === 'free') {
-            window.location.href = '/docs/getting_started';
-            return;
-        }
         setLoading(true);
         try {
             const res = await fetch('/api/checkout', {
@@ -269,6 +267,15 @@ function PricingCard({ tier, index }: { tier: any, index: number }) {
                             </>
                         )}
                     </button>
+
+                    {tier.secondaryCta && (
+                        <a
+                            href={tier.secondaryLink}
+                            className="w-full mt-3 py-3 block text-center font-mono font-bold uppercase tracking-widest text-[10px] text-muted-foreground hover:text-white border border-transparent hover:border-white/10 hover:bg-white/5 transition-all"
+                        >
+                            {tier.secondaryCta}
+                        </a>
+                    )}
                 </div>
             </div>
         </motion.div>

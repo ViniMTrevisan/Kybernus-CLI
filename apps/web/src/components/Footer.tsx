@@ -86,9 +86,20 @@ export function Footer() {
                 </div>
 
                 <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
-                        © {new Date().getFullYear()} KYBERNUS INC. // SYSTEM ID: KIB-9000
-                    </p>
+                    <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
+                        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+                            © {new Date().getFullYear()} KYBERNUS INC. // SYSTEM ID: KIB-9000
+                        </p>
+                        <span className="hidden md:inline text-[10px] text-white/10">|</span>
+                        <a
+                            href="https://www.solutionsbynex.com/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-mono text-muted-foreground hover:text-tech-blue uppercase tracking-wider transition-colors"
+                        >
+                            Developed by Nex Solutions
+                        </a>
+                    </div>
                     <div className="flex gap-8">
                         <a href="#" className="text-[10px] font-mono text-muted-foreground hover:text-white uppercase tracking-wider transition-colors">Privacy Policy</a>
                         <a href="#" className="text-[10px] font-mono text-muted-foreground hover:text-white uppercase tracking-wider transition-colors">Terms of Service</a>
