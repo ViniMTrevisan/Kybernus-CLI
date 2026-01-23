@@ -39,15 +39,23 @@ export class ProjectGenerator {
                 throw new Error(`Directory "${config.projectName}" already exists!`);
             }
 
-            // 2. Determine template path (different for Pro vs Free)
+            // 2. Determine template path based on ARCHITECTURE tier, not user tier
+            // Pro users can generate Free templates (e.g. MVC)
             let templatePath: string;
 
-            if (config.licenseTier === 'pro') {
-                // Pro templates: download from API or use cache
+            // Check if this architecture requires Pro (clean/hexagonal)
+            const isProArchitecture = config.architecture === 'clean' || config.architecture === 'hexagonal';
+
+            if (isProArchitecture && config.licenseTier === 'pro') {
+                // Pro-only architectures: download from API
                 spinner.message('📦 Checking Pro templates...');
                 templatePath = await this.getProTemplatePath(config, spinner);
+            } else if (isProArchitecture && config.licenseTier !== 'pro') {
+                // User tried to access Pro architecture without Pro license
+                spinner.stop('❌ Pro license required');
+                throw new Error(`Architecture "${config.architecture}" requires a Pro license. Use "kybernus upgrade" to unlock.`);
             } else {
-                // Free templates: use local bundled templates
+                // Free/Architect architectures (MVC, default): use local bundled templates
                 templatePath = this.getLocalTemplatePath(config);
             }
 

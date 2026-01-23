@@ -1,14 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
+import { FolderTree, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export function ArchitectureShowcase() {
     return (
-        <section className="py-32 relative overflow-hidden bg-tech-black">
+        <section className="py-24 relative overflow-hidden bg-tech-black">
             {/* Background */}
             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-tech-purple/5 rounded-full blur-[150px]" />
 
             <div className="container relative z-10 px-4">
                 <motion.div
@@ -16,77 +16,38 @@ export function ArchitectureShowcase() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
-                    className="text-center mb-16"
+                    className="max-w-3xl mx-auto text-center"
                 >
-                    <h2 className="text-4xl md:text-6xl font-space font-bold mb-6 uppercase text-white">
-                        SEE THE <span className="text-transparent bg-clip-text bg-gradient-to-r from-tech-blue to-tech-purple">STRUCTURE</span>
-                    </h2>
-                    <p className="text-lg font-mono text-muted-foreground max-w-2xl mx-auto">
-                        // Architecture intended for <span className="text-tech-success">scalability</span>, not just boilerplate.
-                    </p>
-                </motion.div>
-
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: 30 }}
-                    whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8 }}
-                    className="max-w-2xl mx-auto"
-                >
-                    <div className="relative group">
-                        {/* Outer glow */}
-                        <div className="absolute -inset-1 bg-gradient-to-r from-tech-blue via-tech-purple to-tech-success rounded-lg blur-xl opacity-20 group-hover:opacity-40 transition duration-1000" />
-
-                        {/* Card */}
-                        <div className="relative bg-tech-gray/30 border border-white/10 rounded-lg overflow-hidden backdrop-blur-xl">
-                            {/* Header */}
-                            <div className="bg-tech-gray/50 border-b border-white/10 px-3 py-2">
-                                <div className="flex items-center gap-2">
-                                    <div className="flex gap-1.5">
-                                        <div className="w-2 h-2 rounded-full bg-[#ff5f56]" />
-                                        <div className="w-2 h-2 rounded-full bg-[#ffbd2e]" />
-                                        <div className="w-2 h-2 rounded-full bg-[#27c93f]" />
-                                    </div>
-                                    <span className="text-[10px] font-mono text-muted-foreground">
-                                        FastAPI — Clean Architecture
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Image */}
-                            <div className="p-3 bg-[#1e1e1e]">
-                                <div className="relative rounded overflow-hidden border border-white/5">
-                                    <Image
-                                        src="/architecture-demo.png"
-                                        alt="Clean Architecture folder structure - domain, infrastructure, use-cases"
-                                        width={400}
-                                        height={250}
-                                        priority
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Footer */}
-                            <div className="bg-tech-gray/50 border-t border-white/10 px-3 py-2">
-                                <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground">
-                                    <span>Domain → Infra → Use Cases</span>
-                                    <span className="text-tech-success">✓ Ready</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div className="inline-flex items-center gap-3 px-4 py-2 bg-tech-gray/30 border border-white/10 rounded mb-8">
+                        <FolderTree className="w-4 h-4 text-tech-purple" />
+                        <span className="text-xs font-mono font-bold uppercase text-white">Architecture Explorer</span>
                     </div>
 
-                    {/* Caption */}
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                        className="text-center mt-4 text-xs font-mono text-muted-foreground"
-                    >
-                        From <span className="text-tech-blue">entities</span> to <span className="text-tech-purple">infrastructure</span>,
-                        every file has a purpose. <span className="text-tech-success">Zero bloat</span>.
-                    </motion.p>
+                    <h2 className="text-4xl md:text-6xl font-space font-bold mb-6 uppercase text-white">
+                        SEE <span className="text-transparent bg-clip-text bg-gradient-to-r from-tech-blue to-tech-purple">EVERY</span> STRUCTURE
+                    </h2>
+
+                    <p className="text-lg font-mono text-muted-foreground mb-10 max-w-2xl mx-auto">
+                        // Don't just trust us. <span className="text-tech-success">Inspect every folder</span>, every file, every architecture pattern. <br />
+                        All 5 stacks × 3 architectures = 15 production templates.
+                    </p>
+
+                    <Link href="/structure">
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="group relative px-12 py-6 bg-gradient-to-r from-tech-blue to-tech-purple text-white font-mono font-bold uppercase tracking-widest text-sm transition-all hover:shadow-2xl hover:shadow-tech-purple/50"
+                        >
+                            <span className="relative z-10 flex items-center gap-3">
+                                Explore All Architectures
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </span>
+                        </motion.button>
+                    </Link>
+
+                    <p className="text-xs font-mono text-muted-foreground mt-6">
+                        MVC • Clean Architecture • Hexagonal Architecture
+                    </p>
                 </motion.div>
             </div>
         </section>
