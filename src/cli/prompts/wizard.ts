@@ -17,10 +17,10 @@ export interface ConfigOptions {
 }
 
 export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions = {}): Promise<ProjectConfig> {
-  // Se for modo não interativo, validar options obrigatórias
+  // If non-interactive mode, validate required options
   if (options.nonInteractive) {
     if (!options.name || !options.stack) {
-      throw new Error('Modo não interativo requer --name e --stack. Arquitetura assume padrão se não informada.');
+      throw new Error('Non-interactive mode requires --name and --stack. Architecture defaults to mvc if not specified.');
     }
 
     // Default DevOps flags for Pro non-interactive
@@ -43,27 +43,27 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
     };
   }
 
-  clack.intro('🚀 Bem-vindo ao Kybernus');
+  clack.intro('🚀 Welcome to Kybernus');
 
   // Pre-fill prompt default values based on passed options
   const answers = await clack.group(
     {
       projectName: () =>
         clack.text({
-          message: 'Nome do projeto:',
-          placeholder: 'meu-projeto',
+          message: 'Project name:',
+          placeholder: 'my-project',
           initialValue: options.name,
           validate: (value) => {
-            if (!value) return 'Nome é obrigatório';
+            if (!value) return 'Name is required';
             if (!/^[a-z0-9-]+$/.test(value)) {
-              return 'Use apenas letras minúsculas, números e hífens';
+              return 'Use only lowercase letters, numbers and hyphens';
             }
           },
         }),
 
       stack: () =>
         clack.select({
-          message: 'Escolha a stack:',
+          message: 'Choose your stack:',
           initialValue: options.stack,
           options: [
             { value: 'nextjs', label: 'Next.js (React + TypeScript)' },
@@ -85,7 +85,7 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
           message: 'Build tool:',
           initialValue: options.buildTool,
           options: [
-            { value: 'maven', label: 'Maven (Gradle em breve)' },
+            { value: 'maven', label: 'Maven (Gradle coming soon)' },
           ],
         });
       },
@@ -94,26 +94,26 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
         if (results.stack !== 'java-spring') return;
 
         return clack.text({
-          message: 'Package name (ex: com.usuario.projeto):',
-          placeholder: 'com.usuario.projeto',
+          message: 'Package name (e.g., com.user.project):',
+          placeholder: 'com.user.project',
           initialValue: options.packageName,
           validate: (value) => {
-            if (!value) return 'Package name é obrigatório para Java';
+            if (!value) return 'Package name is required for Java';
             if (!/^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$/.test(value)) {
-              return 'Package name inválido (ex: com.usuario.projeto)';
+              return 'Invalid package name (e.g., com.user.project)';
             }
           },
         });
       },
 
       architecture: ({ results }) => {
-        // Apenas stacks backend suportam arquiteturas diferentes
+        // Only backend stacks support different architectures
         const backendStacks = ['java-spring', 'nodejs-express', 'python-fastapi', 'nestjs'];
         if (!backendStacks.includes(results.stack as string)) return;
 
         const uiOptions = [{ value: 'mvc', label: 'MVC (Model-View-Controller)' }];
 
-        // Arquiteturas avançadas apenas no Pro
+        // Advanced architectures only in Pro
         if (licenseTier === 'pro') {
           uiOptions.push(
             { value: 'clean', label: '🌟 Clean Architecture (Pro)' },
@@ -122,7 +122,7 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
         }
 
         return clack.select({
-          message: 'Arquitetura:',
+          message: 'Architecture:',
           initialValue: options.architecture,
           options: uiOptions,
         });
@@ -130,19 +130,19 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
 
       useAI: () =>
         clack.confirm({
-          message: 'Gerar documentação com IA (Google Gemini)?',
+          message: 'Generate AI documentation (Google Gemini)?',
           initialValue: options.ai || false,
         }),
 
       geminiKey: ({ results }) => {
         if (!results.useAI) return;
-        // Se a key já vier nas options, não pergunta
+        // If key already provided in options, don't ask
         if (options.geminiKey) return;
 
         return clack.password({
           message: 'Gemini API Key:',
           validate: (value) => {
-            if (!value) return 'API Key é obrigatória para usar IA';
+            if (!value) return 'API Key is required to use AI';
           },
         });
       },
@@ -150,13 +150,13 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
       devops: async ({ results }) => {
         if (licenseTier !== 'pro') return [];
 
-        // Se já tiver alguma flag de devops, assume que estamos em modo override
+        // If devops flags already set, assume override mode
         if (options.docker || options.cicd || options.terraform) {
           return;
         }
 
         const selected = await clack.multiselect({
-          message: "DevOps & Infraestrutura (marque o que desejar com Space ou 'A' para selecionar todos):",
+          message: "DevOps & Infrastructure (use Space to select, or 'A' to select all):",
           options: [
             { value: 'docker', label: 'Docker + Docker Compose' },
             { value: 'ci-cd', label: 'GitHub Actions CI/CD' },
@@ -170,7 +170,7 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
     },
     {
       onCancel: () => {
-        clack.cancel('Operação cancelada');
+        clack.cancel('Operation cancelled');
         process.exit(0);
       },
     }

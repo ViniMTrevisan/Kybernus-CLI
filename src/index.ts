@@ -9,7 +9,7 @@ const program = new Command();
 
 program
     .name('kybernus')
-    .description('Open Core CLI for scaffolding production-ready backend and fullstack projects')
+    .description('Professional CLI for scaffolding production-ready backend and fullstack projects')
     .version('0.1.0');
 
 program
@@ -38,7 +38,7 @@ import { upgradeCommand } from './cli/commands/upgrade.js';
 
 program
     .command('register')
-    .description('Start a 15-day Free Trial (Full Access)')
+    .description('Start Free Trial (3 Pro Projects Included)')
     .action(registerCommand);
 
 program

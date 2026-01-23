@@ -7,6 +7,17 @@ import { registerSchema } from '@/lib/validations/auth';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// CORS headers for CLI access
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export async function OPTIONS() {
+    return NextResponse.json({}, { headers: corsHeaders });
+}
+
 export async function POST(request: Request) {
     try {
         // Rate limit: 5 registrations per minute per IP
@@ -18,7 +29,7 @@ export async function POST(request: Request) {
         if (!rateLimitResult.allowed) {
             return NextResponse.json(
                 { error: 'Too many registration attempts. Please try again later.' },
-                { status: 429 }
+                { status: 429, headers: corsHeaders }
             );
         }
 
@@ -28,7 +39,7 @@ export async function POST(request: Request) {
         if (!validation.success) {
             return NextResponse.json(
                 { error: validation.error.message },
-                { status: 400 }
+                { status: 400, headers: corsHeaders }
             );
         }
 
@@ -41,7 +52,7 @@ export async function POST(request: Request) {
                 error: 'Email already registered',
                 licenseKey: existing.licenseKey,
                 status: existing.status,
-            }, { status: 400 });
+            }, { status: 400, headers: corsHeaders });
         }
 
         // Cria trial
@@ -57,14 +68,14 @@ export async function POST(request: Request) {
             status: user.status,
             trialStartedAt: user.trialStartedAt,
             trialEndsAt: user.trialEndsAt,
-            message: 'Trial activated for 15 days',
-        }, { status: 201 });
+            message: 'Trial activated with 3 project limit',
+        }, { status: 201, headers: corsHeaders });
 
     } catch (error: any) {
         console.error('Register error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         );
     }
 }

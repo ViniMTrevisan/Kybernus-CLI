@@ -6,6 +6,17 @@ import { rateLimit } from '@/lib/redis';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// CORS headers for CLI access
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export async function OPTIONS() {
+    return NextResponse.json({}, { headers: corsHeaders });
+}
+
 export async function POST(request: Request) {
     try {
         // Rate limit: 10 checkout attempts per minute per IP
@@ -17,7 +28,7 @@ export async function POST(request: Request) {
         if (!rateLimitResult.allowed) {
             return NextResponse.json(
                 { error: 'Too many requests. Please try again later.' },
-                { status: 429 }
+                { status: 429, headers: corsHeaders }
             );
         }
 
@@ -27,7 +38,7 @@ export async function POST(request: Request) {
         if (!tier || (tier !== 'free' && tier !== 'pro')) {
             return NextResponse.json(
                 { error: 'tier must be "free" or "pro"' },
-                { status: 400 }
+                { status: 400, headers: corsHeaders }
             );
         }
 

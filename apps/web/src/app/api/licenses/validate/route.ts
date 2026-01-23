@@ -6,6 +6,17 @@ import { licenseValidateSchema } from '@/lib/validations/license';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+// CORS headers for CLI access
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+export async function OPTIONS() {
+    return NextResponse.json({}, { headers: corsHeaders });
+}
+
 export async function POST(request: Request) {
     try {
         // Rate limit: 60 validations per minute per IP (high volume allowed for frequent checks)
@@ -17,7 +28,7 @@ export async function POST(request: Request) {
         if (!rateLimitResult.allowed) {
             return NextResponse.json(
                 { error: 'Too many requests. Please try again later.' },
-                { status: 429 }
+                { status: 429, headers: corsHeaders }
             );
         }
 
@@ -27,7 +38,7 @@ export async function POST(request: Request) {
         if (!validation.success) {
             return NextResponse.json(
                 { error: validation.error.message },
-                { status: 400 }
+                { status: 400, headers: corsHeaders }
             );
         }
 
@@ -36,7 +47,7 @@ export async function POST(request: Request) {
         // Check cache first (5 min TTL for valid licenses)
         const cached = await getCachedLicense(licenseKey);
         if (cached && cached.valid) {
-            return NextResponse.json(cached);
+            return NextResponse.json(cached, { headers: corsHeaders });
         }
 
         // Cache miss - query database
@@ -48,16 +59,16 @@ export async function POST(request: Request) {
         }
 
         if (!result.valid) {
-            return NextResponse.json(result, { status: 401 });
+            return NextResponse.json(result, { status: 401, headers: corsHeaders });
         }
 
-        return NextResponse.json(result);
+        return NextResponse.json(result, { headers: corsHeaders });
 
     } catch (error: any) {
         console.error('Validation error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         );
     }
 }

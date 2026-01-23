@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 const execPromise = promisify(exec);
 
 /**
- * Gera projetos a partir de templates
+ * Generates projects from templates
  */
 export class ProjectGenerator {
     private engine: TemplateEngine;
@@ -24,7 +24,7 @@ export class ProjectGenerator {
     }
 
     /**
-     * Gera um projeto completo baseado na configuração
+     * Generates a complete project based on configuration
      */
     async generate(config: ProjectConfig, outputDir: string): Promise<void> {
         const spinner = clack.spinner();
@@ -32,55 +32,55 @@ export class ProjectGenerator {
         try {
             spinner.start('🏗️  Gerando projeto...');
 
-            // 1. Verifica se diretório já existe
+            // 1. Check if directory already exists
             const projectPath = path.join(outputDir, config.projectName);
             if (await fs.pathExists(projectPath)) {
-                spinner.stop('❌ Diretório já existe');
-                throw new Error(`Diretório "${config.projectName}" já existe!`);
+                spinner.stop('❌ Directory already exists');
+                throw new Error(`Directory "${config.projectName}" already exists!`);
             }
 
-            // 2. Determina o caminho do template (diferente para Pro vs Free)
+            // 2. Determine template path (different for Pro vs Free)
             let templatePath: string;
 
             if (config.licenseTier === 'pro') {
                 // Pro templates: download from API or use cache
-                spinner.message('📦 Verificando templates Pro...');
+                spinner.message('📦 Checking Pro templates...');
                 templatePath = await this.getProTemplatePath(config, spinner);
             } else {
                 // Free templates: use local bundled templates
                 templatePath = this.getLocalTemplatePath(config);
             }
 
-            // Verifica se template existe
+            // Check if template exists
             if (!(await fs.pathExists(templatePath))) {
-                spinner.stop('❌ Template não encontrado');
+                spinner.stop('❌ Template not found');
                 throw new Error(
-                    `Template não encontrado: ${config.stack}/${config.licenseTier}\n` +
+                    `Template not found: ${config.stack}/${config.licenseTier}\n` +
                     `Path: ${templatePath}`
                 );
             }
 
-            // 3. Constrói o context para Handlebars
+            // 3. Build context for Handlebars
             const context = buildTemplateContext(config);
 
-            // 4. Renderiza todos os templates
+            // 4. Render all templates
             await this.engine.renderTree(templatePath, projectPath, context);
 
-            // 5. Gera documentação com IA (se habilitado)
+            // 5. Generate AI documentation (if enabled)
             if (config.useAI && config.geminiKey) {
-                spinner.message('🤖 Gerando documentação com IA...');
+                spinner.message('🤖 Generating AI documentation...');
                 await this.generateAIDocumentation(config, projectPath);
             }
 
             // 6. Post-generation hooks (Java wrappers, etc)
             await this.runPostGenerationHooks(config, projectPath);
 
-            spinner.stop('✅ Projeto gerado com sucesso!');
+            spinner.stop('✅ Project generated successfully!');
 
-            // 7. Mostra próximos passos
+            // 7. Show next steps
             this.showNextSteps(config);
         } catch (error) {
-            spinner.stop('❌ Erro ao gerar projeto');
+            spinner.stop('❌ Error generating project');
             throw error;
         }
     }
@@ -98,7 +98,7 @@ export class ProjectGenerator {
         }
 
         // Download from API
-        spinner.message('⬇️  Baixando templates Pro...');
+        spinner.message('⬇️  Downloading Pro templates...');
 
         const result = await templateDownloader.downloadProTemplate(
             config.licenseKey!,
@@ -127,14 +127,14 @@ export class ProjectGenerator {
     }
 
     /**
-     * Gera documentação usando IA (README.md e API.md)
+     * Generates documentation using AI (README.md and API.md)
      */
     private async generateAIDocumentation(config: ProjectConfig, projectPath: string): Promise<void> {
         try {
             const { DocumentationGenerator } = await import('../ai/documentation-generator.js');
             const docGen = new DocumentationGenerator(config.geminiKey!);
 
-            // 1. Gera README.md
+            // 1. Generate README.md
             try {
                 const readme = await docGen.generateREADME(config);
                 await fs.writeFile(
@@ -142,13 +142,13 @@ export class ProjectGenerator {
                     readme,
                     'utf-8'
                 );
-                clack.log.success('  ├─ README.md gerado com IA');
+                clack.log.success('  ├─ README.md generated with AI');
             } catch (error: any) {
-                clack.log.warn(`  ├─ Falha ao gerar README: ${error.message}`);
-                clack.log.info('  ├─ Usando README do template');
+                clack.log.warn(`  ├─ Failed to generate README: ${error.message}`);
+                clack.log.info('  ├─ Using template README');
             }
 
-            // 2. Gera API.md (apenas Pro tier com controllers)
+            // 2. Generate API.md (Pro tier only with controllers)
             if (config.licenseTier === 'pro') {
                 try {
                     const controllers = await this.extractControllers(projectPath, config.stack);
@@ -160,25 +160,25 @@ export class ProjectGenerator {
                             apiDocs,
                             'utf-8'
                         );
-                        clack.log.success('  └─ API.md gerado com IA');
+                        clack.log.success('  └─ API.md generated with AI');
                     }
                 } catch (error: any) {
-                    clack.log.warn(`  └─ Falha ao gerar API docs: ${error.message}`);
+                    clack.log.warn(`  └─ Failed to generate API docs: ${error.message}`);
                 }
             }
         } catch (error: any) {
-            clack.log.error(`Erro ao gerar documentação com IA: ${error.message}`);
-            clack.log.info('Continuando com README do template...');
+            clack.log.error(`Error generating AI documentation: ${error.message}`);
+            clack.log.info('Continuing with template README...');
         }
     }
 
     /**
-     * Retorna o caminho do template baseado na config
+     * Returns template path based on config
      */
     private getTemplatePath(config: ProjectConfig): string {
-        // Caminho relativo do generator até a raiz do projeto
-        // generator está em src/core/generator/
-        // templates está em templates/
+        // Relative path from generator to project root
+        // generator is in src/core/generator/
+        // templates is in templates/
         const templatesRoot = path.join(__dirname, '../../../templates');
 
         const tier = config.licenseTier;
@@ -194,17 +194,17 @@ export class ProjectGenerator {
     }
 
     /**
-     * Mostra instruções de próximos passos
+     * Shows next steps instructions
      */
     private showNextSteps(config: ProjectConfig): void {
         const instructions = this.getStackSpecificInstructions(config.stack);
 
         clack.note(
-            `📁 Entre no diretório do projeto:\n   cd ${config.projectName}\n\n` +
+            `📁 Enter the project directory:\n   cd ${config.projectName}\n\n` +
             `📦 ${instructions.install}\n\n` +
             `🚀 ${instructions.run}\n\n` +
-            `📝 Leia o README.md para mais informações`,
-            '✨ Próximos passos'
+            `📝 Read README.md for more information`,
+            '✨ Next steps'
         );
     }
 
@@ -226,73 +226,73 @@ export class ProjectGenerator {
             case 'java-spring':
                 return {
                     install: 'Build tool configurado (Maven/Gradle)',
-                    run: 'Rode a aplicação:\n   ./mvnw spring-boot:run',
+                    run: 'Run the application:\n   ./mvnw spring-boot:run',
                 };
             case 'python-fastapi':
                 return {
-                    install: 'Instale as dependências:\n   pip install -r requirements.txt',
-                    run: 'Inicie o servidor:\n   uvicorn main:app --reload',
+                    install: 'Install dependencies:\n   pip install -r requirements.txt',
+                    run: 'Start the server:\n   uvicorn main:app --reload',
                 };
             case 'nestjs':
                 return {
-                    install: 'Instale as dependências:\n   npm install',
-                    run: 'Inicie o servidor:\n   npm run start:dev',
+                    install: 'Install dependencies:\n   npm install',
+                    run: 'Start the server:\n   npm run start:dev',
                 };
             default:
                 return {
-                    install: 'Veja o README.md',
-                    run: 'Veja o README.md',
+                    install: 'See README.md',
+                    run: 'See README.md',
                 };
         }
     }
 
     /**
-     * Executa hooks pós-geração (ex: instalar wrappers do Maven/Gradle)
+     * Runs post-generation hooks (e.g., install Maven/Gradle wrappers)
      */
     private async runPostGenerationHooks(config: ProjectConfig, projectPath: string): Promise<void> {
-        // Hook específico para Java Spring Boot
+        // Java Spring Boot specific hook
         if (config.stack === 'java-spring') {
             await this.installJavaBuildWrapper(config, projectPath);
         }
     }
 
     /**
-     * Instala o build wrapper (Maven ou Gradle) para projetos Java
+     * Installs build wrapper (Maven or Gradle) for Java projects
      */
     private async installJavaBuildWrapper(config: ProjectConfig, projectPath: string): Promise<void> {
         const buildTool = config.buildTool || 'maven';
 
         try {
             if (buildTool === 'maven') {
-                // Usa mvn wrapper:wrapper para gerar os arquivos do wrapper
+                // Use mvn wrapper:wrapper to generate wrapper files
 
-                // Verifica se Maven está instalado
+                // Check if Maven is installed
                 try {
                     await execPromise('mvn --version');
                 } catch {
-                    console.warn('⚠️  Maven não encontrado. Wrapper não será instalado.');
+                    console.warn('⚠️  Maven not found. Wrapper will not be installed.');
                     console.warn('   Instale Maven ou use o comando: mvn wrapper:wrapper');
                     return;
                 }
 
-                // Gera o wrapper
+                // Generate wrapper
                 await execPromise('mvn wrapper:wrapper', { cwd: projectPath });
 
-                // Define permissões de execução no mvnw
+                // Set execution permissions on mvnw
                 await fs.chmod(path.join(projectPath, 'mvnw'), 0o755);
             } else if (buildTool === 'gradle') {
-                // TODO: Implementar Gradle wrapper quando suportarmos Gradle
-                console.warn('⚠️  Gradle wrapper ainda não implementado');
+                // TODO: Implement Gradle wrapper when we support Gradle
+                console.warn('⚠️  Gradle wrapper not yet implemented');
             }
         } catch (error) {
-            // Não falha a geração do projeto se o wrapper falhar
+            // Don't fail project generation if wrapper fails
             console.warn(`⚠️  Erro ao instalar ${buildTool} wrapper:`, error);
-            console.warn(`   O projeto foi gerado, mas você precisará instalar o wrapper manualmente.`);
+            console.warn(`   Project was generated, but you will need to install the wrapper manually.`);
         }
     }
 
     /**
-     * Extrai arquivos de controllers para documentação da API
+     * Extracts controller files for API documentation
      */
     private async extractControllers(projectPath: string, stack: string): Promise<Array<{ name: string, content: string }>> {
         const controllers: Array<{ name: string, content: string }> = [];
@@ -312,28 +312,28 @@ export class ProjectGenerator {
         if (!(await fs.pathExists(fullPath))) return controllers;
 
         try {
-            // Encontra arquivos de controllers recursivamente
+            // Find controller files recursively
             const files = await this.findControllerFiles(fullPath, stack);
 
-            // Lê conteúdo de cada controller (máximo 5 para não sobrecarregar)
+            // Read content of each controller (max 5 to avoid overload)
             for (const file of files.slice(0, 5)) {
                 try {
                     const content = await fs.readFile(file, 'utf-8');
                     const name = path.basename(file);
                     controllers.push({ name, content });
                 } catch (error) {
-                    // Ignora arquivos que não podem ser lidos
+                    // Ignore files that can't be read
                 }
             }
         } catch (error) {
-            // Se falhar, retorna array vazio
+            // If it fails, return empty array
         }
 
         return controllers;
     }
 
     /**
-     * Busca arquivos de controllers baseado no stack
+     * Searches for controller files based on stack
      */
     private async findControllerFiles(dir: string, stack: string): Promise<string[]> {
         const extensions: Record<string, string[]> = {
@@ -362,7 +362,7 @@ export class ProjectGenerator {
                     const ext = path.extname(entry.name);
                     const name = entry.name.toLowerCase();
 
-                    // Inclui apenas arquivos de controllers/routes
+                    // Include only controller/route files
                     if (validExts.includes(ext) &&
                         (name.includes('controller') || name.includes('route') ||
                             name.includes('auth') || name.includes('payment'))) {

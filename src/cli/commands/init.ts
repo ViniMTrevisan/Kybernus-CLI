@@ -20,7 +20,7 @@ export async function initCommand(options: InitOptions) {
     const configManager = new ConfigManager();
     const validator = new LicenseValidator();
 
-    // Determinar tier de licença
+    // Determine license tier
     let licenseTier: LicenseTier = 'free';
     let licenseKey: string | undefined = options.license;
 
@@ -48,14 +48,14 @@ export async function initCommand(options: InitOptions) {
 
     if (licenseTier === 'free') {
         clack.note(
-            '🆓 Modo Free ativo\n\nVocê está usando o Kybernus Free. Para acessar:\n- Arquiteturas avançadas (Clean, Hexagonal)\n- Stacks adicionais (Python FastAPI, NestJS)\n- DevOps completo (Docker, CI/CD, Terraform)\n\nAdquira uma licença Pro em: https://kybernus.dev/pro',
-            'ℹ️  Informação'
+            '🆓 Free Mode Active\n\nYou are using Kybernus Free. To access:\n- Advanced Architectures (Clean, Hexagonal)\n- Additional Stacks (Python FastAPI, NestJS)\n- Complete DevOps (Docker, CI/CD, Terraform)\n\nTo unlock Pro features, run: kybernus upgrade',
+            'ℹ️  Information'
         );
     } else {
-        clack.note('🌟 Modo Pro ativo\n\nVocê tem acesso a todos os recursos!', '✨ Pro');
+        clack.note('🌟 Pro Mode Active\n\nYou have access to all features!', '✨ Pro');
     }
 
-    // Executar wizard interativo (ou usar options se non-interactive)
+    // Run interactive wizard (or use options if non-interactive)
     const config = await runWizard(licenseTier, options);
 
     // Inject licenseKey into config if available
@@ -66,26 +66,26 @@ export async function initCommand(options: InitOptions) {
     // Validate project limit (Metered Trial)
     if (licenseTier === 'pro' && licenseKey) {
         const spinner = clack.spinner();
-        spinner.start('Validando cota de projetos...');
+        spinner.start('Validating project quota...');
 
         const creditCheck = await validator.consumeCredit(licenseKey);
 
-        spinner.stop('Cota verificada');
+        spinner.stop('Quota verified');
 
         if (!creditCheck.authorized) {
-            clack.log.error(creditCheck.message || 'Criação de projeto bloqueada por limite da licença.');
+            clack.log.error(creditCheck.message || 'Project creation blocked by license limit.');
             if (creditCheck.message?.includes('Trial limit')) {
-                clack.note('🔓 Desbloqueie projetos ilimitados com Kybernus Pro lifetime.\nExecute: kybernus upgrade', 'Limite Atingido');
+                clack.note('🔓 Unlock unlimited projects with Kybernus Pro lifetime.\nRun: kybernus upgrade', 'Limit Reached');
             }
             return; // Stop generation
         }
 
         if (creditCheck.remaining !== undefined && creditCheck.remaining >= 0) {
-            clack.log.info(`Créditos Trial: ${creditCheck.usage}/${creditCheck.limit} utilizados. (${creditCheck.remaining} restantes)`);
+            clack.log.info(`Trial Credits: ${creditCheck.usage}/${creditCheck.limit} used. (${creditCheck.remaining} remaining)`);
         }
     }
 
-    // Gerar projeto
+    // Generate project
     const generator = new ProjectGenerator();
     await generator.generate(config, process.cwd());
 
@@ -99,5 +99,5 @@ export async function initCommand(options: InitOptions) {
         command: 'init'
     });
 
-    clack.outro('🎉 Projeto criado com sucesso! Bom desenvolvimento!');
+    clack.outro('🎉 Project created successfully! Happy coding!');
 }
