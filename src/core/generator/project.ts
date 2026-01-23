@@ -130,7 +130,10 @@ export class ProjectGenerator {
      */
     private getLocalTemplatePath(config: ProjectConfig): string {
         const templatesRoot = path.join(__dirname, '../../../templates');
-        const architecture = config.architecture || 'mvc';
+
+        // Next.js uses 'default' architecture, others use 'mvc'
+        const architecture = config.architecture || (config.stack === 'nextjs' ? 'default' : 'mvc');
+
         return path.join(templatesRoot, config.stack, 'free', architecture);
     }
 
