@@ -45,7 +45,7 @@ kybernus init       # Generate a new project
 kybernus register   # Start a free trial (15 days)
 kybernus login      # Login with your license key
 kybernus status     # Check license and usage
-kybernus upgrade    # Upgrade to Pro ($97 lifetime)
+kybernus upgrade    # Upgrade to Pro ($49 lifetime)
 kybernus logout     # Sign out
 ```
 
