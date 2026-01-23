@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 
-const API_URL = process.env.KYBERNUS_API_URL || 'https://getkybernus.com/api';
+const API_URL = process.env.KYBERNUS_API_URL || 'https://kybernus-cli.vercel.app/api';
 
 export interface TemplateFile {
     path: string;

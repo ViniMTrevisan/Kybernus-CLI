@@ -1,6 +1,6 @@
 import { ConfigManager } from '../../core/config/config-manager.js';
 
-const API_URL = process.env.KYBERNUS_API_URL || 'https://getkybernus.com/api';
+const API_URL = process.env.KYBERNUS_API_URL || 'https://kybernus-cli.vercel.app/api';
 
 export class AnalyticsClient {
     private configManager: ConfigManager;

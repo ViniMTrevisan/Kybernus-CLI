@@ -2,7 +2,7 @@ import * as clack from '@clack/prompts';
 import { ConfigManager } from '../../core/config/config-manager.js';
 import { AnalyticsClient } from '../services/AnalyticsClient.js';
 
-const API_URL = process.env.KYBERNUS_API_URL || 'https://getkybernus.com/api';
+const API_URL = process.env.KYBERNUS_API_URL || 'https://kybernus-cli.vercel.app/api';
 
 export async function registerCommand() {
     console.clear();
@@ -38,6 +38,19 @@ export async function registerCommand() {
         process.exit(0);
     }
 
+    const password = await clack.password({
+        message: 'Create a password:',
+        validate: (value) => {
+            if (!value) return 'Password is required';
+            if (value.length < 6) return 'Password must be at least 6 characters';
+        },
+    });
+
+    if (clack.isCancel(password)) {
+        clack.outro('Operation cancelled.');
+        process.exit(0);
+    }
+
     const s = clack.spinner();
     s.start('Registering account...');
 
@@ -47,7 +60,7 @@ export async function registerCommand() {
         const response = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, machineId }),
+            body: JSON.stringify({ email, password }),
         });
 
         const data = await response.json() as any;
