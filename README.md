@@ -72,12 +72,12 @@ $ kybernus init
 
 ### 3 projects FREE! Includes PRO and Architect templates 
 
-### Architect ($7)
+### Architect ($9)
 - Basic project scaffolding (MVC)
 - Node.js, Next.js, Java Spring Boot
 - README with setup instructions
 
-### Pro Tier ($97 lifetime)
+### Pro Tier ($49 lifetime)
 - **All stacks** including NestJS and FastAPI
 - **Clean & Hexagonal Architecture** patterns
 - **Docker & docker-compose** configurations
@@ -92,13 +92,12 @@ $ kybernus init
 
 - 🌐 **Website**: [kybernus.vercel.app](https://kybernus.vercel.app)
 - 📖 **Docs**: [kybernus.vercel.app/docs](https://kybernus.vercel.app/docs)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/ViniMTrevisan/Kybernus-CLI/issues)
 
 ---
 
 ## License
 
-MIT © 2026 Vini Trevisan
+Copyright © 2026 Vini Trevisan. All rights reserved. Redistribution or modification involves a violation of applicable laws
 
 ---
 

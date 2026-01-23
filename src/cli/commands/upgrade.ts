@@ -21,8 +21,8 @@ export async function upgradeCommand() {
     const type = await clack.select({
         message: 'Choose your plan:',
         options: [
-            { value: 'monthly', label: 'Monthly Subscription ($7/month) - Continue using standard features' },
-            { value: 'lifetime', label: 'Pro Lifetime ($97 one-time) - Unlock Advanced Architecture & DevOps forever' },
+            { value: 'monthly', label: 'Monthly Subscription ($9/month) - Continue using standard features' },
+            { value: 'lifetime', label: 'Pro Lifetime ($49 one-time) - Unlock Advanced Architecture & DevOps forever' },
         ],
     });
 
