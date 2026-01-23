@@ -1,6 +1,6 @@
 {
   "name": "kybernus",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "type": "module",
   "description": "The Ultimate Scaffolding CLI for Modern Developers",
   "main": "dist/index.js",

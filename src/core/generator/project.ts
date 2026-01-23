@@ -39,23 +39,32 @@ export class ProjectGenerator {
                 throw new Error(`Directory "${config.projectName}" already exists!`);
             }
 
-            // 2. Determine template path based on ARCHITECTURE tier, not user tier
-            // Pro users can generate Free templates (e.g. MVC)
+            // 2. Determine template path based on ARCHITECTURE tier AND stack availability
+            // Pro users can generate Free templates (e.g. MVC) IF the stack has a Free version
             let templatePath: string;
 
             // Check if this architecture requires Pro (clean/hexagonal)
             const isProArchitecture = config.architecture === 'clean' || config.architecture === 'hexagonal';
 
-            if (isProArchitecture && config.licenseTier === 'pro') {
-                // Pro-only architectures: download from API
+            // Some stacks are Pro-only (no Free tier at all)
+            const isProOnlyStack = config.stack === 'python-fastapi' || config.stack === 'nestjs';
+
+            // Need Pro template if: Pro architecture OR Pro-only stack
+            const needsProTemplate = isProArchitecture || isProOnlyStack;
+
+            if (needsProTemplate && config.licenseTier === 'pro') {
+                // Pro templates: download from API
                 spinner.message('📦 Checking Pro templates...');
                 templatePath = await this.getProTemplatePath(config, spinner);
-            } else if (isProArchitecture && config.licenseTier !== 'pro') {
-                // User tried to access Pro architecture without Pro license
+            } else if (needsProTemplate && config.licenseTier !== 'pro') {
+                // User tried to access Pro content without Pro license
                 spinner.stop('❌ Pro license required');
-                throw new Error(`Architecture "${config.architecture}" requires a Pro license. Use "kybernus upgrade" to unlock.`);
+                const reason = isProOnlyStack
+                    ? `Stack "${config.stack}" requires a Pro license`
+                    : `Architecture "${config.architecture}" requires a Pro license`;
+                throw new Error(`${reason}. Use "kybernus upgrade" to unlock.`);
             } else {
-                // Free/Architect architectures (MVC, default): use local bundled templates
+                // Free/Architect templates: use local bundled templates
                 templatePath = this.getLocalTemplatePath(config);
             }
 
