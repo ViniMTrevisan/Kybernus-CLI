@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 // Allowed stacks and architectures for Pro tier
 const ALLOWED_STACKS = ['nodejs-express', 'nextjs', 'java-spring', 'nestjs', 'python-fastapi'];
-const ALLOWED_ARCHITECTURES = ['clean', 'hexagonal'];
+const ALLOWED_ARCHITECTURES = ['mvc', 'clean', 'hexagonal'];
 
 export async function POST(request: Request) {
     try {
