@@ -46,14 +46,14 @@ const architectures: { id: Architecture; name: string; tier: "free" | "pro"; ava
     },
 ];
 
-// Placeholder data - screenshots will be added later
+// Real screenshot data - all uploaded to public/
 const templates: Record<Stack, Record<Architecture, ArchTemplate>> = {
     "nextjs": {
         "mvc": {
-            name: "Next.js MVC",
+            name: "Next.js Default",
             tier: "free",
-            description: "Standard pages directory with API routes, components, and utilities.",
-            screenshot: null,
+            description: "Modern Next.js 13+ with App Router, Server Components, and TypeScript.",
+            screenshot: "/next-free.png",
         },
         "clean": {
             name: "Next.js Clean",
@@ -73,36 +73,80 @@ const templates: Record<Stack, Record<Architecture, ArchTemplate>> = {
             name: "Node.js MVC",
             tier: "free",
             description: "Classic Model-View-Controller with routes, controllers, and middleware.",
-            screenshot: null,
+            screenshot: "/node-mvc.png",
         },
         "clean": {
             name: "Node.js Clean",
             tier: "pro",
             description: "Use case-driven architecture with domain isolation and dependency injection.",
-            screenshot: null,
+            screenshot: "/node-clean.png",
         },
         "hexagonal": {
             name: "Node.js Hexagonal",
             tier: "pro",
             description: "Port-based design with interchangeable adapters for databases and APIs.",
-            screenshot: null,
+            screenshot: "/node-hexagonal.png",
         },
     },
-    // Add other stacks similarly...
     "java-spring": {
-        "mvc": { name: "Java Spring MVC", tier: "free", description: "Standard Spring MVC with controllers and services.", screenshot: null },
-        "clean": { name: "Java Spring Clean", tier: "pro", description: "Domain-centric Spring architecture.", screenshot: null },
-        "hexagonal": { name: "Java Spring Hexagonal", tier: "pro", description: "Ports & adapters with Spring DI.", screenshot: null },
+        "mvc": {
+            name: "Java Spring MVC",
+            tier: "free",
+            description: "Standard Spring MVC with controllers, services, and repository pattern.",
+            screenshot: "/java-mvc.png"
+        },
+        "clean": {
+            name: "Java Spring Clean",
+            tier: "pro",
+            description: "Domain-centric Spring architecture with clear separation of concerns.",
+            screenshot: "/java-clean.png"
+        },
+        "hexagonal": {
+            name: "Java Spring Hexagonal",
+            tier: "pro",
+            description: "Ports & adapters pattern with Spring dependency injection.",
+            screenshot: "/java-hexagonal.png"
+        },
     },
     "python-fastapi": {
-        "mvc": { name: "FastAPI MVC", tier: "free", description: "Simple FastAPI with routers and services.", screenshot: "/architecture-demo.png" },
-        "clean": { name: "FastAPI Clean", tier: "pro", description: "Clean architecture with FastAPI.", screenshot: null },
-        "hexagonal": { name: "FastAPI Hexagonal", tier: "pro", description: "Hexagonal pattern with FastAPI.", screenshot: null },
+        "mvc": {
+            name: "FastAPI MVC",
+            tier: "pro",
+            description: "FastAPI with routers, services, and async repository pattern.",
+            screenshot: null
+        },
+        "clean": {
+            name: "FastAPI Clean",
+            tier: "pro",
+            description: "Clean architecture with domain entities and use cases.",
+            screenshot: "/python-clean.png"
+        },
+        "hexagonal": {
+            name: "FastAPI Hexagonal",
+            tier: "pro",
+            description: "Hexagonal pattern with ports and adapters for FastAPI.",
+            screenshot: "/python-hexagonal.png"
+        },
     },
     "nestjs": {
-        "mvc": { name: "NestJS MVC", tier: "free", description: "Classic NestJS module structure.", screenshot: null },
-        "clean": { name: "NestJS Clean", tier: "pro", description: "Domain-driven NestJS.", screenshot: null },
-        "hexagonal": { name: "NestJS Hexagonal", tier: "pro", description: "Ports & adapters with NestJS.", screenshot: null },
+        "mvc": {
+            name: "NestJS MVC",
+            tier: "pro",
+            description: "NestJS with controllers, services, and module organization.",
+            screenshot: null
+        },
+        "clean": {
+            name: "NestJS Clean",
+            tier: "pro",
+            description: "Domain-driven NestJS with clean architecture principles.",
+            screenshot: "/nest-clean.png"
+        },
+        "hexagonal": {
+            name: "NestJS Hexagonal",
+            tier: "pro",
+            description: "Ports & adapters with NestJS modules and providers.",
+            screenshot: "/nest-hexagonal.png"
+        },
     },
 };
 
