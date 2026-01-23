@@ -4,7 +4,7 @@ Understand the philosophy behind Kybernus and how it structures your application
 
 ## 1. Tiers & Pricing
 
-Kybernus operates on a **Freemium** model. We believe every developer should have access to professional-grade tools, while offered specialized features for enterprise and scaling teams.
+Kybernus operates on a **Paid** model. We believe every developer should have access to professional-grade tools, while offered specialized features for enterprise and scaling teams.
 
 | Feature | Free Tier | Pro Tier 🌟 |
 | :--- | :--- | :--- |

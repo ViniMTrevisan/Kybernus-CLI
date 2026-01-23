@@ -38,7 +38,7 @@ High performance, easy to learn, fast to code, ready for production.
     *   `Alembic` for migrations.
     *   Automatic interactive API docs (Swagger UI).
 
-## 5. Next.js (Free & Pro) 🌟
+## 5. Next.js (Free & Pro) 
 The React Framework for the Web.
 *   **Language**: TypeScript.
 *   **Features**:

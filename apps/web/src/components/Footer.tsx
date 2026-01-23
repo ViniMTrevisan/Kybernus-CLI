@@ -101,8 +101,8 @@ export function Footer() {
                         </a>
                     </div>
                     <div className="flex gap-8">
-                        <a href="#" className="text-[10px] font-mono text-muted-foreground hover:text-white uppercase tracking-wider transition-colors">Privacy Policy</a>
-                        <a href="#" className="text-[10px] font-mono text-muted-foreground hover:text-white uppercase tracking-wider transition-colors">Terms of Service</a>
+                        <a href="/privacy" className="text-[10px] font-mono text-muted-foreground hover:text-white uppercase tracking-wider transition-colors">Privacy Policy</a>
+                        <a href="/terms" className="text-[10px] font-mono text-muted-foreground hover:text-white uppercase tracking-wider transition-colors">Terms of Service</a>
                     </div>
                 </div>
             </div>

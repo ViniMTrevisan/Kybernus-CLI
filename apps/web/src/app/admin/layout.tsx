@@ -15,12 +15,12 @@ export default async function AdminLayout({
     console.log('[AdminLayout] Checking access. Token present:', !!token);
 
     if (!token) {
-        redirect('/admin-login');
+        redirect('/login');
     }
 
     const payload = verifyAdminToken(token);
     if (!payload || payload.role !== 'admin') {
-        redirect('/admin-login');
+        redirect('/login');
     }
 
     return (
