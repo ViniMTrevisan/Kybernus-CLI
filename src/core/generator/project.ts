@@ -215,13 +215,13 @@ export class ProjectGenerator {
         switch (stack) {
             case 'nodejs-express':
                 return {
-                    install: 'Instale as dependências:\n   npm install',
-                    run: 'Inicie o servidor:\n   npm run dev',
+                    install: 'Install the dependencies:\n   npm install',
+                    run: 'Start the server:\n   npm run dev',
                 };
             case 'nextjs':
                 return {
-                    install: 'Instale as dependências:\n   npm install',
-                    run: 'Inicie o servidor:\n   npm run dev',
+                    install: 'Install the dependencies:\n   npm install',
+                    run: 'Start the server:\n   npm run dev',
                 };
             case 'java-spring':
                 return {

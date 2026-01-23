@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import * as jose from 'jose';
 
 const JWT_SECRET = new TextEncoder().encode(
-    process.env.JWT_SECRET || 'default-secret-change-in-production'
+    process.env.JWT_SECRET
 );
 
 export async function proxy(request: NextRequest) {
