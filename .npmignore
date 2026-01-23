@@ -1,5 +1,7 @@
 # Ignore Pro templates - they are paid features!
 templates/*/pro/
+templates/nestjs/free
+templates/python-fastapi/free
 
 # Other ignores
 node_modules/
@@ -13,3 +15,4 @@ coverage/
 old/
 apps/
 docs/
+
