@@ -7,12 +7,16 @@ import { StackShowcase } from "@/components/StackShowcase";
 import { ArchitectureVisual } from "@/components/ArchitectureVisual";
 import { SocialProof } from "@/components/SocialProof";
 import { FinalCTA } from "@/components/FinalCTA";
+import { WhyKybernus } from "@/components/WhyKybernus";
+import { ArchitectureShowcase } from "@/components/ArchitectureShowcase";
 
 export default function Home() {
   return (
     <main className="min-h-screen">
       <Navbar />
       <Hero />
+      <WhyKybernus />
+      <ArchitectureShowcase />
       <StackShowcase />
       <Features />
       <ArchitectureVisual />

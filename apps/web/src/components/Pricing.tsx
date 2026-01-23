@@ -77,7 +77,7 @@ export function Pricing() {
                     </h2>
                     <p className="text-xl font-mono text-muted-foreground max-w-2xl mx-auto">
                         // Choose the plan that fits your engineering needs. <br />
-                        Start for free, upgrade for full power.
+                        <span className="text-tech-success">Be a PRO. Own it forever.</span> No subscriptions, no surprises.
                     </p>
                 </motion.div>
 

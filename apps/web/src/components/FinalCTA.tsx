@@ -36,12 +36,13 @@ export function FinalCTA() {
                         <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-20 pointer-events-none" />
 
                         <h2 className="text-4xl md:text-7xl font-space font-bold mb-6 tracking-tighter uppercase leading-[0.9] text-white">
-                            STOP WRITING <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-tech-blue to-tech-purple italic">BOILERPLATE</span>
+                            START BUILDING
+                            <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-tech-blue to-tech-purple italic">FASTER TODAY</span>
                         </h2>
                         <p className="text-xl font-mono text-muted-foreground mb-12 max-w-xl mx-auto">
-                            // Start your next production system in seconds. <br />
-                            Kybernus is free to start, and built for a lifetime of engineering excellence.
+                            // Join developers building production-ready systems in minutes. <br />
+                            Free to start. Built for scale.
                         </p>
 
                         <div className="flex flex-col md:flex-row items-center justify-center gap-8">

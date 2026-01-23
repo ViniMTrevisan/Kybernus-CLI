@@ -83,25 +83,51 @@ export function Hero() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.4 }}
-                            className="flex flex-wrap justify-center gap-6 mb-24"
+                            className="flex flex-col sm:flex-row justify-center gap-4 mb-16"
                         >
-                            <a
-                                href="/register"
-                                className="group relative px-8 py-4 bg-tech-blue text-black font-mono font-bold uppercase tracking-widest text-sm transition-all hover:bg-white overflow-hidden clip-path-polygon"
+                            <motion.a
+                                href="#install"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="group relative px-10 py-5 bg-tech-purple text-white font-mono font-bold uppercase tracking-widest text-sm transition-all hover:bg-white hover:text-black overflow-hidden shadow-lg hover:shadow-tech-purple/50 min-w-[240px] text-center"
                             >
-                                <span className="relative z-10 flex items-center gap-2">
-                                    Initialize Project <ArrowRight className="w-4 h-4" />
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                    Get Started Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                 </span>
-                            </a>
+                            </motion.a>
+
+                            <motion.a
+                                href="#pricing"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.98 }}
+                                className="group relative px-10 py-5 bg-transparent border-2 border-white/20 text-white font-mono font-bold uppercase tracking-widest text-sm transition-all hover:border-white hover:bg-white/5 min-w-[240px] text-center"
+                            >
+                                <span className="relative z-10 flex items-center justify-center gap-2">
+                                    View Pro Features
+                                </span>
+                            </motion.a>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.5 }}
+                            id="install"
+                            className="mb-24"
+                        >
+                            <div className="inline-flex items-center gap-3 px-6 py-3 rounded bg-tech-gray/50 border border-white/10 font-mono text-sm">
+                                <TerminalIcon className="w-4 h-4 text-tech-blue" />
+                                <code className="text-white">npm install -g kybernus</code>
+                            </div>
                         </motion.div>
                     </motion.div>
 
-                    {/* Premium Terminal Area */}
+                    {/* Terminal Demo GIF */}
                     <div className="w-full max-w-4xl perspective-2000">
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 50, rotateX: 10 }}
-                            animate={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
-                            transition={{ duration: 1, delay: 0.5 }}
+                            initial={{ opacity: 0, scale: 0.95, y: 50 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            transition={{ duration: 1, delay: 0.6 }}
                             className="relative group"
                         >
                             {/* Outer Glow */}
@@ -120,34 +146,13 @@ export function Hero() {
                                     </div>
                                 </div>
 
-                                {/* Content */}
-                                <div className="p-8 font-mono text-sm md:text-base min-h-[400px] text-left bg-black/80 backdrop-blur-xl">
-                                    <div className="space-y-3">
-                                        {terminalLines.slice(0, currentLine).map((line, i) => (
-                                            <motion.div
-                                                key={i}
-                                                initial={{ opacity: 0, x: -5 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                className={cn(
-                                                    "flex gap-3",
-                                                    line.type === "command" && "text-blue-400",
-                                                    line.type === "input" && "text-white font-bold",
-                                                    line.type === "info" && "text-gray-500",
-                                                    line.type === "success" && "text-green-400"
-                                                )}
-                                            >
-                                                <span className="shrink-0 select-none opacity-50">
-                                                    {line.type === "command" ? ">" : line.type === "input" ? "?" : " "}
-                                                </span>
-                                                <span>{line.text}</span>
-                                            </motion.div>
-                                        ))}
-                                        {currentLine < terminalLines.length && (
-                                            <div className="flex gap-2">
-                                                <span className="text-tech-blue animate-pulse">▊</span>
-                                            </div>
-                                        )}
-                                    </div>
+                                {/* GIF Content */}
+                                <div className="relative bg-black/80 backdrop-blur-xl">
+                                    <img
+                                        src="/kybernus-demo.gif"
+                                        alt="Kybernus CLI Demo - Generate production-ready projects in seconds"
+                                        className="w-full h-auto"
+                                    />
                                 </div>
 
                                 {/* Status Bar */}
