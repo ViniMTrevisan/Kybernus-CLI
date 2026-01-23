@@ -70,7 +70,9 @@ export async function POST(request: Request) {
         }
 
         // Build template path
-        const templatesRoot = path.join(process.cwd(), '..', '..', 'templates');
+        // Templates are in monorepo root /templates, not apps/web
+        const projectRoot = path.join(process.cwd(), '..', '..');
+        const templatesRoot = path.join(projectRoot, 'templates');
         const templatePath = path.join(templatesRoot, stack, 'pro', architecture);
 
         // Check if template exists
