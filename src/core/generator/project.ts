@@ -49,11 +49,9 @@ export class ProjectGenerator {
             // Some stacks are Pro-only (no Free tier at all)
             const isProOnlyStack = config.stack === 'python-fastapi' || config.stack === 'nestjs';
 
-            // Next.js is special: uses "default" for both Free and Pro
-            // Pro users with Next.js + default should get Pro template
-            const isNextJsPro = config.stack === 'nextjs' && 
-                                config.architecture === 'default' && 
-                                config.licenseTier === 'pro';
+            // Next.js Pro: uses 'mvc' architecture (not 'default')
+            // Next.js Free: uses 'default' architecture
+            const isNextJsPro = config.stack === 'nextjs' && config.architecture === 'mvc';
 
             // Need Pro template if: Pro architecture OR Pro-only stack OR Next.js Pro
             const needsProTemplate = isProArchitecture || isProOnlyStack || isNextJsPro;
@@ -71,6 +69,7 @@ export class ProjectGenerator {
                 throw new Error(`${reason}. Use "kybernus upgrade" to unlock.`);
             } else {
                 // Free/Architect templates: use local bundled templates
+                // This includes: Java MVC, Node MVC, Next.js default (Pro users can use these too!)
                 templatePath = this.getLocalTemplatePath(config);
             }
 
