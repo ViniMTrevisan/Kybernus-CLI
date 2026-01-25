@@ -55,7 +55,7 @@ export function Hero() {
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-tech-blue/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             <div className="w-1.5 h-1.5 rounded-sm bg-tech-success animate-pulse" />
-                            <span className="text-xs font-mono font-bold tracking-widest uppercase text-white">System v1.0.0 Online</span>
+                            <span className="text-xs font-mono font-bold tracking-widest uppercase text-white">System Online</span>
                         </motion.div>
 
                         <motion.h1
