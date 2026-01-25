@@ -54,7 +54,7 @@ const templates: Record<Stack, Record<string, ArchTemplate>> = {
             name: "Next.js Pro",
             tier: "pro",
             description: "Production-ready structure with Auth, Dashboard, Infra, and Docker configured.",
-            screenshot: null, // Placeholder for Pro screenshot
+            screenshot: "/next-pro.png",  // ✅ Updated!
         },
     },
     "nodejs-express": {
