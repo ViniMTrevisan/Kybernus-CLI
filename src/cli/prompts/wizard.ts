@@ -107,7 +107,23 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
       },
 
       architecture: ({ results }) => {
-        // Only backend stacks support different architectures
+        // Next.js has different architecture options (default vs mvc)
+        if (results.stack === 'nextjs') {
+          const nextjsOptions = [{ value: 'default', label: 'Default Structure (Free)' }];
+
+          // MVC option only in Pro
+          if (licenseTier === 'pro') {
+            nextjsOptions.push({ value: 'mvc', label: '🌟 MVC Structure (Pro)' });
+          }
+
+          return clack.select({
+            message: 'Template:',
+            initialValue: options.architecture || 'default',
+            options: nextjsOptions,
+          });
+        }
+
+        // Backend stacks support MVC/Clean/Hexagonal
         const backendStacks = ['java-spring', 'nodejs-express', 'python-fastapi', 'nestjs'];
         if (!backendStacks.includes(results.stack as string)) return;
 
