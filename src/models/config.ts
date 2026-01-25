@@ -7,7 +7,7 @@ export type Stack =
     | 'python-fastapi'
     | 'nestjs';
 
-export type Architecture = 'mvc' | 'clean' | 'hexagonal';
+export type Architecture = 'mvc' | 'clean' | 'hexagonal' | 'default';
 
 export type BuildTool = 'maven' | 'gradle' | 'npm' | 'pnpm' | 'yarn';
 

@@ -49,8 +49,14 @@ export class ProjectGenerator {
             // Some stacks are Pro-only (no Free tier at all)
             const isProOnlyStack = config.stack === 'python-fastapi' || config.stack === 'nestjs';
 
-            // Need Pro template if: Pro architecture OR Pro-only stack
-            const needsProTemplate = isProArchitecture || isProOnlyStack;
+            // Next.js is special: uses "default" for both Free and Pro
+            // Pro users with Next.js + default should get Pro template
+            const isNextJsPro = config.stack === 'nextjs' && 
+                                config.architecture === 'default' && 
+                                config.licenseTier === 'pro';
+
+            // Need Pro template if: Pro architecture OR Pro-only stack OR Next.js Pro
+            const needsProTemplate = isProArchitecture || isProOnlyStack || isNextJsPro;
 
             if (needsProTemplate && config.licenseTier === 'pro') {
                 // Pro templates: download from API
