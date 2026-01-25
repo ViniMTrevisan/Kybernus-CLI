@@ -4,13 +4,17 @@ import { Command } from 'commander';
 import { initCommand } from './cli/commands/init.js';
 import { loginCommand } from './cli/commands/login.js';
 import { logoutCommand } from './cli/commands/logout.js';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json');
 
 const program = new Command();
 
 program
     .name('kybernus')
     .description('Professional CLI for scaffolding production-ready backend and fullstack projects')
-    .version('0.1.0');
+    .version(pkg.version);
 
 program
     .command('init')
