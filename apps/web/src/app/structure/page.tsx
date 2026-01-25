@@ -170,8 +170,8 @@ export default function StructurePage() {
                                 key={stack.id}
                                 onClick={() => setSelectedStack(stack.id)}
                                 className={`px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider transition-all rounded ${selectedStack === stack.id
-                                        ? "bg-tech-purple text-white shadow-[0_0_20px_rgba(124,58,237,0.3)]"
-                                        : "bg-tech-gray/30 text-muted-foreground hover:bg-tech-gray/50 border border-white/10 hover:border-white/20"
+                                    ? "bg-tech-purple text-white shadow-[0_0_20px_rgba(124,58,237,0.3)]"
+                                    : "bg-tech-gray/30 text-muted-foreground hover:bg-tech-gray/50 border border-white/10 hover:border-white/20"
                                     }`}
                             >
                                 {stack.name}
