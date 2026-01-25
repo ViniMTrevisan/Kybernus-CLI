@@ -26,7 +26,7 @@ const features = [
 
 export function WhyKybernus() {
     return (
-        <section className="relative py-32 bg-tech-black overflow-hidden">
+        <section id="why-us" className="relative py-32 bg-tech-black overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
 

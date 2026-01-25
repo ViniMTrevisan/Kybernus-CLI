@@ -8,7 +8,7 @@ import { ArchitectureVisual } from "@/components/ArchitectureVisual";
 import { SocialProof } from "@/components/SocialProof";
 import { FinalCTA } from "@/components/FinalCTA";
 import { WhyKybernus } from "@/components/WhyKybernus";
-import { ArchitectureShowcase } from "@/components/ArchitectureShowcase";
+import { ArchitectureExplorer } from "@/components/ArchitectureExplorer";
 
 export default function Home() {
   return (
@@ -16,7 +16,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <WhyKybernus />
-      <ArchitectureShowcase />
+      <ArchitectureExplorer />
       <StackShowcase />
       <Features />
       <ArchitectureVisual />

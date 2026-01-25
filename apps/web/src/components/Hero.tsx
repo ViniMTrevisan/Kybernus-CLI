@@ -112,7 +112,6 @@ export function Hero() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.5 }}
-                            id="install"
                             className="mb-24"
                         >
                             <div className="inline-flex items-center gap-3 px-6 py-3 rounded bg-tech-gray/50 border border-white/10 font-mono text-sm">

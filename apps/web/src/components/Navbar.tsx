@@ -6,9 +6,11 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 const links = [
-    { name: "Stacks", href: "#stacks", icon: Cpu },
-    { name: "Features", href: "#features", icon: Terminal },
-    { name: "Pricing", href: "#pricing", icon: CreditCard },
+    { name: "Why Us", href: "/#why-us", icon: Terminal },
+    { name: "Structure", href: "/#structure", icon: Cpu },
+    { name: "Stacks", href: "/#stacks", icon: Book },
+    { name: "Features", href: "/#features", icon: Terminal },
+    { name: "Pricing", href: "/#pricing", icon: CreditCard },
     { name: "Docs", href: "/docs", icon: Book },
 ];
 

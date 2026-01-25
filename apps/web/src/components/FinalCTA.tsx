@@ -15,7 +15,7 @@ export function FinalCTA() {
     };
 
     return (
-        <section className="py-24 relative overflow-hidden bg-tech-black">
+        <section id="install" className="py-24 relative overflow-hidden bg-tech-black">
             {/* Background Decor */}
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
