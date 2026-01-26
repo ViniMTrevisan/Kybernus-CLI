@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Terminal, Lock, Mail, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function RegisterPage() {
@@ -55,10 +56,9 @@ export default function RegisterPage() {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
-                        <div className="p-2 border border-white/10 bg-black/50">
-                            <Terminal className="w-6 h-6 text-tech-purple" />
+                        <div className="relative">
+                            <Image src="/kybernus-new.png" alt="Kybernus Logo" width={80} height={80} className="object-contain" />
                         </div>
-                        <span className="text-xl font-space font-bold uppercase tracking-tight text-white">Kybernus</span>
                     </Link>
                     <h1 className="text-3xl font-space font-bold uppercase tracking-tight mb-2 text-white">
                         Access <span className="text-tech-purple">Request</span>

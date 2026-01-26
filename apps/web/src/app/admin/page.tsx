@@ -7,11 +7,11 @@ import {
     TrendingUp,
     DollarSign,
     Activity,
-    Terminal,
     LogOut,
     RefreshCw,
     BarChart3
 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface DashboardData {
@@ -119,8 +119,8 @@ export default function AdminDashboard() {
             <header className="border-b border-white/10 bg-tech-zinc/50 backdrop-blur-md sticky top-0 z-50">
                 <div className="container px-4 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="p-1 border border-white/10 bg-black/50">
-                            <Terminal className="w-5 h-5 text-tech-blue" />
+                        <div className="relative">
+                            <Image src="/kybernus-new.png" alt="Kybernus Logo" width={80} height={80} className="object-contain" />
                         </div>
                         <span className="text-lg font-bold uppercase tracking-tight text-white">
                             Kybernus <span className="text-tech-purple text-xs border border-tech-purple/30 px-1 py-0.5 ml-1">ADMIN</span>

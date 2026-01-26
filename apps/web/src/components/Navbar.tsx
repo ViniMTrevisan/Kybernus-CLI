@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Terminal, Book, Cpu, CreditCard, Menu, X } from "lucide-react";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -38,11 +39,8 @@ export function Navbar() {
                 <div className="container max-w-7xl mx-auto px-6 flex items-center justify-between">
                     {/* Logo */}
                     <a href="/" className="flex items-center gap-3 group">
-                        <div className="relative p-2 rounded bg-tech-gray border border-white/10 group-hover:border-tech-blue/50 transition-colors">
-                            <Terminal className="w-5 h-5 text-tech-blue" />
-                            {/* Corner accents */}
-                            <div className="absolute -top-px -left-px w-1.5 h-1.5 border-t border-l border-tech-blue/0 group-hover:border-tech-blue transition-colors" />
-                            <div className="absolute -bottom-px -right-px w-1.5 h-1.5 border-b border-r border-tech-blue/0 group-hover:border-tech-blue transition-colors" />
+                        <div className="relative transition-transform group-hover:scale-110">
+                            <Image src="/kybernus-new.png" alt="Kybernus Logo" width={80} height={80} className="object-contain" />
                         </div>
                         <div className="flex flex-col">
                             <span className="text-xl font-space font-bold tracking-tight text-white leading-none">KYBERNUS</span>

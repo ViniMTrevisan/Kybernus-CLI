@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Terminal, Copy, Check, Download, ExternalLink, ArrowUpCircle, ShieldCheck, Activity, User as UserIcon } from 'lucide-react';
+import { Copy, Check, Download, ExternalLink, ArrowUpCircle, ShieldCheck, Activity, User as UserIcon } from 'lucide-react';
+import Image from 'next/image';
 
 interface User {
     email: string;
@@ -46,10 +47,8 @@ export default function DashboardClient({ user }: DashboardClientProps) {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6 p-6 border-b border-white/10 bg-black/20 backdrop-blur-sm">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 border border-tech-blue/30 bg-tech-blue/10 relative">
-                            <div className="absolute top-0 left-0 w-1 h-1 bg-tech-blue" />
-                            <div className="absolute bottom-0 right-0 w-1 h-1 bg-tech-blue" />
-                            <Terminal className="w-8 h-8 text-tech-blue" />
+                        <div className="relative">
+                            <Image src="/kybernus-new.png" alt="Kybernus Logo" width={80} height={80} className="object-contain" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold font-space uppercase text-white tracking-widest">

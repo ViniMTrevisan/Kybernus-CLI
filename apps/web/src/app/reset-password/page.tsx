@@ -3,6 +3,7 @@
 import { useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Lock, Loader2, CheckCircle2, ShieldCheck, Terminal } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -187,12 +188,8 @@ export default function ResetPasswordPage() {
                     </Link>
 
                     <div className="flex justify-center mb-6">
-                        <div className="p-3 border border-white/10 bg-black/50 backdrop-blur-sm relative">
-                            <div className="absolute -top-1 -left-1 w-2 h-2 border-t border-l border-white/30" />
-                            <div className="absolute -top-1 -right-1 w-2 h-2 border-t border-r border-white/30" />
-                            <div className="absolute -bottom-1 -left-1 w-2 h-2 border-b border-l border-white/30" />
-                            <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b border-r border-white/30" />
-                            <Terminal className="w-8 h-8 text-white" />
+                        <div className="w-16 h-16 bg-black/50 rounded-xl flex items-center justify-center border border-white/10 mx-auto mb-6">
+                            <Image src="/kybernus-new.png" alt="Kybernus Logo" width={80} height={80} className="object-contain" />
                         </div>
                     </div>
 

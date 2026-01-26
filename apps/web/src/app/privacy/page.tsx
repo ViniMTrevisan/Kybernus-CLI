@@ -1,4 +1,5 @@
 import { Terminal, Shield, Lock, Eye, Database, Server } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export const metadata = {
@@ -17,8 +18,8 @@ export default function PrivacyPolicy() {
                 {/* Header */}
                 <div className="mb-16">
                     <Link href="/" className="inline-flex items-center gap-2 mb-8 hover:opacity-80 transition-opacity">
-                        <div className="p-2 border border-white/10 bg-black/50">
-                            <Terminal className="w-5 h-5 text-tech-blue" />
+                        <div className="relative">
+                            <Image src="/kybernus-new.png" alt="Kybernus Logo" width={80} height={80} className="object-contain" />
                         </div>
                         <span className="text-sm font-space font-bold uppercase tracking-tight">Kybernus_Legal</span>
                     </Link>

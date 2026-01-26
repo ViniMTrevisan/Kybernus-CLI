@@ -1,4 +1,5 @@
 import { Twitter, Linkedin, Terminal, Mail } from "lucide-react";
+import Image from "next/image";
 
 export function Footer() {
     return (
@@ -11,10 +12,9 @@ export function Footer() {
                     {/* Brand */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-3">
-                            <div className="p-1.5 bg-tech-blue text-black">
-                                <Terminal className="w-5 h-5" />
+                            <div className="relative">
+                                <Image src="/kybernus-new.png" alt="Kybernus Logo" width={80} height={80} className="object-contain" />
                             </div>
-                            <span className="text-2xl font-space font-bold text-white tracking-tight">KYBERNUS</span>
                         </div>
                         <p className="text-sm font-mono text-muted-foreground leading-relaxed max-w-xs">
                             // SYSTEM_STATUS: OPERATIONAL<br />

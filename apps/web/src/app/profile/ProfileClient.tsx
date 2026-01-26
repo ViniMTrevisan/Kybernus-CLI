@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Terminal, Lock, Mail, Save, AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface User {
@@ -97,8 +98,8 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                         Back to Command Center
                     </Link>
                     <h1 className="text-3xl font-space font-bold uppercase tracking-tight flex items-center gap-3">
-                        <div className="p-2 border border-white/10 bg-black/50">
-                            <Terminal className="w-6 h-6 text-tech-blue" />
+                        <div className="relative">
+                            <Image src="/kybernus-new.png" alt="Kybernus Logo" width={80} height={80} className="object-contain" />
                         </div>
                         Profile <span className="text-tech-blue">Config</span>
                     </h1>
@@ -202,8 +203,8 @@ export default function ProfileClient({ user }: ProfileClientProps) {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className={`mt-6 p-4 border flex items-center gap-3 text-xs font-mono ${message.type === 'success'
-                                ? 'bg-tech-success/10 border-tech-success/20 text-tech-success'
-                                : 'bg-red-500/10 border-red-500/20 text-red-500'
+                            ? 'bg-tech-success/10 border-tech-success/20 text-tech-success'
+                            : 'bg-red-500/10 border-red-500/20 text-red-500'
                             }`}
                     >
                         <AlertCircle className="w-4 h-4" />

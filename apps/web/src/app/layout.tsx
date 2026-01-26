@@ -23,7 +23,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kybernus - The Ultimate Backend Scaffolding CLI",
+  title: "Kybernus - The Ultimate Scaffolding CLI",
   description: "Build production-ready Node.js, NestJS, Spring Boot, FastAPI, and Next.js applications in seconds. The only template CLI you'll ever need.",
 };
 

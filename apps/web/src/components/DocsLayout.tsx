@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Book, ChevronRight, Menu, X, Command, Terminal, Sparkles, Layers } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,10 +42,9 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
                 <div className="container flex h-16 items-center justify-between px-4">
                     <div className="flex items-center gap-4">
                         <Link href="/" className="flex items-center gap-2 group">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyber-blue to-cyber-purple flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <Command className="w-5 h-5 text-black" />
+                            <div className="relative group-hover:scale-110 transition-transform">
+                                <Image src="/kybernus-new.png" alt="Kybernus" width={60} height={60} className="object-contain" />
                             </div>
-                            <span className="text-xl font-bold tracking-tight">Kybernus</span>
                         </Link>
                         <div className="h-6 w-px bg-border hidden sm:block" />
                         <span className="text-sm font-medium text-muted-foreground hidden sm:block">Documentation</span>
