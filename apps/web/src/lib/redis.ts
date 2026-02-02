@@ -4,7 +4,7 @@ const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
 const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 // Lazy initialization
-let redis: Redis | null = null;
+let _redisClient: Redis | null = null;
 
 // In-memory fallback rate limiter for when Redis is unavailable
 const memoryRateLimiter = new Map<string, { count: number; resetAt: number }>();
@@ -24,13 +24,13 @@ function getRedis(): Redis | null {
         // Redis is optional - just skip caching/rate limiting if not configured
         return null;
     }
-    if (!redis) {
-        redis = new Redis({
+    if (!_redisClient) {
+        _redisClient = new Redis({
             url: redisUrl,
             token: redisToken,
         });
     }
-    return redis;
+    return _redisClient;
 }
 
 /**
@@ -147,3 +147,26 @@ export async function invalidateLicenseCache(licenseKey: string): Promise<void> 
 }
 
 export { getRedis };
+
+// Export simplified redis interface for device flow
+export const deviceRedis = {
+    get: async (key: string) => {
+        const client = getRedis();
+        if (!client) return null;
+        return client.get(key);
+    },
+    set: async (key: string, value: string, options?: { ex?: number }) => {
+        const client = getRedis();
+        if (!client) return;
+        if (options?.ex) {
+            await client.setex(key, options.ex, value);
+        } else {
+            await client.set(key, value);
+        }
+    },
+    del: async (key: string) => {
+        const client = getRedis();
+        if (!client) return;
+        await client.del(key);
+    },
+};

@@ -1,10 +1,15 @@
 import * as clack from '@clack/prompts';
 import { ConfigManager } from '../../core/config/config-manager.js';
 import { AnalyticsClient } from '../services/AnalyticsClient.js';
+import { requestDeviceCode, waitForAuth } from '../../core/auth/device-flow.js';
 
 const API_URL = process.env.KYBERNUS_API_URL || 'https://kybernus-cli.vercel.app/api';
 
-export async function registerCommand() {
+interface RegisterOptions {
+    google?: boolean;
+}
+
+export async function registerCommand(options: RegisterOptions = {}) {
     console.clear();
     clack.intro('🚀 Kybernus Registration');
 
@@ -24,6 +29,72 @@ export async function registerCommand() {
         }
     }
 
+    // Google OAuth flow
+    if (options.google) {
+        await handleGoogleRegister(configManager);
+        return;
+    }
+
+    // Traditional email/password registration
+    await handleEmailRegister(configManager);
+}
+
+async function handleGoogleRegister(configManager: ConfigManager) {
+    const spinner = clack.spinner();
+    spinner.start('Requesting authentication code...');
+
+    try {
+        const deviceCode = await requestDeviceCode();
+        spinner.stop();
+
+        clack.log.info('🔐 Google Authentication Required\n');
+        clack.log.message(`Visit: ${deviceCode.verificationUrl}`);
+        clack.log.message(`Enter code: ${deviceCode.userCode}\n`);
+
+        const continueAuth = await clack.confirm({
+            message: 'Press Enter once you\'ve opened the URL in your browser',
+        });
+
+        if (clack.isCancel(continueAuth) || !continueAuth) {
+            clack.cancel('Registration cancelled');
+            process.exit(0);
+        }
+
+        spinner.start('Waiting for authentication...');
+
+        const result = await waitForAuth(deviceCode.deviceCode, deviceCode.interval);
+
+        spinner.stop();
+
+        if (result.licenseKey && result.email) {
+            // Save credentials
+            configManager.setLicenseKey(result.licenseKey);
+            configManager.setEmail(result.email);
+            configManager.setLicenseTier(result.tier === 'PRO' ? 'PRO' : 'FREE');
+
+            // Track registration
+            const analytics = new AnalyticsClient();
+            analytics.track('user_registered', { email: result.email, method: 'google' });
+
+            clack.note(
+                `Email: ${result.email}\nLicense Key: ${result.licenseKey}\nPlan: Metered Trial (3 Projects included)`,
+                'Registration Successful'
+            );
+
+            clack.outro('🎉 You are now ready to build amazing projects with Kybernus!');
+        } else {
+            clack.log.error('Registration failed. Please try again.');
+            process.exit(1);
+        }
+
+    } catch (error: any) {
+        spinner.stop();
+        clack.log.error(error.message || 'Registration failed');
+        process.exit(1);
+    }
+}
+
+async function handleEmailRegister(configManager: ConfigManager) {
     const email = await clack.text({
         message: 'Enter your email address to unlock 3 Free Pro Projects (Metered Trial):',
         placeholder: 'you@example.com',
@@ -59,8 +130,6 @@ export async function registerCommand() {
     s.start('Registering account...');
 
     try {
-        const machineId = configManager.getMachineId();
-
         const response = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -85,7 +154,7 @@ export async function registerCommand() {
 
         // Track registration
         const analytics = new AnalyticsClient();
-        analytics.track('user_registered', { email });
+        analytics.track('user_registered', { email, method: 'email' });
 
         s.stop('Registration successful! 🎉');
 

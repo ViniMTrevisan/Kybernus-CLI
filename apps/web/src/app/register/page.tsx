@@ -7,6 +7,7 @@ import { Terminal, Lock, Mail, ArrowRight, AlertCircle, Loader2 } from 'lucide-r
 import Image from 'next/image';
 import Link from 'next/link';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
+import { GoogleSignInButton } from '@/components/GoogleSignInButton';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -139,6 +140,19 @@ export default function RegisterPage() {
                             )}
                         </button>
                     </form>
+
+                    {/* OAuth Divider */}
+                    <div className="relative my-6">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-white/10"></div>
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-tech-gray/20 px-3 text-muted-foreground font-mono">Or</span>
+                        </div>
+                    </div>
+
+                    {/* Google Sign Up */}
+                    <GoogleSignInButton mode="signup" />
 
                     <div className="mt-6 pt-6 border-t border-white/5 text-center flex flex-col gap-2">
                         <span className="text-xs font-mono text-muted-foreground">Already have access?</span>

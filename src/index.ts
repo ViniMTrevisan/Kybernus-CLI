@@ -30,8 +30,9 @@ program
 
 program
     .command('login')
-    .description('Authenticate with a Pro license key')
+    .description('Authenticate with a Pro license key or Google account')
     .option('-k, --key <key>', 'Pro license key')
+    .option('-g, --google', 'Sign in with Google account')
     .action(loginCommand);
 
 import { registerCommand } from './cli/commands/register.js';
@@ -43,6 +44,7 @@ import { upgradeCommand } from './cli/commands/upgrade.js';
 program
     .command('register')
     .description('Start Free Trial (3 Pro Projects Included)')
+    .option('-g, --google', 'Sign up with Google account')
     .action(registerCommand);
 
 program

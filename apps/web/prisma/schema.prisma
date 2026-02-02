@@ -27,6 +27,11 @@ model User {
   email           String         @unique
   password        String?        // Optional: for web dashboard access
   
+  // OAuth
+  googleId        String?        @unique
+  oauthProvider   String?        // 'google', 'github', etc
+  profilePicture  String?
+  
   // Trial tracking
   trialStartedAt  DateTime       @default(now())
   trialEndsAt     DateTime       @default(dbgenerated("NOW() + INTERVAL '15 days'"))
@@ -55,6 +60,7 @@ model User {
   
   @@index([email])
   @@index([licenseKey])
+  @@index([googleId])
   @@index([status])
   @@index([tier])
 }

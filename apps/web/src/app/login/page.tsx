@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Terminal, Lock, Mail, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { GoogleSignInButton } from '@/components/GoogleSignInButton';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -156,6 +157,26 @@ export default function LoginPage() {
                             )}
                         </button>
                     </form>
+
+                    {/* OAuth Divider */}
+                    <div className="relative my-6">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-white/10"></div>
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-tech-gray/20 px-3 text-muted-foreground font-mono">Or</span>
+                        </div>
+                    </div>
+
+                    {/* Google Sign In */}
+                    <GoogleSignInButton mode="signin" />
+
+                    <div className="mt-6 pt-6 border-t border-white/5 text-center flex flex-col gap-2">
+                        <span className="text-xs font-mono text-muted-foreground">Need access?</span>
+                        <Link href="/register" className="text-xs font-mono font-bold uppercase tracking-wider text-white hover:text-tech-blue transition-colors inline-block">
+                            // REQUEST ACCESS
+                        </Link>
+                    </div>
                 </div>
             </motion.div>
         </div>
