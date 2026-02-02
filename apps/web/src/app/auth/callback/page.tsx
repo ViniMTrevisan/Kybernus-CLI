@@ -87,15 +87,31 @@ function CallbackContent() {
         setMessage('Linking your accounts...');
 
         try {
-            // First get a fresh OAuth URL to get a new state token
-            const urlResponse = await fetch('/api/auth/google/url', {
+            // Call the link endpoint with the current code and state
+            const response = await fetch('/api/auth/google/link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: linkingData.email,
+                    code: linkingData.code,
+                    state: linkingData.state,
+                }),
                 credentials: 'include',
             });
-            const urlData = await urlResponse.json();
 
-            // Redirect to Google to re-authenticate for linking
-            // This ensures the user proves they own the Google account
-            window.location.href = urlData.url;
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to link accounts');
+            }
+
+            setStatus('success');
+            setMessage('Accounts linked successfully!');
+
+            // Redirect to dashboard after short delay
+            setTimeout(() => {
+                router.push('/dashboard');
+            }, 1500);
 
         } catch (error: any) {
             setStatus('error');
