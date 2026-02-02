@@ -8,13 +8,14 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
     try {
-        // Rate limit: 20 project creations per minute per IP (liberal limit)
+        // Rate limit: 10 project creations per minute per IP (prevent abuse)
         const ip = request.headers.get('x-forwarded-for') ||
             request.headers.get('x-real-ip') ||
             'unknown';
 
-        const rateLimitResult = await rateLimit(`consume:${ip}`, 20, 60);
+        const rateLimitResult = await rateLimit(`consume:${ip}`, 10, 60);
         if (!rateLimitResult.allowed) {
+            console.warn(`[SECURITY] Rate limit exceeded for project consumption from ${ip}`);
             return NextResponse.json(
                 { error: 'Too many requests. Please try again later.' },
                 { status: 429 }

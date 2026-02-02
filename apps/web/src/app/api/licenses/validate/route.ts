@@ -19,13 +19,14 @@ export async function OPTIONS() {
 
 export async function POST(request: Request) {
     try {
-        // Rate limit: 60 validations per minute per IP (high volume allowed for frequent checks)
+        // Rate limit: 20 validations per minute per IP (reduced for security)
         const ip = request.headers.get('x-forwarded-for') ||
             request.headers.get('x-real-ip') ||
             'unknown';
 
-        const rateLimitResult = await rateLimit(`validate:${ip}`, 60, 60);
+        const rateLimitResult = await rateLimit(`validate:${ip}`, 20, 60);
         if (!rateLimitResult.allowed) {
+            console.warn(`[SECURITY] Rate limit exceeded for license validation from ${ip}`);
             return NextResponse.json(
                 { error: 'Too many requests. Please try again later.' },
                 { status: 429, headers: corsHeaders }
@@ -59,6 +60,7 @@ export async function POST(request: Request) {
         }
 
         if (!result.valid) {
+            console.warn(`[SECURITY] Invalid license attempt from ${ip}: ${licenseKey.substring(0, 15)}...`);
             return NextResponse.json(result, { status: 401, headers: corsHeaders });
         }
 

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Terminal, Lock, Mail, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -116,11 +117,11 @@ export default function RegisterPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    minLength={6}
                                     className="w-full pl-10 pr-4 py-3 bg-black/50 border border-white/10 text-white placeholder:text-muted-foreground/50 font-mono text-sm focus:outline-none focus:border-tech-purple/50 focus:ring-1 focus:ring-tech-purple/20 transition-all"
                                     required
                                 />
                             </div>
+                            <PasswordStrengthIndicator password={password} />
                         </div>
 
                         <button

@@ -5,14 +5,59 @@ import { LicenseTier } from '@prisma/client';
 
 export class LicenseService {
     /**
-     * Gera uma license key única
+     * Generates HMAC signature for a license key
+     */
+    private generateSignature(licenseKey: string): string {
+        const secret = process.env.LICENSE_SECRET;
+        if (!secret) {
+            throw new Error('CRITICAL: LICENSE_SECRET environment variable is required for security');
+        }
+
+        return crypto
+            .createHmac('sha256', secret)
+            .update(licenseKey)
+            .digest('hex')
+            .substring(0, 8)
+            .toUpperCase();
+    }
+
+    /**
+     * Verifies HMAC signature of a license key
+     */
+    private verifySignature(licenseKey: string): { valid: boolean; base?: string } {
+        const parts = licenseKey.split('-');
+
+        // Old format (backward compatible): KYB-PRO-XXXX-XXXX-XXXX (no signature)
+        if (parts.length === 4) {
+            return { valid: true }; // Allow old keys
+        }
+
+        // New format: KYB-PRO-XXXX-XXXX-XXXX-SIGNATURE
+        if (parts.length === 5) {
+            const base = parts.slice(0, 4).join('-');
+            const providedSig = parts[4];
+            const expectedSig = this.generateSignature(base);
+
+            return {
+                valid: providedSig === expectedSig,
+                base
+            };
+        }
+
+        return { valid: false };
+    }
+
+    /**
+     * Gera uma license key única com assinatura HMAC
      */
     generateLicenseKey(tier: string): string {
         const random = crypto.randomBytes(16).toString('hex');
         const prefix = tier === 'pro' ? 'PRO' : tier === 'trial' ? 'TRIAL' : 'FREE';
 
-        // Formato: KYB-{PREFIX}-XXXX-XXXX-XXXX
-        return `KYB-${prefix}-${random.slice(0, 4)}-${random.slice(4, 8)}-${random.slice(8, 12)}`.toUpperCase();
+        // Formato: KYB-{PREFIX}-XXXX-XXXX-XXXX-SIGNATURE
+        const base = `KYB-${prefix}-${random.slice(0, 4)}-${random.slice(4, 8)}-${random.slice(8, 12)}`.toUpperCase();
+        const signature = this.generateSignature(base);
+        return `${base}-${signature}`;
     }
 
     /**
@@ -45,6 +90,15 @@ export class LicenseService {
      * Valida uma license key
      */
     async validate(licenseKey: string) {
+        // First verify signature if present (new keys)
+        const sigCheck = this.verifySignature(licenseKey);
+        if (!sigCheck.valid) {
+            return {
+                valid: false,
+                message: 'Invalid license signature',
+            };
+        }
+
         const user = await prisma.user.findUnique({
             where: { licenseKey },
             include: { subscription: true },

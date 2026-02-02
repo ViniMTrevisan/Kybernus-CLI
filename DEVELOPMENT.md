@@ -277,9 +277,10 @@ templates/{stack}/{tier}/
 2. **Trial Mode**: Full Pro access for 15 days, 3 project limit
 3. **Pro Mode**: Lifetime access, all features, unlimited projects
 
-### License Key Format
-- Trial: `KYB-TRIAL-XXXX-XXXX-XXXX`
-- Pro: `KYB-PRO-XXXX-XXXX-XXXX`
+### License Key **Format:**
+- Trial: `KYB-TRIAL-XXXX-XXXX-XXXX-XXXXXXXX` (with HMAC signature)
+- Pro: `KYB-PRO-XXXX-XXXX-XXXX-XXXXXXXX` (with HMAC signature)
+- Legacy (backward compatible): `KYB-{TIER}-XXXX-XXXX-XXXX` (without signature)
 
 ### Validation Flow
 ```

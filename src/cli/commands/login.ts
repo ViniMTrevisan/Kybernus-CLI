@@ -18,7 +18,7 @@ export async function loginCommand(options: LoginOptions) {
     if (!licenseKey) {
         const keyInput = await clack.text({
             message: 'Enter your Pro license key:',
-            placeholder: 'KYB-PRO-XXXXXXXX',
+            placeholder: 'KYB-PRO-XXXX-XXXX-XXXX-XXXXXXXX',
             validate: (value) => {
                 if (!value) return 'License key is required';
             },

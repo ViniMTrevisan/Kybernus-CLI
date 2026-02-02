@@ -58,11 +58,11 @@ export async function POST(request: Request) {
                         let user = await licenseService.findByEmail(email);
 
                         if (!user) {
-                            // Cria novo usuário Pro direto
+                            // Cria novo usuário Pro direto com license key segura
                             user = await prisma.user.create({
                                 data: {
                                     email,
-                                    licenseKey: `KYB-PRO-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
+                                    licenseKey: licenseService.generateLicenseKey('pro'),
                                     tier: 'PRO',
                                     status: 'PRO_ACTIVE',
                                     stripeCustomerId: session.customer,

@@ -10,14 +10,14 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
     try {
-        // Rate limit: 10 failed attempts per minute per IP to prevent brute force
-        // But allow legitimate users to retry reasonably
+        // Rate limit: 5 failed attempts per minute per IP to prevent brute force
         const ip = request.headers.get('x-forwarded-for') ||
             request.headers.get('x-real-ip') ||
             'unknown';
 
-        const rateLimitResult = await rateLimit(`login:${ip}`, 10, 60);
+        const rateLimitResult = await rateLimit(`login:${ip}`, 5, 60);
         if (!rateLimitResult.allowed) {
+            console.warn(`[SECURITY] Rate limit exceeded for login from ${ip}`);
             return NextResponse.json(
                 { error: 'Too many login attempts. Please try again later.' },
                 { status: 429 }
@@ -52,6 +52,7 @@ export async function POST(request: Request) {
         // Verify password hash
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) {
+            console.warn(`[SECURITY] Failed login attempt for ${email} from ${ip}`);
             return NextResponse.json(
                 { error: 'Invalid credentials' },
                 { status: 401 }

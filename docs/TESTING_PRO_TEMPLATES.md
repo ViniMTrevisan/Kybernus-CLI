@@ -51,7 +51,7 @@ curl -X POST http://localhost:3010/api/templates/download \
 curl -X POST http://localhost:3010/api/templates/download \
   -H "Content-Type: application/json" \
   -d '{
-    "licenseKey": "KYB-FREE-XXXX-XXXX-XXXX",
+    "licenseKey": "KYB-FREE-XXXX-XXXX-XXXX-XXXXXXXX",
     "stack": "nestjs",
     "architecture": "clean"
   }'
