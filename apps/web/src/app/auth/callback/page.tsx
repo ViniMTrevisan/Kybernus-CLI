@@ -95,7 +95,7 @@ function CallbackContent() {
 
             // Redirect to Google to re-authenticate for linking
             // This ensures the user proves they own the Google account
-            window.location.href = urlData.url + '&prompt=consent';
+            window.location.href = urlData.url;
 
         } catch (error: any) {
             setStatus('error');
