@@ -51,9 +51,6 @@ export async function POST(request: Request) {
             );
         }
 
-        // Clear the state cookie
-        cookieStore.delete('oauth_state');
-
         // Exchange code for tokens
         const tokens = await getGoogleTokens(code);
 
@@ -91,6 +88,7 @@ export async function POST(request: Request) {
         }
 
         if (needsLinking && existingUserByEmail) {
+            // DON'T clear the state cookie yet - we need it for the /link endpoint
             // Return response indicating account linking is needed
             return NextResponse.json({
                 needsLinking: true,
@@ -99,6 +97,9 @@ export async function POST(request: Request) {
                 message: 'An account with this email already exists. Would you like to link your Google account?'
             }, { status: 200 });
         }
+
+        // Clear the state cookie only after successful auth (not during linking)
+        cookieStore.delete('oauth_state');
 
         if (!user && !existingUserByEmail) {
             // Create new user with Google OAuth
