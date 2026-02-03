@@ -7,11 +7,12 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
 
-  // Security headers
+  // Security headers - exclude static assets to reduce edge requests
   async headers() {
     return [
       {
-        source: '/:path*',
+        // Apply headers to HTML pages only, not static assets
+        source: '/:path((?!_next/static|_next/image|favicon.ico|.*\\.(png|jpg|jpeg|gif|svg|ico|webp)).*)',
         headers: [
           {
             key: 'X-Frame-Options',

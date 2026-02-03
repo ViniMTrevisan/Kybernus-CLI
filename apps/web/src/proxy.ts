@@ -7,32 +7,25 @@ const JWT_SECRET = new TextEncoder().encode(
 );
 
 export async function proxy(request: NextRequest) {
-    console.log('[PROXY] Request to:', request.nextUrl.pathname);
+    // Only protect /admin routes - no logging to avoid edge invocations
+    const token = request.cookies.get('admin-token')?.value;
 
-    // Only protect /admin routes
-    if (request.nextUrl.pathname.startsWith('/admin')) {
-        console.log('[PROXY] Admin route detected, checking token...');
-        const token = request.cookies.get('admin-token')?.value;
-        console.log('[PROXY] Token present:', !!token);
+    if (!token) {
+        return NextResponse.redirect(new URL('/admin-login', request.url));
+    }
 
-        if (!token) {
-            return NextResponse.redirect(new URL('/admin-login', request.url));
-        }
-
-        try {
-            // Verify JWT using jose (Edge-compatible)
-            await jose.jwtVerify(token, JWT_SECRET);
-        } catch (error) {
-            // Clear invalid cookie and redirect
-            const response = NextResponse.redirect(new URL('/admin-login', request.url));
-            response.cookies.delete('admin-token');
-            return response;
-        }
+    try {
+        await jose.jwtVerify(token, JWT_SECRET);
+    } catch {
+        const response = NextResponse.redirect(new URL('/admin-login', request.url));
+        response.cookies.delete('admin-token');
+        return response;
     }
 
     return NextResponse.next();
 }
 
+// CRITICAL: Only match admin routes to minimize edge invocations
 export const config = {
     matcher: ['/admin/:path*'],
 };

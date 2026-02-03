@@ -10,6 +10,10 @@ import { FinalCTA } from "@/components/FinalCTA";
 import { WhyKybernus } from "@/components/WhyKybernus";
 import { ArchitectureExplorer } from "@/components/ArchitectureExplorer";
 
+// Force static generation for homepage to reduce edge requests
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour
+
 export default function Home() {
   return (
     <main className="min-h-screen">
