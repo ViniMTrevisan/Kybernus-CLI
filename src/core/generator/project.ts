@@ -7,7 +7,7 @@ import * as clack from '@clack/prompts';
 import { ProjectConfig } from '../../models/config.js';
 import { TemplateEngine } from '../templates/engine.js';
 import { buildTemplateContext } from './context-builder.js';
-import { templateDownloader } from '../templates/downloader.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,46 +39,15 @@ export class ProjectGenerator {
                 throw new Error(`Directory "${config.projectName}" already exists!`);
             }
 
-            // 2. Determine template path based on ARCHITECTURE tier AND stack availability
-            // Pro users can generate Free templates (e.g. MVC) IF the stack has a Free version
-            let templatePath: string;
-
-            // Check if this architecture requires Pro (clean/hexagonal)
-            const isProArchitecture = config.architecture === 'clean' || config.architecture === 'hexagonal';
-
-            // Some stacks are Pro-only (no Free tier at all)
-            const isProOnlyStack = config.stack === 'python-fastapi' || config.stack === 'nestjs';
-
-            // Next.js Pro: uses 'mvc' architecture (not 'default')
-            // Next.js Free: uses 'default' architecture
-            const isNextJsPro = config.stack === 'nextjs' && config.architecture === 'mvc';
-
-            // Need Pro template if: Pro architecture OR Pro-only stack OR Next.js Pro
-            const needsProTemplate = isProArchitecture || isProOnlyStack || isNextJsPro;
-
-            if (needsProTemplate && config.licenseTier === 'pro') {
-                // Pro templates: download from API
-                spinner.message('📦 Checking Pro templates...');
-                templatePath = await this.getProTemplatePath(config, spinner);
-            } else if (needsProTemplate && config.licenseTier !== 'pro') {
-                // User tried to access Pro content without Pro license
-                spinner.stop('❌ Pro license required');
-                const reason = isProOnlyStack
-                    ? `Stack "${config.stack}" requires a Pro license`
-                    : `Architecture "${config.architecture}" requires a Pro license`;
-                throw new Error(`${reason}. Use "kybernus upgrade" to unlock.`);
-            } else {
-                // Free/Architect templates: use local bundled templates
-                // This includes: Java MVC, Node MVC, Next.js default (Pro users can use these too!)
-                templatePath = this.getLocalTemplatePath(config);
-            }
+            // 2. Determine template path (Always use local templates)
+            const templatePath = await this.getLocalTemplatePath(config);
 
             // Check if template exists
-            if (!(await fs.pathExists(templatePath))) {
+            if (!templatePath || !(await fs.pathExists(templatePath))) {
                 spinner.stop('❌ Template not found');
                 throw new Error(
-                    `Template not found: ${config.stack}/${config.licenseTier}\n` +
-                    `Path: ${templatePath}`
+                    `Template not found for stack: ${config.stack} and architecture: ${config.architecture}\n` +
+                    `Searched in local templates.`
                 );
             }
 
@@ -108,47 +77,27 @@ export class ProjectGenerator {
     }
 
     /**
-     * Get Pro template path - downloads from API if not cached
+     * Get local template path. Checks 'pro' folder first, then 'free'.
      */
-    private async getProTemplatePath(config: ProjectConfig, spinner: ReturnType<typeof clack.spinner>): Promise<string> {
-        const architecture = config.architecture || 'clean';
-
-        // Check cache first
-        const cachedPath = await templateDownloader.getCachedTemplate(config.stack, architecture);
-        if (cachedPath) {
-            return cachedPath;
-        }
-
-        // Download from API
-        spinner.message('⬇️  Downloading Pro templates...');
-
-        const result = await templateDownloader.downloadProTemplate(
-            config.licenseKey!,
-            config.stack,
-            architecture
-        );
-
-        if (!result.success || !result.files) {
-            throw new Error(result.error || 'Failed to download Pro template');
-        }
-
-        // Cache the downloaded template
-        await templateDownloader.cacheTemplate(config.stack, architecture, result.files);
-
-        // Return cache path
-        return await templateDownloader.getCachedTemplate(config.stack, architecture) || '';
-    }
-
-    /**
-     * Get local template path for Free tier (bundled with npm package)
-     */
-    private getLocalTemplatePath(config: ProjectConfig): string {
+    private async getLocalTemplatePath(config: ProjectConfig): Promise<string> {
         const templatesRoot = path.join(__dirname, '../../../templates');
 
-        // Next.js uses 'default' architecture, others use 'mvc'
+        // Architecture defaults
         const architecture = config.architecture || (config.stack === 'nextjs' ? 'default' : 'mvc');
 
-        return path.join(templatesRoot, config.stack, 'free', architecture);
+        // Check Pro path first (since most architectures are there now or we want to prioritize it)
+        const proPath = path.join(templatesRoot, config.stack, 'pro', architecture);
+        if (await fs.pathExists(proPath)) {
+            return proPath;
+        }
+
+        // Check Free path
+        const freePath = path.join(templatesRoot, config.stack, 'free', architecture);
+        if (await fs.pathExists(freePath)) {
+            return freePath;
+        }
+
+        return proPath; // Return pro path as default for error message if neither exists
     }
 
     /**
@@ -173,23 +122,21 @@ export class ProjectGenerator {
                 clack.log.info('  ├─ Using template README');
             }
 
-            // 2. Generate API.md (Pro tier only with controllers)
-            if (config.licenseTier === 'pro') {
-                try {
-                    const controllers = await this.extractControllers(projectPath, config.stack);
+            // 2. Generate API.md (Always generate for all users if content exists)
+            try {
+                const controllers = await this.extractControllers(projectPath, config.stack);
 
-                    if (controllers.length > 0) {
-                        const apiDocs = await docGen.generateAPIDocumentation(config.stack, controllers);
-                        await fs.writeFile(
-                            path.join(projectPath, 'API.md'),
-                            apiDocs,
-                            'utf-8'
-                        );
-                        clack.log.success('  └─ API.md generated with AI');
-                    }
-                } catch (error: any) {
-                    clack.log.warn(`  └─ Failed to generate API docs: ${error.message}`);
+                if (controllers.length > 0) {
+                    const apiDocs = await docGen.generateAPIDocumentation(config.stack, controllers);
+                    await fs.writeFile(
+                        path.join(projectPath, 'API.md'),
+                        apiDocs,
+                        'utf-8'
+                    );
+                    clack.log.success('  └─ API.md generated with AI');
                 }
+            } catch (error: any) {
+                clack.log.warn(`  └─ Failed to generate API docs: ${error.message}`);
             }
         } catch (error: any) {
             clack.log.error(`Error generating AI documentation: ${error.message}`);
@@ -200,23 +147,7 @@ export class ProjectGenerator {
     /**
      * Returns template path based on config
      */
-    private getTemplatePath(config: ProjectConfig): string {
-        // Relative path from generator to project root
-        // generator is in src/core/generator/
-        // templates is in templates/
-        const templatesRoot = path.join(__dirname, '../../../templates');
 
-        const tier = config.licenseTier;
-        const stack = config.stack;
-
-        // For stacks that support architectures (backend stacks)
-        // Path: templates/<stack>/<tier>/<architecture>
-        // For stacks without architecture (e.g., nextjs)
-        // Path: templates/<stack>/<tier>/default
-        const architecture = config.architecture || 'default';
-
-        return path.join(templatesRoot, stack, tier, architecture);
-    }
 
     /**
      * Shows next steps instructions

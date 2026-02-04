@@ -11,7 +11,7 @@ const JWT_SECRET: string = JWT_SECRET_RAW;
 
 export interface AdminTokenPayload {
     email: string;
-    role: 'admin' | 'user'; // Extended to include user
+    role: 'admin';
     iat?: number;
     exp?: number;
 }
@@ -24,23 +24,7 @@ export function signAdminToken(email: string): string {
     );
 }
 
-export function signUserToken(email: string): string {
-    return jwt.sign(
-        { email, role: 'user' } as AdminTokenPayload,
-        JWT_SECRET,
-        { expiresIn: '7d' } // Users stay logged in longer
-    );
-}
-
 export function verifyAdminToken(token: string): AdminTokenPayload | null {
-    try {
-        return jwt.verify(token, JWT_SECRET) as AdminTokenPayload;
-    } catch (error) {
-        return null;
-    }
-}
-
-export function verifyUserToken(token: string): AdminTokenPayload | null {
     try {
         return jwt.verify(token, JWT_SECRET) as AdminTokenPayload;
     } catch (error) {

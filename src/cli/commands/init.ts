@@ -1,9 +1,7 @@
 import * as clack from '@clack/prompts';
+import color from 'picocolors';
 import { runWizard } from '../prompts/wizard.js';
 import { ProjectGenerator } from '../../core/generator/project.js';
-import { LicenseTier } from '../../models/config.js';
-import { ConfigManager } from '../../core/config/config-manager.js';
-import { LicenseValidator } from '../../core/auth/license-validator.js';
 import { AnalyticsClient } from '../services/AnalyticsClient.js';
 
 interface InitOptions {
@@ -11,79 +9,22 @@ interface InitOptions {
     stack?: string;
     architecture?: string;
     buildTool?: string;
-    license?: string;
     ai?: boolean;
     nonInteractive?: boolean;
 }
 
 export async function initCommand(options: InitOptions) {
-    const configManager = new ConfigManager();
-    const validator = new LicenseValidator();
-
-    // Determine license tier
-    let licenseTier: LicenseTier = 'free';
-    let licenseKey: string | undefined = options.license;
-
-    // If no license provided via flag, check stored config
-    if (!licenseKey) {
-        licenseKey = configManager.getLicenseKey();
-    }
-
-    // Validate license if present
-    if (licenseKey) {
-        const result = await validator.validate(licenseKey);
-
-        if (result.valid && result.tier === 'PRO') {
-            const expiration = configManager.getLicenseExpiration();
-
-            // Check if license is still active
-            if (validator.isLicenseActive(expiration)) {
-                licenseTier = 'pro';
-            } else {
-                clack.log.warn('Your Pro license has expired. Switching to Free mode.');
-                configManager.clearLicense();
-            }
-        }
-    }
-
-    if (licenseTier === 'free') {
-        clack.note(
-            '🆓 Free Mode Active\n\nYou are using Kybernus Free. To access:\n- Advanced Architectures (Clean, Hexagonal)\n- Additional Stacks (Python FastAPI, NestJS)\n- Complete DevOps (Docker, CI/CD, Terraform)\n\nTo unlock Pro features, run: kybernus upgrade',
-            'ℹ️  Information'
-        );
-    } else {
-        clack.note('🌟 Pro Mode Active\n\nYou have access to all features!', '✨ Pro');
-    }
-
     // Run interactive wizard (or use options if non-interactive)
-    const config = await runWizard(licenseTier, options);
+    // Implicitly pass 'pro' tier or handle inside wizard to defaults
+    // Privacy Notice
+    console.log('');
+    console.log(color.dim('📊 Anonymous usage data is collected to improve Kybernus.'));
+    console.log(color.dim('   No personal information is tracked. Opt-out anytime:'));
+    console.log(color.dim('   kybernus analytics --disable'));
+    console.log(color.dim('   Learn more: https://getkybernus.com/privacy'));
+    console.log('');
 
-    // Inject licenseKey into config if available
-    if (licenseKey) {
-        config.licenseKey = licenseKey;
-    }
-
-    // Validate project limit (Metered Trial)
-    if (licenseTier === 'pro' && licenseKey) {
-        const spinner = clack.spinner();
-        spinner.start('Validating project quota...');
-
-        const creditCheck = await validator.consumeCredit(licenseKey);
-
-        spinner.stop('Quota verified');
-
-        if (!creditCheck.authorized) {
-            clack.log.error(creditCheck.message || 'Project creation blocked by license limit.');
-            if (creditCheck.message?.includes('Trial limit')) {
-                clack.note('🔓 Unlock unlimited projects with Kybernus Pro lifetime.\nRun: kybernus upgrade', 'Limit Reached');
-            }
-            return; // Stop generation
-        }
-
-        if (creditCheck.remaining !== undefined && creditCheck.remaining >= 0) {
-            clack.log.info(`Trial Credits: ${creditCheck.usage}/${creditCheck.limit} used. (${creditCheck.remaining} remaining)`);
-        }
-    }
+    const config = await runWizard(options);
 
     // Generate project
     const generator = new ProjectGenerator();
@@ -95,7 +36,7 @@ export async function initCommand(options: InitOptions) {
         name: config.projectName,
         stack: config.stack,
         architecture: config.architecture,
-        tier: licenseTier,
+        tier: 'opensource',
         command: 'init'
     });
 

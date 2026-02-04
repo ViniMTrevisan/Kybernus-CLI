@@ -2,33 +2,36 @@
 
 Kybernus supports a curated list of modern, high-demand technology stacks. Each template is hand-crafted to follow industry best practices.
 
-## 1. Node.js + Express (Free)
+**All stacks are 100% Free and Open Source.**
+
+## 1. Node.js + Express
 The classic, unopinionated backend choice.
 *   **Language**: TypeScript (Strict mode).
 *   **Features**:
     *   `Setup` with `ts-node-dev` for hot reloading.
     *   `Prisma ORM` for database access.
     *   `MVC Architecture`.
+    *   `Clean Architecture` & `Hexagonal Architecture` templates.
     *   `Jest for testing`.
-    *   **Pro Exclusives**: `Clean Architecture` & `Hexagonal Architecture` templates.
 
-## 2. NestJS (Pro Only) 
+## 2. NestJS
 An opinionated framework for building efficient, scalable Node.js server-side applications.
 *   **Language**: TypeScript.
 *   **Features**:
     *   `Dependency Injection` out of the box.
     *   `Modular architecture` (Modules, Controllers, Providers).
+    *   Available in all architectures.
 
-## 3. Java Spring Boot (Free & Pro)
+## 3. Java Spring Boot
 The enterprise standard.
 *   **Language**: Java 17+.
 *   **Build Tool**: Maven.
 *   **Features**:
     *   `Spring Web MVC`.
     *   `Spring Data JPA`.
-    *   **Pro Exclusives**: `Clean Architecture` & `Hexagonal Architecture` templates.
+    *   `Clean Architecture` & `Hexagonal Architecture` templates.
 
-## 4. Python FastAPI (Pro Only) 
+## 4. Python FastAPI
 High performance, easy to learn, fast to code, ready for production.
 *   **Language**: Python 3.10+.
 *   **Features**:
@@ -38,7 +41,7 @@ High performance, easy to learn, fast to code, ready for production.
     *   `Alembic` for migrations.
     *   Automatic interactive API docs (Swagger UI).
 
-## 5. Next.js (Free & Pro) 
+## 5. Next.js
 The React Framework for the Web.
 *   **Language**: TypeScript.
 *   **Features**:
@@ -47,4 +50,4 @@ The React Framework for the Web.
     *   `Server Actions` for backend logic.
     *   `Prisma ORM` integration.
     *   `NextAuth.js` (Auth.js) setup.
-    *   **Pro Exclusives**: Hexagonal and Clean Architecture implementation.
+    *   Hexagonal and Clean Architecture implementation.

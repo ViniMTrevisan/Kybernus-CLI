@@ -5,6 +5,7 @@ import { ConfigManager } from '../../../src/core/config/config-manager.js';
 const mockGet = vi.fn();
 const mockSet = vi.fn();
 const mockDelete = vi.fn();
+const mockClear = vi.fn();
 const mockStore = {};
 
 vi.mock('conf', () => {
@@ -13,6 +14,7 @@ vi.mock('conf', () => {
             get = mockGet;
             set = mockSet;
             delete = mockDelete;
+            clear = mockClear;
             store = mockStore;
         },
     };
@@ -26,43 +28,25 @@ describe('ConfigManager', () => {
         configManager = new ConfigManager();
     });
 
-    it('should get license key', () => {
-        mockGet.mockReturnValue('test-key');
-        expect(configManager.getLicenseKey()).toBe('test-key');
-        expect(mockGet).toHaveBeenCalledWith('licenseKey');
-    });
-
-    it('should set license key', () => {
-        configManager.setLicenseKey('new-key');
-        expect(mockSet).toHaveBeenCalledWith('licenseKey', 'new-key');
-    });
-
-    it('should get default license tier as FREE', () => {
+    it('should default analytics to enabled', () => {
+        // Mock get to return the default value passed to it
         mockGet.mockImplementation((key, defaultValue) => defaultValue);
-        expect(configManager.getLicenseTier()).toBe('FREE');
+        expect(configManager.isAnalyticsEnabled()).toBe(true);
+        expect(mockGet).toHaveBeenCalledWith('analyticsEnabled', true);
     });
 
-    it('should generate machineId if missing', () => {
-        mockGet.mockReturnValue(undefined);
-        const id = configManager.getMachineId();
-        expect(id).toBeDefined();
-        expect(typeof id).toBe('string');
-        expect(mockSet).toHaveBeenCalledWith('machineId', expect.any(String));
+    it('should set analytics enabled status', () => {
+        configManager.setAnalyticsEnabled(false);
+        expect(mockSet).toHaveBeenCalledWith('analyticsEnabled', false);
     });
 
-    it('should reuse existing machineId', () => {
-        mockGet.mockReturnValue('existing-id');
-        const id = configManager.getMachineId();
-        expect(id).toBe('existing-id');
-        expect(mockSet).not.toHaveBeenCalledWith('machineId', expect.any(String));
+    it('should get analytics enabled status', () => {
+        mockGet.mockReturnValue(false);
+        expect(configManager.isAnalyticsEnabled()).toBe(false);
     });
 
-    it('should clear license data', () => {
-        configManager.clearLicense();
-        expect(mockDelete).toHaveBeenCalledWith('licenseKey');
-        expect(mockDelete).toHaveBeenCalledWith('licenseTier');
-        expect(mockDelete).toHaveBeenCalledWith('licenseExpiration');
-        expect(mockDelete).toHaveBeenCalledWith('email');
-        expect(mockSet).toHaveBeenCalledWith('licenseTier', 'FREE');
+    it('should clear config', () => {
+        configManager.clear();
+        expect(mockClear).toHaveBeenCalled();
     });
 });

@@ -42,7 +42,7 @@ export function FinalCTA() {
                         </h2>
                         <p className="text-xl font-mono text-muted-foreground mb-12 max-w-xl mx-auto">
                             // Join developers building production-ready systems in minutes. <br />
-                            Free to start. Built for scale.
+                            100% Free & Open Source. Built for scale.
                         </p>
 
                         <div className="flex flex-col md:flex-row items-center justify-center gap-8">

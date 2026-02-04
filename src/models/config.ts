@@ -1,5 +1,3 @@
-export type LicenseTier = 'free' | 'pro';
-
 export type Stack =
     | 'nextjs'
     | 'java-spring'
@@ -24,8 +22,6 @@ export interface ProjectConfig {
         cicd: boolean;
         terraform: boolean;
     };
-    licenseTier: LicenseTier;
-    licenseKey?: string; // Required for Pro template downloads
 }
 
 export interface TemplateContext {
@@ -40,10 +36,4 @@ export interface TemplateContext {
     architecture?: Architecture;
     buildTool?: BuildTool;
     currentYear: number;
-}
-
-export interface LicenseInfo {
-    valid: boolean;
-    tier: LicenseTier;
-    validatedAt: string;
 }

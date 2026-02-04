@@ -4,23 +4,17 @@ import { ProjectConfig, Stack, Architecture } from '../../../models/config.js';
  * Build prompt for generating README.md
  */
 export function buildREADMEPrompt(config: ProjectConfig): string {
-    const tier = config.licenseTier === 'pro' ? 'PRO' : 'FREE';
+    const tier = 'OPEN SOURCE';
     const architecture = config.architecture || 'MVC';
 
-    const proFeatures = `
+    const features = `
+- ✅ **Production Architecture** - ${architecture} pattern for scalability
 - ✅ **Authentication** - JWT-based authentication with bcrypt password hashing
-- ✅ **Stripe Integration** - Complete payment processing with webhooks
 - ✅ **DevOps Ready** - Docker, Docker Compose, GitHub Actions CI/CD
 - ✅ **Infrastructure** - Terraform templates for AWS deployment
-- ✅ **Production Architecture** - ${architecture} pattern for scalability
 - ✅ **Security** - Authentication middlewares, CORS, environment validation
-`;
-
-    const freeFeatures = `
-- ✅ **Clean Structure** - Professional ${architecture} architecture
 - ✅ **Health Endpoint** - API health check ready
 - ✅ **CRUD Example** - Basic items CRUD implementation
-- ✅ **Docker Setup** - Containerization with Docker Compose
 - ✅ **Error Handling** - Global exception handling
 `;
 
@@ -35,8 +29,8 @@ You are a professional technical writer creating a comprehensive README.md for a
 ${config.buildTool ? `- **Build Tool**: ${config.buildTool}` : ''}
 ${config.packageName ? `- **Package**: ${config.packageName}` : ''}
 
-**Features (${tier} Tier):**
-${tier === 'PRO' ? proFeatures : freeFeatures}
+**Features:**
+${features}
 
 **Tech Stack Details:**
 ${getStackDetails(config.stack)}
@@ -52,7 +46,7 @@ ${getStackDetails(config.stack)}
    - Installation commands
    - Environment variables setup
    - Running locally commands
-7. ${tier === 'PRO' ? 'Document API endpoints with examples' : 'Mention basic endpoints'}
+7. Document API endpoints with examples
 8. Show project structure tree
 9. Include development tips
 10. Add deployment instructions
@@ -76,35 +70,33 @@ function getStackDetails(stack: Stack): string {
         'nextjs': `
 - **Frontend**: Next.js 14+ with App Router
 - **Styling**: Tailwind CSS
-- **Database**: Prisma ORM (Pro)
-- **Auth**: NextAuth.js (Pro)
+- **Database**: Prisma ORM
+- **Auth**: NextAuth.js
 - **API**: Next.js API Routes
 `,
         'python-fastapi': `
 - **Framework**: FastAPI
 - **Validation**: Pydantic
-- **Auth**: JWT with python-jose (Pro)
-- **Payments**: Stripe SDK (Pro)
+- **Auth**: JWT with python-jose
 - **Testing**: pytest
 `,
         'nodejs-express': `
 - **Runtime**: Node.js 18+
 - **Framework**: Express.js
 - **Language**: TypeScript
-- **Auth**: JWT with bcryptjs (Pro)
-- **Payments**: Stripe SDK (Pro)
+- **Auth**: JWT with bcryptjs
 `,
         'java-spring': `
 - **Framework**: Spring Boot 3.x
 - **Language**: Java 17+
-- **Security**: Spring Security (Pro)
-- **Data**: Spring Data JPA (Pro)
+- **Security**: Spring Security
+- **Data**: Spring Data JPA
 - **Testing**: JUnit 5
 `,
         'nestjs': `
 - **Framework**: NestJS
 - **Language**: TypeScript
-- **Auth**: Passport + JWT (Pro)
+- **Auth**: Passport + JWT
 - **Validation**: class-validator
 - **Testing**: Jest
 `

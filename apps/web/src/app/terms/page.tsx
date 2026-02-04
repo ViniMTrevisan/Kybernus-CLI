@@ -54,20 +54,17 @@ export default function TermsOfService() {
                         <section className="mb-12">
                             <h2 className="text-xl font-bold flex items-center gap-3 text-white mb-4">
                                 <Scale className="w-5 h-5 text-tech-purple" />
-                                2. License & Access
+                                2. Open Source License
                             </h2>
                             <div className="space-y-4 font-mono text-sm text-muted-foreground">
                                 <p>
-                                    <strong>Free Tier (Kybernus Architect):</strong> Limited personal use license. Attribution required.
+                                    Kybernus is free and open source software licensed under the <strong>MIT License</strong>.
                                 </p>
                                 <p>
-                                    <strong>Kybernus Pro:</strong> Commercial license for individual developers. Allows use in commercial projects.
-                                </p>
-                                <p>
-                                    <strong>Enterprise (coming soon):</strong> Custom license agreement for organizations.
+                                    You are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, subject to the conditions of the MIT License.
                                 </p>
                                 <div className="p-4 bg-tech-purple/5 border border-tech-purple/20 text-xs mt-4">
-                                    Prohibition: You may not resell, redistribute, or reverse engineer the Kybernus CLI source code or generated templates in their raw form as a competing product.
+                                    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
                                 </div>
                             </div>
                         </section>
@@ -85,10 +82,10 @@ export default function TermsOfService() {
                         <section className="mb-12">
                             <h2 className="text-xl font-bold flex items-center gap-3 text-white mb-4">
                                 <Gavel className="w-5 h-5 text-white" />
-                                4. Termination
+                                4. Acceptable Use
                             </h2>
                             <p className="text-muted-foreground font-mono text-sm leading-relaxed">
-                                We reserve the right to terminate or suspend access to our Service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms (e.g., license key sharing).
+                                You agree not to use the Service for any unlawful purpose or in any way that interrupts, damages, or impairs the service. We reserve the right to block access to our web services (e.g., website, docs) if we detect abuse.
                             </p>
                         </section>
 
@@ -99,8 +96,8 @@ export default function TermsOfService() {
                             <p className="text-muted-foreground font-mono text-sm leading-relaxed mb-4">
                                 These Terms shall be governed by the laws of Brazil/International Commerce Laws, without regard to its conflict of law provisions.
                             </p>
-                            <a href="mailto:contact@kybernus.com" className="inline-flex items-center gap-2 px-4 py-2 bg-tech-purple/10 border border-tech-purple/30 text-tech-purple font-mono text-xs uppercase hover:bg-tech-purple hover:text-white transition-all">
-                                contact@kybernus.com
+                            <a href="tel:+5541991221573" className="inline-flex items-center gap-2 px-4 py-2 bg-tech-purple/10 border border-tech-purple/30 text-tech-purple font-mono text-xs uppercase hover:bg-tech-purple hover:text-white transition-all">
+                                +55 41 991221573
                             </a>
                         </section>
                     </div>

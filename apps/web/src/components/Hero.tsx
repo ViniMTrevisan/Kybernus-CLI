@@ -86,26 +86,45 @@ export function Hero() {
                             className="flex flex-col sm:flex-row justify-center gap-4 mb-16"
                         >
                             <motion.a
-                                href="#install"
+                                href="/docs"
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.98 }}
                                 className="group relative px-10 py-5 bg-tech-purple text-white font-mono font-bold uppercase tracking-widest text-sm transition-all hover:bg-white hover:text-black overflow-hidden shadow-lg hover:shadow-tech-purple/50 min-w-[240px] text-center"
                             >
                                 <span className="relative z-10 flex items-center justify-center gap-2">
-                                    Get Started Free <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                    Quick Start <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                 </span>
                             </motion.a>
 
                             <motion.a
-                                href="#pricing"
+                                href="https://github.com/ViniMTrevisan/Kybernus-CLI"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.98 }}
                                 className="group relative px-10 py-5 bg-transparent border-2 border-white/20 text-white font-mono font-bold uppercase tracking-widest text-sm transition-all hover:border-white hover:bg-white/5 min-w-[240px] text-center"
                             >
                                 <span className="relative z-10 flex items-center justify-center gap-2">
-                                    View Pro Features
+                                    Star on GitHub
                                 </span>
                             </motion.a>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.45 }}
+                            className="flex justify-center mb-16"
+                        >
+                            <a
+                                href="https://discord.gg/M2GyVqX2hg"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground hover:text-tech-purple transition-colors"
+                            >
+                                <span className="w-1.5 h-1.5 rounded-full bg-tech-purple animate-pulse" />
+                                Join the Community on Discord
+                            </a>
                         </motion.div>
 
                         <motion.div
@@ -145,13 +164,40 @@ export function Hero() {
                                     </div>
                                 </div>
 
-                                {/* GIF Content */}
-                                <div className="relative bg-black/80 backdrop-blur-xl">
-                                    <img
-                                        src="/kybernus-demo.gif"
-                                        alt="Kybernus CLI Demo - Generate production-ready projects in seconds"
-                                        className="w-full h-auto"
-                                    />
+                                {/* Live Terminal Code Animation */}
+                                <div className="relative bg-black/80 backdrop-blur-xl p-6 font-mono text-xs md:text-sm min-h-[300px] overflow-hidden">
+                                    <div className="space-y-2">
+                                        {terminalLines.map((line, index) => (
+                                            <motion.div
+                                                key={index}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{
+                                                    opacity: index <= currentLine ? 1 : 0,
+                                                    x: index <= currentLine ? 0 : -10
+                                                }}
+                                                className="flex items-start gap-3"
+                                            >
+                                                {line.type === 'command' && <span className="text-tech-purple font-bold shrink-0">$</span>}
+                                                {line.type === 'input' && <span className="text-tech-blue font-bold shrink-0">?</span>}
+                                                {line.type === 'success' && <span className="text-tech-success font-bold shrink-0">✔</span>}
+                                                {line.type === 'info' && <span className="text-tech-blue font-bold shrink-0">i</span>}
+                                                <span className={`${line.type === 'command' ? 'text-white' :
+                                                    line.type === 'success' ? 'text-tech-success' :
+                                                        line.type === 'info' ? 'text-muted-foreground' :
+                                                            'text-white/90'
+                                                    }`}>
+                                                    {line.text}
+                                                </span>
+                                            </motion.div>
+                                        ))}
+
+                                        {/* Cursor */}
+                                        <motion.div
+                                            animate={{ opacity: [1, 0] }}
+                                            transition={{ repeat: Infinity, duration: 0.8 }}
+                                            className="w-2.5 h-4 bg-tech-purple inline-block ml-1"
+                                        />
+                                    </div>
                                 </div>
 
                                 {/* Status Bar */}

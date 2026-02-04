@@ -4,6 +4,8 @@
 
 Build production-ready applications in minutes. Kybernus generates robust, scalable backend projects with industry best practices built-in.
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ---
 
 ## Installation
@@ -19,22 +21,21 @@ npm install -g kybernus
 ```bash
 # Create your first project
 kybernus init
-
-# Or start with a free trial (15 days, full Pro access)
-kybernus register
 ```
 
 ---
 
 ## Supported Stacks
 
-| Stack | Free | Pro |
-|:------|:----:|:---:|
-| **Node.js + Express** | ✅ MVC | ✅ Clean/Hexagonal |
-| **Next.js** | ✅ MVC | ✅ Clean/Hexagonal |
-| **Java Spring Boot** | ✅ MVC | ✅ Clean/Hexagonal |
-| **NestJS** | – | ✅ All Patterns |
-| **Python FastAPI** | – | ✅ All Patterns |
+All stacks and architectures are **100% FREE** and Open Source.
+
+| Stack | Supported Architectures |
+|:------|:-----------------------:|
+| **Node.js + Express** | MVC, Clean, Hexagonal |
+| **Next.js** | MVC, Clean, Hexagonal |
+| **Java Spring Boot** | MVC, Clean, Hexagonal |
+| **NestJS** | All Patterns |
+| **Python FastAPI** | All Patterns |
 
 ---
 
@@ -42,11 +43,6 @@ kybernus register
 
 ```bash
 kybernus init       # Generate a new project
-kybernus register   # Start a free trial (3 projects)
-kybernus login      # Login with your license key
-kybernus status     # Check license and usage
-kybernus upgrade    # Upgrade to Pro ($49 lifetime)
-kybernus logout     # Sign out
 ```
 
 ---
@@ -70,14 +66,7 @@ $ kybernus init
 
 ## What's Included
 
-### 3 projects FREE! Includes PRO and Architect templates 
-
-### Architect ($9)
-- Basic project scaffolding (MVC)
-- Node.js, Next.js, Java Spring Boot
-- README with setup instructions
-
-### Pro Tier ($49 lifetime)
+### 100% Free & Open Source
 - **All stacks** including NestJS and FastAPI
 - **Clean & Hexagonal Architecture** patterns
 - **Docker & docker-compose** configurations
@@ -85,6 +74,18 @@ $ kybernus init
 - **Terraform** infrastructure configs
 - **AI-powered documentation** (via Gemini)
 - Unlimited projects
+
+---
+
+## Contributing
+
+We welcome contributions! Please feel free to open an issue or submit a Pull Request.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
@@ -97,7 +98,7 @@ $ kybernus init
 
 ## License
 
-Copyright © 2026 Vini Trevisan. All rights reserved. Redistribution or modification involves a violation of applicable laws
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 

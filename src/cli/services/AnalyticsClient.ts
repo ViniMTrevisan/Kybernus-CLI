@@ -1,37 +1,43 @@
+import { PostHog } from 'posthog-node';
 import { ConfigManager } from '../../core/config/config-manager.js';
 
-const API_URL = process.env.KYBERNUS_API_URL || 'https://kybernus-cli.vercel.app/api';
+const POSTHOG_API_KEY = 'phc_YourPublicPostHogKeyHere'; // TODO: Replace with env or build param
+const POSTHOG_HOST = 'https://us.i.posthog.com';
 
 export class AnalyticsClient {
+    private client: PostHog;
     private configManager: ConfigManager;
 
     constructor() {
         this.configManager = new ConfigManager();
+        this.client = new PostHog(
+            process.env.POSTHOG_API_KEY || 'phc_test_key_placeholder', // Hardcoded or env
+            { host: POSTHOG_HOST }
+        );
     }
 
-    async track(event: string, data: { stack?: string; architecture?: string; command?: string;[key: string]: any } = {}): Promise<void> {
+    async track(event: string, properties: Record<string, any> = {}): Promise<void> {
+        if (!this.configManager.isAnalyticsEnabled()) {
+            return;
+        }
+
+        const distinctId = this.configManager.getMachineId();
+
         try {
-            const licenseKey = this.configManager.getLicenseKey();
-            const machineId = this.configManager.getMachineId(); // Enviando machineId no metadata se API nao suporta direto, ou ignorando?
+            this.client.capture({
+                distinctId,
+                event,
+                properties: {
+                    ...properties,
+                    $os: process.platform,
+                    cli_version: '1.3.0', // Should fetch from package.json
+                },
+            });
 
-            const { stack, architecture, command, ...rest } = data;
-
-            // Fire and forget
-            fetch(`${API_URL}/analytics/track`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    event,
-                    licenseKey: licenseKey || undefined,
-                    stack,
-                    architecture,
-                    command,
-                    metadata: { ...rest, machineId } // Colocando machineId no metadata
-                })
-            }).catch(() => { });
-
+            // Flush properly in short-lived CLI commands
+            await this.client.shutdown();
         } catch (error) {
-            // Silently fail
+            // Silently fail to not interrupt user flow
         }
     }
 }

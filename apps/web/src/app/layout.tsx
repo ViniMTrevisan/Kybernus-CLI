@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google"; // Stro
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { CookieConsent } from "@/components/CookieConsent";
+import { PostHogProvider } from "@/providers/PostHogProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,10 +41,10 @@ export default function RootLayout({
         jetbrainsMono.variable,
         "font-sans bg-background text-foreground antialiased selection:bg-tech-blue/30 selection:text-white"
       )}>
-
-
-        {children}
-        <CookieConsent />
+        <PostHogProvider>
+          {children}
+          <CookieConsent />
+        </PostHogProvider>
       </body>
     </html>
   );

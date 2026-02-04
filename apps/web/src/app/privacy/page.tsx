@@ -51,26 +51,13 @@ export default function PrivacyPolicy() {
                             </p>
                             <ul className="space-y-4 font-mono text-sm text-muted-foreground list-none pl-0">
                                 <li className="flex items-start gap-3 bg-black/30 p-4 border border-white/5">
-                                    <Eye className="w-4 h-4 text-tech-blue mt-0.5 shrink-0" />
-                                    <div>
-                                        <strong className="text-white block mb-1">Identity Data</strong>
-                                        Email address and encrypted password hash. We do not store plain-text passwords.
-                                    </div>
-                                </li>
-                                <li className="flex items-start gap-3 bg-black/30 p-4 border border-white/5">
                                     <Database className="w-4 h-4 text-tech-blue mt-0.5 shrink-0" />
                                     <div>
                                         <strong className="text-white block mb-1">Operational Data</strong>
                                         Project generation statistics, license key usage logs, and CLI download metrics.
                                     </div>
                                 </li>
-                                <li className="flex items-start gap-3 bg-black/30 p-4 border border-white/5">
-                                    <Server className="w-4 h-4 text-tech-blue mt-0.5 shrink-0" />
-                                    <div>
-                                        <strong className="text-white block mb-1">Payment Data</strong>
-                                        Processed securely via Stripe. We do not store full credit card numbers on our servers.
-                                    </div>
-                                </li>
+
                             </ul>
                         </section>
 
@@ -119,8 +106,8 @@ export default function PrivacyPolicy() {
                             <p className="text-muted-foreground font-mono text-sm leading-relaxed mb-4">
                                 For data privacy inquiries or deletion requests, initiate a secure channel:
                             </p>
-                            <a href="mailto:contact@kybernus.com" className="inline-flex items-center gap-2 px-4 py-2 bg-tech-blue/10 border border-tech-blue/30 text-tech-blue font-mono text-xs uppercase hover:bg-tech-blue hover:text-black transition-all">
-                                contact@kybernus.com
+                            <a href="tel:+5541991221573" className="inline-flex items-center gap-2 px-4 py-2 bg-tech-blue/10 border border-tech-blue/30 text-tech-blue font-mono text-xs uppercase hover:bg-tech-blue hover:text-black transition-all">
+                                +55 41 991221573
                             </a>
                         </section>
                     </div>

@@ -9,10 +9,6 @@ export default defineConfig({
         exclude: [
             '**/node_modules/**',
             '**/dist/**',
-            '**/auth-flow.test.ts',
-            '**/password-recovery.test.ts',
-            '**/email-real.test.ts',
-            '**/admin-protection.test.ts',
         ],
     },
     resolve: {

@@ -1,5 +1,5 @@
 import * as clack from '@clack/prompts';
-import { ProjectConfig, LicenseTier, Stack, Architecture, BuildTool } from '../../models/config.js';
+import { ProjectConfig, Stack, Architecture, BuildTool } from '../../models/config.js';
 import { toKebabCase } from '../../core/generator/context-builder.js';
 
 export interface ConfigOptions {
@@ -16,14 +16,14 @@ export interface ConfigOptions {
   terraform?: boolean;
 }
 
-export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions = {}): Promise<ProjectConfig> {
+export async function runWizard(options: ConfigOptions = {}): Promise<ProjectConfig> {
   // If non-interactive mode, validate required options
   if (options.nonInteractive) {
     if (!options.name || !options.stack) {
       throw new Error('Non-interactive mode requires --name and --stack. Architecture defaults to mvc if not specified.');
     }
 
-    // Default DevOps flags for Pro non-interactive
+    // Default DevOps flags
     const devops = {
       docker: options.docker || false,
       cicd: options.cicd || false,
@@ -39,7 +39,6 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
       useAI: options.ai || false,
       geminiKey: options.geminiKey,
       devops,
-      licenseTier
     };
   }
 
@@ -69,12 +68,8 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
             { value: 'nextjs', label: 'Next.js (React + TypeScript)' },
             { value: 'java-spring', label: 'Java Spring Boot' },
             { value: 'nodejs-express', label: 'Node.js + Express' },
-            ...(licenseTier === 'pro'
-              ? [
-                { value: 'python-fastapi', label: '🌟 Python FastAPI (Pro)' },
-                { value: 'nestjs', label: '🌟 NestJS (Pro)' },
-              ]
-              : []),
+            { value: 'python-fastapi', label: 'Python FastAPI' },
+            { value: 'nestjs', label: 'NestJS' },
           ],
         }),
 
@@ -109,38 +104,27 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
       architecture: ({ results }) => {
         // Next.js has different architecture options (default vs mvc)
         if (results.stack === 'nextjs') {
-          const nextjsOptions = [{ value: 'default', label: 'Default Structure (Free)' }];
-
-          // MVC option only in Pro
-          if (licenseTier === 'pro') {
-            nextjsOptions.push({ value: 'mvc', label: '🌟 MVC Structure (Pro)' });
-          }
-
           return clack.select({
             message: 'Template:',
             initialValue: options.architecture || 'default',
-            options: nextjsOptions,
+            options: [
+              { value: 'default', label: 'Default Structure' },
+              { value: 'mvc', label: 'MVC Structure' },
+              { value: 'clean', label: 'Clean Architecture' },
+              { value: 'hexagonal', label: 'Hexagonal Architecture' }
+            ],
           });
         }
 
         // Backend stacks support MVC/Clean/Hexagonal
-        const backendStacks = ['java-spring', 'nodejs-express', 'python-fastapi', 'nestjs'];
-        if (!backendStacks.includes(results.stack as string)) return;
-
-        const uiOptions = [{ value: 'mvc', label: 'MVC (Model-View-Controller)' }];
-
-        // Advanced architectures only in Pro
-        if (licenseTier === 'pro') {
-          uiOptions.push(
-            { value: 'clean', label: '🌟 Clean Architecture (Pro)' },
-            { value: 'hexagonal', label: '🌟 Hexagonal Architecture (Pro)' }
-          );
-        }
-
         return clack.select({
           message: 'Architecture:',
           initialValue: options.architecture,
-          options: uiOptions,
+          options: [
+            { value: 'mvc', label: 'MVC (Model-View-Controller)' },
+            { value: 'clean', label: 'Clean Architecture' },
+            { value: 'hexagonal', label: 'Hexagonal Architecture' }
+          ],
         });
       },
 
@@ -164,8 +148,6 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
       },
 
       devops: async ({ results }) => {
-        if (licenseTier !== 'pro') return [];
-
         // If devops flags already set, assume override mode
         if (options.docker || options.cicd || options.terraform) {
           return;
@@ -205,6 +187,5 @@ export async function runWizard(licenseTier: LicenseTier, options: ConfigOptions
       cicd: options.cicd || (answers.devops as string[] | undefined)?.includes('ci-cd') || false,
       terraform: options.terraform || (answers.devops as string[] | undefined)?.includes('terraform') || false,
     },
-    licenseTier,
   };
 }

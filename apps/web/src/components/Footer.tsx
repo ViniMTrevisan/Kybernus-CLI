@@ -1,4 +1,4 @@
-import { Twitter, Linkedin, Terminal, Mail } from "lucide-react";
+import { Twitter, Linkedin, Terminal } from "lucide-react";
 import Image from "next/image";
 
 export function Footer() {
@@ -40,7 +40,6 @@ export function Footer() {
                             <li><a href="#stacks" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">Tech Stacks</a></li>
                             <li><a href="#architecture" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">Architectures</a></li>
                             <li><a href="#features" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">Features</a></li>
-                            <li><a href="#pricing" className="text-sm text-muted-foreground hover:text-tech-blue transition-colors">Pricing</a></li>
                         </ul>
                     </div>
 
@@ -65,22 +64,21 @@ export function Footer() {
                             Connect
                         </h4>
                         <div className="space-y-4">
-                            <a href="mailto:contact@kybernus.com" className="flex items-center gap-3 group">
-                                <Mail className="w-4 h-4 text-muted-foreground group-hover:text-tech-blue transition-colors" />
-                                <span className="text-sm font-mono text-muted-foreground group-hover:text-white transition-colors">contact@kybernus.com</span>
-                            </a>
-
-                            <div className="p-4 bg-tech-gray border border-white/5 relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-16 h-16 bg-tech-blue/10 blur-2xl group-hover:bg-tech-blue/20 transition-all" />
-                                <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-tech-blue mb-2">NEWSLETTER</div>
-                                <p className="text-xs text-muted-foreground mb-3">
-                                    Join 500+ architects.
+                            <a
+                                href="https://discord.gg/M2GyVqX2hg"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block p-4 bg-tech-gray border border-white/5 relative overflow-hidden group hover:border-tech-purple/30 transition-all"
+                            >
+                                <div className="absolute top-0 right-0 w-16 h-16 bg-tech-purple/10 blur-2xl group-hover:bg-tech-purple/20 transition-all" />
+                                <div className="text-[10px] font-mono font-bold uppercase tracking-widest text-tech-purple mb-2">COMMUNITY</div>
+                                <p className="text-xs text-muted-foreground mb-3 group-hover:text-white transition-colors">
+                                    Join us on Discord.
                                 </p>
-                                <div className="flex gap-2">
-                                    <input type="email" placeholder="Email..." className="w-full bg-black border border-white/10 px-2 py-1 text-xs text-white focus:border-tech-blue outline-none" />
-                                    <button className="bg-white text-black px-2 py-1 text-xs font-bold hover:bg-tech-blue transition-colors">→</button>
+                                <div className="flex items-center gap-2 text-xs font-bold text-white group-hover:translate-x-1 transition-transform">
+                                    Join Server →
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     </div>
                 </div>

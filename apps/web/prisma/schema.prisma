@@ -38,15 +38,15 @@ model User {
   
   // License
   licenseKey      String         @unique
-  tier            LicenseTier    @default(FREE)
-  status          LicenseStatus  @default(TRIAL)
+  tier            LicenseTier    @default(PRO)
+  status          LicenseStatus  @default(PRO_ACTIVE)
   
   // Stripe
   stripeCustomerId String?       @unique
 
   // Project Limits
   projectUsage    Int            @default(0)
-  projectLimit    Int            @default(3)
+  projectLimit    Int            @default(999999)
   
   // Timestamps
   createdAt       DateTime       @default(now())
