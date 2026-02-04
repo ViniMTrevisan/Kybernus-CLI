@@ -94,7 +94,7 @@ kybernus init
 └  🎉 Project created successfully! Happy coding!
 
 ---
-
+```
 ## What's Included
 
 ### 100% Free & Open Source
