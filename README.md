@@ -32,10 +32,10 @@ All stacks and architectures are **100% FREE** and Open Source.
 | Stack | Supported Architectures |
 |:------|:-----------------------:|
 | **Node.js + Express** | MVC, Clean, Hexagonal |
-| **Next.js** | MVC, Clean, Hexagonal |
+| **Next.js** | MVC |
 | **Java Spring Boot** | MVC, Clean, Hexagonal |
-| **NestJS** | All Patterns |
-| **Python FastAPI** | All Patterns |
+| **NestJS** | MVC, Clean, Hexagonal |
+| **Python FastAPI** | MVC, Clean, Hexagonal |
 
 ---
 
@@ -50,17 +50,48 @@ kybernus init       # Generate a new project
 ## Example
 
 ```bash
-$ kybernus init
+kybernus init
 
-┌  🚀 Kybernus Project Generator
+📊 Anonymous usage data is collected to improve Kybernus.
+   No personal information is tracked. Opt-out anytime:
+   kybernus analytics --disable
+   Learn more: https://getkybernus.com/privacy
+
+┌  🚀 Welcome to Kybernus
 │
-◆  Project name: my-api
-◆  Stack: Node.js + Express
-◆  Architecture: Clean Architecture
-◆  Include Docker? Yes
+◇  Project name:
+│  my-demo
 │
-└  ✅ Project created successfully!
-```
+◇  Choose your stack:
+│  Python FastAPI
+│
+◇  Architecture:
+│  Clean Architecture
+│
+◇  Generate AI documentation (Google Gemini)?
+│  No
+│
+◇  DevOps & Infrastructure (use Space to select, or 'A' to select all):
+│  Docker + Docker Compose, GitHub Actions CI/CD, Terraform (AWS)
+│
+◇  ✅ Project generated successfully!
+│
+◇  ✨ Next steps ───────────────────────────╮
+│                                          │
+│  📁 Enter the project directory:         │
+│     cd my-demo                           │
+│                                          │
+│  📦 Install dependencies:                │
+│     pip install -r requirements.txt      │
+│                                          │
+│  🚀 Start the server:                    │
+│     uvicorn main:app --reload            │
+│                                          │
+│  📝 Read README.md for more information  │
+│                                          │
+├──────────────────────────────────────────╯
+│
+└  🎉 Project created successfully! Happy coding!
 
 ---
 
