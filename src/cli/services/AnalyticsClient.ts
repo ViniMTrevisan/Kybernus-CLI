@@ -11,7 +11,7 @@ export class AnalyticsClient {
     constructor() {
         this.configManager = new ConfigManager();
         this.client = new PostHog(
-            process.env.POSTHOG_API_KEY || 'phc_test_key_placeholder', // Hardcoded or env
+            process.env.POSTHOG_API_KEY || 'phc_J6HPBT5VMDPcOOaukG1ia5JKO7uEgAfsTIgPdceXTQS',
             { host: POSTHOG_HOST }
         );
     }

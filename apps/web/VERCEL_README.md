@@ -59,7 +59,7 @@ UPSTASH_REDIS_REST_TOKEN="..."
 
 ### Application
 ```
-NEXT_PUBLIC_APP_URL="https://kybernus.vercel.app"
+NEXT_PUBLIC_APP_URL="https://www.getkybernus.com"
 ```
 
 ## 🚀 Deploy
@@ -84,7 +84,7 @@ vercel --prod
 
 2. **Stripe Webhooks**: Update webhook URL in Stripe Dashboard
    ```
-   https://your-app.vercel.app/api/webhooks/stripe
+   https://www.getkybernus.com/api/webhooks/stripe
    ```
 
 3. **Domain**: Configure custom domain in Vercel Dashboard (optional)

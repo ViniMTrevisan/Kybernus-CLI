@@ -310,7 +310,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙋 Support
 
-- **Documentation**: [kybernus.dev/docs](https://kybernus.vercel.app/docs)
+- **Support**: [kybernus.dev/docs](https://www.getkybernus.com/docs)
 - **Issues**: [GitHub Issues](https://github.com/ViniMTrevisan/Kybernus-CLI/issues)
 - **Email**: support@kybernus.dev
 
