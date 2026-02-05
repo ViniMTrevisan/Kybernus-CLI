@@ -123,8 +123,8 @@ We welcome contributions! Please feel free to open an issue or submit a Pull Req
 
 ## Links
 
-- 🌐 **Website**: [kybernus.vercel.app](https://kybernus.vercel.app)
-- 📖 **Docs**: [kybernus.vercel.app/docs](https://kybernus.vercel.app/docs)
+- 🌐 **Website**: [getkybernus.com](https://www.getkybernus.com/)
+- 📖 **Docs**: [getkybernus.com/docs](https://www.getkybernus.com/docs/getting_started)
 - 💬 **Discord**: [Join the Community](https://discord.gg/u5ANEpAAhT)
 
 ---
