@@ -1,8 +1,12 @@
 import { PostHog } from 'posthog-node';
 import { ConfigManager } from '../../core/config/config-manager.js';
+import { createRequire } from 'module';
 
-const POSTHOG_API_KEY = 'phc_YourPublicPostHogKeyHere'; // TODO: Replace with env or build param
+const POSTHOG_API_KEY = 'phc_J6HPBT5VMDPcOOaukG1ia5JKO7uEgAfsTIgPdceXTQS';
 const POSTHOG_HOST = 'https://us.i.posthog.com';
+const requirePkg = createRequire(import.meta.url);
+const pkg = requirePkg('../../../package.json');
+
 
 export class AnalyticsClient {
     private client: PostHog;
@@ -11,7 +15,7 @@ export class AnalyticsClient {
     constructor() {
         this.configManager = new ConfigManager();
         this.client = new PostHog(
-            process.env.POSTHOG_API_KEY || 'phc_J6HPBT5VMDPcOOaukG1ia5JKO7uEgAfsTIgPdceXTQS',
+            process.env.POSTHOG_API_KEY || POSTHOG_API_KEY,
             { host: POSTHOG_HOST }
         );
     }
@@ -30,7 +34,7 @@ export class AnalyticsClient {
                 properties: {
                     ...properties,
                     $os: process.platform,
-                    cli_version: '1.3.0', // Should fetch from package.json
+                    cli_version: pkg.version,
                 },
             });
 

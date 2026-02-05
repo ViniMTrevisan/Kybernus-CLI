@@ -1,4 +1,4 @@
-import { ProjectConfig, Stack, Architecture } from '../../../models/config.js';
+import { ProjectConfig, Stack } from '../../../models/config.js';
 
 /**
  * Build prompt for generating README.md
@@ -51,7 +51,7 @@ ${getStackDetails(config.stack)}
 9. Include development tips
 10. Add deployment instructions
 11. Add license info (MIT)
-12. Credit: "Generated with ❤️ by [Kybernus CLI](https://kybernus.dev)"
+12. Credit: "Generated with ❤️ by [Kybernus CLI](https://getkybernus.com/)"
 
 **Style Guidelines:**
 - Use clear, professional language
