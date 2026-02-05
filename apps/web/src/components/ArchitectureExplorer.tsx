@@ -10,7 +10,6 @@ type ArchitectureSlot = "slot1" | "slot2" | "slot3";
 
 interface ArchTemplate {
     name: string;
-    tier: "free" | "pro";
     description: string;
     screenshot: string | null;
 }
@@ -28,8 +27,7 @@ const getStackConfig = (stack: Stack): { id: ArchitectureSlot; label: string }[]
     switch (stack) {
         case "nextjs":
             return [
-                { id: "slot1", label: "Default Structure (Free)" },
-                { id: "slot2", label: "Default Structure (Pro)" },
+                { id: "slot1", label: "Production Structure" },
             ];
         default:
             return [
@@ -43,14 +41,7 @@ const getStackConfig = (stack: Stack): { id: ArchitectureSlot; label: string }[]
 const templates: Record<Stack, Record<string, ArchTemplate>> = {
     "nextjs": {
         "slot1": {
-            name: "Next.js Default",
-            tier: "free",
-            description: "Modern Next.js 13+ with App Router, Server Components, and TypeScript.",
-            screenshot: "/next-free.png",
-        },
-        "slot2": {
-            name: "Next.js Pro",
-            tier: "pro",
+            name: "Next.js Enterprise",
             description: "Production-ready structure with Auth, Dashboard, Infra, and Docker configured.",
             screenshot: "/next-pro.png",
         },
@@ -58,19 +49,16 @@ const templates: Record<Stack, Record<string, ArchTemplate>> = {
     "nodejs-express": {
         "slot1": {
             name: "Node.js MVC",
-            tier: "free",
             description: "Classic Model-View-Controller with routes, controllers, and middleware.",
-            screenshot: "/node-mvc.png",
+            screenshot: "/node-mvc-new.png",
         },
         "slot2": {
             name: "Node.js Clean",
-            tier: "pro",
             description: "Use case-driven architecture with domain isolation and dependency injection.",
             screenshot: "/node-clean.png",
         },
         "slot3": {
             name: "Node.js Hexagonal",
-            tier: "pro",
             description: "Port-based design with interchangeable adapters for databases and APIs.",
             screenshot: "/node-hexagonal.png",
         },
@@ -78,19 +66,16 @@ const templates: Record<Stack, Record<string, ArchTemplate>> = {
     "java-spring": {
         "slot1": {
             name: "Java Spring MVC",
-            tier: "free",
             description: "Standard Spring MVC with controllers, services, and repository pattern.",
-            screenshot: "/java-mvc.png"
+            screenshot: "/java-mvc-new.png"
         },
         "slot2": {
             name: "Java Spring Clean",
-            tier: "pro",
             description: "Domain-centric Spring architecture with clear separation of concerns.",
             screenshot: "/java-clean.png"
         },
         "slot3": {
             name: "Java Spring Hexagonal",
-            tier: "pro",
             description: "Ports & adapters pattern with Spring dependency injection.",
             screenshot: "/java-hexagonal.png"
         },
@@ -98,19 +83,16 @@ const templates: Record<Stack, Record<string, ArchTemplate>> = {
     "python-fastapi": {
         "slot1": {
             name: "FastAPI MVC",
-            tier: "pro", // Python MVC is PRO
             description: "FastAPI with routers, services, and async repository pattern.",
             screenshot: "/python-mvc.png"
         },
         "slot2": {
             name: "FastAPI Clean",
-            tier: "pro",
             description: "Clean architecture with domain entities and use cases.",
             screenshot: "/python-clean.png"
         },
         "slot3": {
             name: "FastAPI Hexagonal",
-            tier: "pro",
             description: "Hexagonal pattern with ports and adapters for FastAPI.",
             screenshot: "/python-hexagonal.png"
         },
@@ -118,19 +100,16 @@ const templates: Record<Stack, Record<string, ArchTemplate>> = {
     "nestjs": {
         "slot1": {
             name: "NestJS MVC",
-            tier: "pro", // NestJS MVC is PRO
             description: "NestJS with controllers, services, and module organization.",
             screenshot: "/nest-mvc.png"
         },
         "slot2": {
             name: "NestJS Clean",
-            tier: "pro",
             description: "Domain-driven NestJS with clean architecture principles.",
             screenshot: "/nest-clean.png"
         },
         "slot3": {
             name: "NestJS Hexagonal",
-            tier: "pro",
             description: "Ports & adapters with NestJS modules and providers.",
             screenshot: "/nest-hexagonal.png"
         },
@@ -191,11 +170,8 @@ export function ArchitectureExplorer() {
                             return (
                                 <div key={slot.id} className="relative group h-full">
                                     {/* Tier Badge */}
-                                    <div className={`absolute -top-3 -right-3 z-20 px-3 py-1 text-xs font-mono font-bold uppercase ${template.tier === "free" ? "bg-tech-blue" : "bg-tech-purple"
-                                        } text-white flex items-center gap-1 shadow-lg`}>
-                                        {template.tier === "pro" && <Lock className="w-3 h-3" />}
-                                        {template.tier}
-                                    </div>
+                                    {/* Tier Badge Removed */}
+
 
                                     {/* Card */}
                                     <div className="relative bg-tech-gray/30 border border-white/10 rounded-lg overflow-hidden backdrop-blur-xl hover:border-white/20 transition-all h-full flex flex-col group-hover:bg-tech-gray/40">

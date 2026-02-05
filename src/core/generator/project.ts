@@ -77,27 +77,19 @@ export class ProjectGenerator {
     }
 
     /**
-     * Get local template path. Checks 'pro' folder first, then 'free'.
+     * Get local template path.
+     * Updated: Removed distinction between 'pro' and 'free'. All templates are now standard.
      */
     private async getLocalTemplatePath(config: ProjectConfig): Promise<string> {
         const templatesRoot = path.join(__dirname, '../../../templates');
 
         // Architecture defaults
-        const architecture = config.architecture || (config.stack === 'nextjs' ? 'default' : 'mvc');
+        const architecture = config.architecture || (config.stack === 'nextjs' ? 'mvc' : 'mvc');
 
-        // Check Pro path first (since most architectures are there now or we want to prioritize it)
-        const proPath = path.join(templatesRoot, config.stack, 'pro', architecture);
-        if (await fs.pathExists(proPath)) {
-            return proPath;
-        }
+        // Check path directly under stack/architecture
+        const templatePath = path.join(templatesRoot, config.stack, architecture);
 
-        // Check Free path
-        const freePath = path.join(templatesRoot, config.stack, 'free', architecture);
-        if (await fs.pathExists(freePath)) {
-            return freePath;
-        }
-
-        return proPath; // Return pro path as default for error message if neither exists
+        return templatePath;
     }
 
     /**

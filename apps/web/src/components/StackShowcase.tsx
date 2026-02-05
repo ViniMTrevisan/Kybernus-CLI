@@ -10,7 +10,6 @@ const stacks = [
         icon: Server,
         color: "text-cyber-blue",
         bg: "bg-cyber-blue/10",
-        tier: "Pro",
     },
     {
         name: "Next.js",
@@ -18,7 +17,6 @@ const stacks = [
         icon: Globe,
         color: "text-white",
         bg: "bg-white/10",
-        tier: "Free",
     },
     {
         name: "Spring Boot",
@@ -26,7 +24,6 @@ const stacks = [
         icon: Database,
         color: "text-neon-green",
         bg: "bg-neon-green/10",
-        tier: "Free",
     },
     {
         name: "FastAPI",
@@ -34,7 +31,6 @@ const stacks = [
         icon: Cpu,
         color: "text-cyber-purple",
         bg: "bg-cyber-purple/10",
-        tier: "Pro",
     },
     {
         name: "Express.js",
@@ -42,7 +38,6 @@ const stacks = [
         icon: Laptop,
         color: "text-cyber-pink",
         bg: "bg-cyber-pink/10",
-        tier: "Free",
     },
     {
         name: "Terraform",
@@ -50,7 +45,6 @@ const stacks = [
         icon: Cloud,
         color: "text-blue-400",
         bg: "bg-blue-400/10",
-        tier: "Pro",
     },
 ];
 
@@ -77,7 +71,7 @@ export function StackShowcase() {
                     <p className="text-xl font-mono text-muted-foreground leading-relaxed">
                         // Kybernus configures the best tools for your mission. <br />
                         <span className="text-sm font-bold text-tech-purple mt-2 block">
-                            Note: Advanced architectures (Clean/Hexagonal) require a PRO license.
+                            Production-ready architectures available for all stacks.
                         </span>
                     </p>
                 </div>
@@ -101,12 +95,6 @@ export function StackShowcase() {
                                 <div className={`p-4 bg-tech-black border border-white/10 group-hover:border-tech-blue/50 transition-colors`}>
                                     <stack.icon className={`w-8 h-8 ${stack.color}`} />
                                 </div>
-                                <span className={`text-[10px] font-mono font-bold uppercase tracking-widest px-2 py-1 border ${stack.tier === 'Pro'
-                                    ? 'border-tech-blue/30 text-tech-blue bg-tech-blue/5'
-                                    : 'border-white/10 text-muted-foreground bg-white/5'
-                                    }`}>
-                                    {stack.tier}
-                                </span>
                             </div>
 
                             <h3 className="text-2xl font-space font-bold mb-3 text-white group-hover:text-tech-blue transition-colors">{stack.name}</h3>
@@ -120,7 +108,7 @@ export function StackShowcase() {
                                         initial={{ width: 0 }}
                                         whileInView={{ width: "100%" }}
                                         transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                                        className={`h-full ${stack.tier === 'Pro' ? 'bg-tech-blue' : 'bg-white/20'}`}
+                                        className={`h-full bg-tech-blue`}
                                     />
                                 </div>
                             </div>
