@@ -1,12 +1,10 @@
-name: Publish to NPM
+name: Run Tests
 
 on:
   push:
     tags:
       - 'v*.*.*'
 
-permissions:
-  contents: write
 
 jobs:
   publish:
@@ -20,7 +18,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
       
       - name: Install dependencies
         run: npm ci
@@ -31,26 +28,3 @@ jobs:
       - name: Build CLI
         run: npm run build
       
-      - name: Verify package contents
-        run: |
-          echo "📦 Verificando conteúdo do pacote..."
-          npm pack --dry-run
-          echo ""
-          echo "✅ Verificar se 'templates' está incluído acima"
-      
-      - name: Publish to NPM
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          generate_release_notes: true
-          body: |
-            ## 🚀 Kybernus CLI Release
-            
-            Install or update:
-            ```bash
-            npm install -g kybernus
-            ```

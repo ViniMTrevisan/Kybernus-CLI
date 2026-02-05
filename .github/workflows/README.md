@@ -6,25 +6,16 @@ This directory contains automated CI/CD workflows for the Kybernus platform.
 
 ### `ci.yml` - Continuous Integration
 **Trigger**: Every push and pull request
-- Runs tests for CLI
-- Runs tests for Web App
-- Runs linters
+- Runs tests for CLI (unit tests only)
+- Runs tests for Web App (build, lint, and tests)
 - Verifies builds
 
-### `publish-npm.yml` - NPM Publishing
+### `publish-npm.yml` - Run Tests (Build Verification)
 **Trigger**: Version tags (v*.*.*)
-- Builds and tests CLI
-- Publishes to NPM registry
-- Creates GitHub Release
+- This workflow **does not publish to NPM**.
+- It ensures that tagged versions pass all tests and build steps before any manual release process.
+- Runs `npm ci`, `npm test`, and `npm run build`.
 
-## 🔐 Required Secrets
-
-Configure in **GitHub Repository → Settings → Secrets and variables → Actions**:
-
-| Secret | Description | How to get |
-|--------|-------------|------------|
-| `NPM_TOKEN` | NPM publish token | npmjs.com → Access Tokens → Generate (Automation) |
-| `GITHUB_TOKEN` | GitHub API access | Auto-provided by GitHub Actions |
 
 ## 🚀 Usage
 
@@ -34,7 +25,7 @@ git push origin your-branch
 # CI runs automatically
 ```
 
-### Publish to NPM
+### Trigger Build Verification
 ```bash
 # 1. Update version in package.json
 npm version patch  # or minor, or major
@@ -47,7 +38,7 @@ git commit -m "chore: bump version to X.X.X"
 git tag vX.X.X
 git push origin main --tags
 
-# 4. GitHub Action runs automatically
+# 4. GitHub Action runs automatically to verify the build
 ```
 
 ## ✅ Status Badges
@@ -55,5 +46,4 @@ git push origin main --tags
 Add to README.md:
 ```markdown
 ![CI](https://github.com/ViniMTrevisan/Kybernus-CLI/workflows/CI%20-%20Tests/badge.svg)
-![NPM Version](https://img.shields.io/npm/v/kybernus)
 ```
