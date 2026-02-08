@@ -1,45 +1,41 @@
 # Production Dockerfile for {{projectName}}
 
 # Build stage
-FROM node:20-alpine AS builder
+FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm ci --only=production
+# Copy pom.xml and install dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
 # Copy source code
-COPY . .
+COPY src ./src
 
-# Build TypeScript
-RUN npm run build
+# Build application
+RUN mvn package -DskipTests
 
 # Production stage
-FROM node:20-alpine AS production
+FROM eclipse-temurin:21-jre-alpine AS production
 
 WORKDIR /app
 
 # Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+RUN addgroup -g 1001 -S spring && \
+  adduser -S spring -u 1001
 
 # Copy built application
-COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nodejs:nodejs /app/package.json ./
+COPY --from=builder --chown=spring:spring /app/target/*.jar app.jar
 
 # Switch to non-root user
-USER nodejs
+USER spring
 
 # Expose port
-EXPOSE 3000
+EXPOSE 8080
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
 # Start application
-CMD ["node", "dist/index.js"]
+CMD ["java", "-jar", "app.jar"]
