@@ -52,11 +52,6 @@ const config: Config = {
                 'grid-pattern': "linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)",
                 'scanner': 'linear-gradient(to bottom, transparent, rgba(0, 240, 255, 0.5), transparent)',
             },
-            animation: {
-                'float': 'float 6s ease-in-out infinite',
-                'glow': 'glow 2s ease-in-out infinite alternate',
-                'scan': 'scan 2s linear infinite',
-            },
             keyframes: {
                 float: {
                     '0%, 100%': { transform: 'translateY(0)' },
@@ -69,7 +64,17 @@ const config: Config = {
                 scan: {
                     '0%': { transform: 'translateY(-100%)' },
                     '100%': { transform: 'translateY(100%)' },
+                },
+                scanline: {
+                    '0%': { transform: 'translateY(-100%)' },
+                    '100%': { transform: 'translateY(1000%)' },
                 }
+            },
+            animation: {
+                'float': 'float 6s ease-in-out infinite',
+                'glow': 'glow 2s ease-in-out infinite alternate',
+                'scan': 'scan 2s linear infinite',
+                'scanline': 'scanline 8s linear infinite',
             },
         },
     },

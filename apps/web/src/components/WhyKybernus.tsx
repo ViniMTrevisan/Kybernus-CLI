@@ -8,19 +8,25 @@ const features = [
         icon: Container,
         title: "Stop Wasting 3 Days on Setup",
         description: "Last time you started a project, how long did you spend on Docker configs, CI/CD, and folder structure? 2 days? 3? Get it done in 2 minutes. That's $2,400 saved per project at $100/hr.",
-        accent: "tech-blue",
+        accent: "text-tech-blue",
+        bg: "bg-tech-blue/10",
+        border: "border-tech-blue/20"
     },
     {
         icon: LockOpen,
         title: "No Vendor Lock-In = No Regrets",
         description: "Your code. Your repo. Zero runtime dependencies. No proprietary garbage. If Kybernus disappeared tomorrow, your projects still work. Try that with SaaS scaffolders charging $49/month forever.",
-        accent: "tech-purple",
+        accent: "text-tech-purple",
+        bg: "bg-tech-purple/10",
+        border: "border-tech-purple/20"
     },
     {
         icon: Network,
         title: "Ship Features, Not Boilerplate",
         description: "Clean Architecture isn't just 'nice to have' — it's the difference between a 2-week refactor and a 2-month rewrite. Start right. Scale effortlessly. Your future self will thank you.",
-        accent: "tech-success",
+        accent: "text-neon-green",
+        bg: "bg-neon-green/10",
+        border: "border-neon-green/20"
     },
 ];
 
@@ -39,48 +45,72 @@ export function WhyKybernus() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
-                    className="text-center mb-20"
+                    className="text-center mb-32"
                 >
                     <h2 className="text-4xl md:text-6xl font-space font-bold mb-6 uppercase text-white">
                         Why <span className="text-transparent bg-clip-text bg-gradient-to-r from-tech-blue to-tech-purple">Kybernus?</span>
                     </h2>
                     <p className="text-lg font-mono text-muted-foreground max-w-2xl mx-auto">
-                        // Built by engineers, for engineers. No fluff, just results.
+                        // Built by engineers, for engineers.
                     </p>
                 </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                     {features.map((feature, index) => {
-                        const Icon = feature.icon;
                         return (
                             <motion.div
                                 key={feature.title}
-                                initial={{ opacity: 0, y: 30 }}
+                                initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.6, delay: index * 0.1 }}
-                                whileHover={{ y: -8 }}
-                                className="group relative p-8 bg-tech-gray/30 border border-white/10 rounded-lg hover:border-white/20 transition-all duration-300"
+                                transition={{ duration: 0.5, delay: index * 0.1 }}
+                                whileHover="hover"
+                                className="group relative p-10 rounded-3xl cursor-pointer"
                             >
-                                {/* Hover gradient */}
-                                <div className={`absolute inset-0 bg-gradient-to-br from-${feature.accent}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-lg`} />
+                                {/* The Hover Shield/Background */}
+                                <motion.div
+                                    variants={{
+                                        hover: {
+                                            opacity: 1,
+                                            scale: 1,
+                                            backgroundColor: "rgba(255, 255, 255, 0.08)",
+                                            borderColor: "rgba(0, 240, 255, 0.5)",
+                                            boxShadow: "0 20px 40px -15px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 240, 255, 0.1)"
+                                        }
+                                    }}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    className="absolute inset-0 border border-white/5 rounded-3xl -z-10 backdrop-blur-xl transition-all duration-300"
+                                />
 
-                                <div className="relative z-10">
-                                    <div className={`w-14 h-14 mb-6 rounded-lg bg-${feature.accent}/10 border border-${feature.accent}/20 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                                        <Icon className={`w-7 h-7 text-${feature.accent}`} />
-                                    </div>
+                                <div className="relative z-10 pointer-events-none">
+                                    <motion.div
+                                        variants={{
+                                            hover: { y: -5, scale: 1.1, color: "#00f0ff" }
+                                        }}
+                                        className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/5 border border-white/10 mb-8 text-lg font-mono font-bold text-tech-blue/40 transition-colors duration-300"
+                                    >
+                                        0{index + 1}
+                                    </motion.div>
 
-                                    <h3 className="text-xl font-space font-bold mb-3 text-white uppercase tracking-wide">
+                                    <motion.h3
+                                        variants={{
+                                            hover: { x: 10, scale: 1.05 }
+                                        }}
+                                        className="text-2xl font-space font-bold mb-4 text-white uppercase tracking-tight group-hover:text-tech-blue transition-all duration-300"
+                                    >
                                         {feature.title}
-                                    </h3>
+                                    </motion.h3>
 
-                                    <p className="text-sm font-mono text-muted-foreground leading-relaxed">
+                                    <motion.p
+                                        variants={{
+                                            hover: { x: 10, opacity: 1 }
+                                        }}
+                                        className="text-sm font-mono text-muted-foreground leading-relaxed group-hover:text-white/90 transition-all duration-300"
+                                    >
                                         {feature.description}
-                                    </p>
+                                    </motion.p>
                                 </div>
 
-                                {/* Bottom accent line */}
-                                <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-${feature.accent} to-transparent opacity-0 group-hover:opacity-100 transition-opacity`} />
                             </motion.div>
                         );
                     })}

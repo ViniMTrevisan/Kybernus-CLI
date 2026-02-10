@@ -2,49 +2,57 @@
 
 import { motion } from "framer-motion";
 import { Server, Globe, Database, Cpu, Cloud, Laptop } from "lucide-react";
+import { CyberCard } from "@/components/ui/CyberCard";
+import { cn } from "@/lib/utils";
 
 const stacks = [
     {
         name: "NestJS",
-        description: "Enterprise-grade Node.js framework for scalable server-side apps.",
+        description: "Enterprise-grade Node.js framework.",
         icon: Server,
-        color: "text-cyber-blue",
-        bg: "bg-cyber-blue/10",
+        color: "text-tech-blue",
+        glow: "group-hover:border-tech-blue/50 group-hover:shadow-[0_0_20px_rgba(0,240,255,0.1)]",
+        tech: "BACKEND"
     },
     {
         name: "Next.js",
-        description: "The React framework for production with SSR and static generation.",
+        description: "The React framework for production.",
         icon: Globe,
         color: "text-white",
-        bg: "bg-white/10",
+        glow: "group-hover:border-white/50 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.1)]",
+        tech: "FULLSTACK"
     },
     {
         name: "Spring Boot",
-        description: "The world's most popular Java framework for microservices.",
+        description: "Java framework for microservices.",
         icon: Database,
-        color: "text-neon-green",
-        bg: "bg-neon-green/10",
+        color: "text-tech-success",
+        glow: "group-hover:border-tech-success/50 group-hover:shadow-[0_0_20px_rgba(34,197,94,0.1)]",
+        tech: "BACKEND"
     },
     {
         name: "FastAPI",
-        description: "Modern, high-performance Python framework for building APIs.",
+        description: "High-performance Python APIs.",
         icon: Cpu,
-        color: "text-cyber-purple",
-        bg: "bg-cyber-purple/10",
+        color: "text-tech-purple",
+        glow: "group-hover:border-tech-purple/50 group-hover:shadow-[0_0_20px_rgba(176,38,255,0.1)]",
+        tech: "BACKEND"
     },
     {
         name: "Express.js",
-        description: "Minimalist and flexible Node.js web application framework.",
+        description: "Minimalist Node.js framework.",
         icon: Laptop,
-        color: "text-cyber-pink",
-        bg: "bg-cyber-pink/10",
+        color: "text-pink-500",
+        glow: "group-hover:border-pink-500/50 group-hover:shadow-[0_0_20px_rgba(236,72,153,0.1)]",
+        tech: "BACKEND"
     },
     {
         name: "Terraform",
-        description: "Infrastructure as Code for provisioning and managing clouds.",
+        description: "Infrastructure as Code.",
         icon: Cloud,
         color: "text-blue-400",
-        bg: "bg-blue-400/10",
+        glow: "group-hover:border-blue-400/50 group-hover:shadow-[0_0_20px_rgba(96,165,250,0.1)]",
+        tech: "DEVOPS"
     },
 ];
 
@@ -76,45 +84,35 @@ export function StackShowcase() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
                     {stacks.map((stack, index) => (
                         <motion.div
                             key={index}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.5, delay: index * 0.1 }}
-                            whileHover={{ y: -5 }}
-                            className="group relative bg-tech-gray/20 backdrop-blur-sm p-8 border border-white/5 hover:border-tech-blue/50 transition-all duration-300"
                         >
-                            {/* Tech Borders */}
-                            <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/10 group-hover:border-tech-blue transition-colors" />
-                            <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/10 group-hover:border-tech-blue transition-colors" />
-
-                            <div className="flex items-center justify-between mb-6">
-                                <div className={`p-4 bg-tech-black border border-white/10 group-hover:border-tech-blue/50 transition-colors`}>
-                                    <stack.icon className={`w-8 h-8 ${stack.color}`} />
+                            <CyberCard variant="glass" className={cn("h-full transition-all duration-300", stack.glow)}>
+                                <div className="flex items-center gap-4">
+                                    <div className={cn(
+                                        "p-3 bg-white/5 rounded-lg border border-white/10 transition-all duration-300 group-hover:bg-white/10",
+                                        "group-hover:scale-110",
+                                        stack.color
+                                    )}>
+                                        <stack.icon className="w-6 h-6" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-center mb-1">
+                                            <h3 className="text-lg font-space font-bold text-white group-hover:text-glow transition-all">{stack.name}</h3>
+                                            <span className="text-[10px] font-mono text-white/40 border border-white/10 px-2 py-0.5 rounded-full group-hover:border-white/30 transition-colors uppercase">{stack.tech}</span>
+                                        </div>
+                                        <p className="text-xs font-mono text-muted-foreground group-hover:text-white/60 transition-colors">
+                                            {stack.description}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <h3 className="text-2xl font-space font-bold mb-3 text-white group-hover:text-tech-blue transition-colors">{stack.name}</h3>
-                            <p className="text-sm font-mono text-muted-foreground leading-relaxed mb-6 border-t border-white/5 pt-4">
-                                {stack.description}
-                            </p>
-
-                            <div className="flex gap-2">
-                                <div className="h-0.5 flex-1 bg-white/5 overflow-hidden">
-                                    <motion.div
-                                        initial={{ width: 0 }}
-                                        whileInView={{ width: "100%" }}
-                                        transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                                        className={`h-full bg-tech-blue`}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Hover Scan Effect */}
-                            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-tech-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                            </CyberCard>
                         </motion.div>
                     ))}
                 </div>
