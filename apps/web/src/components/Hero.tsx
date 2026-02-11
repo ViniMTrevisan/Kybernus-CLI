@@ -3,6 +3,8 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Terminal as TerminalIcon, Sparkles, ArrowRight, Command } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import { CopyCommandButton } from "./CopyCommandButton";
+import { DiscordLink } from "./DiscordLink";
 
 const terminalLines = [
     { text: "$ npm install -g kybernus", type: "command" },
@@ -116,15 +118,7 @@ export function Hero() {
                             transition={{ duration: 0.8, delay: 0.45 }}
                             className="flex justify-center mb-16"
                         >
-                            <a
-                                href="https://discord.gg/M2GyVqX2hg"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-muted-foreground hover:text-tech-purple transition-colors"
-                            >
-                                <span className="w-1.5 h-1.5 rounded-full bg-tech-purple animate-pulse" />
-                                Join the Community on Discord
-                            </a>
+                            <DiscordLink />
                         </motion.div>
 
                         <motion.div
@@ -133,10 +127,7 @@ export function Hero() {
                             transition={{ duration: 0.8, delay: 0.5 }}
                             className="mb-24 hidden md:block"
                         >
-                            <div className="inline-flex items-center gap-3 px-6 py-3 rounded bg-tech-gray/50 border border-white/10 font-mono text-sm">
-                                <TerminalIcon className="w-4 h-4 text-tech-blue" />
-                                <code className="text-white">npm install -g kybernus</code>
-                            </div>
+                            <CopyCommandButton />
                         </motion.div>
                     </motion.div>
 
