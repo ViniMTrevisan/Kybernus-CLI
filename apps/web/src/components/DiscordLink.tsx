@@ -13,7 +13,7 @@ export function DiscordLink() {
 
     return (
         <a
-            href="https://discord.gg/M2GyVqX2hg"
+            href="https://discord.gg/u5ANEpAAhT"
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleClick}

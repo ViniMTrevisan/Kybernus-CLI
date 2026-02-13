@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export function CopyCommandButton() {
     const [copied, setCopied] = useState(false);
     const posthog = usePostHog();
-    const command = "npm install -g kybernus";
+    const command = "npx kybernus@latest init";
 
     const handleCopy = async () => {
         try {

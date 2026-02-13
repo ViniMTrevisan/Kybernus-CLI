@@ -32,7 +32,7 @@ export async function initCommand(options: InitOptions) {
 
     // Track generation
     const analytics = new AnalyticsClient();
-    analytics.track('project_generated', {
+    await analytics.track('project_generated', {
         name: config.projectName,
         stack: config.stack,
         architecture: config.architecture,

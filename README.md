@@ -12,7 +12,7 @@ Build production-ready applications in minutes. Kybernus generates robust, scala
 ## Installation
 
 ```bash
-npm install -g kybernus
+npx kybernus@latest init
 ```
 
 ---
@@ -21,7 +21,7 @@ npm install -g kybernus
 
 ```bash
 # Create your first project
-kybernus init
+npx kybernus@latest init
 ```
 
 ---

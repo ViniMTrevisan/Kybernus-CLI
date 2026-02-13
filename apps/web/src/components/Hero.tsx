@@ -7,8 +7,7 @@ import { CopyCommandButton } from "./CopyCommandButton";
 import { DiscordLink } from "./DiscordLink";
 
 const terminalLines = [
-    { text: "$ npm install -g kybernus", type: "command" },
-    { text: "$ kybernus init", type: "command" },
+    { text: "$ npx kybernus@latest init", type: "command" },
     { text: "? Project Name: my-awesome-api", type: "input" },
     { text: "? Choose Stack: NestJS", type: "input" },
     { text: "? Architecture: Clean Architecture", type: "input" },
