@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.10] - 2026-02-13
+### Improvements
+- **Zero-Friction Start**: Switched primary installation method to `npx kybernus@latest init`. This removes the need for global installation and ensures users always run the latest version.
+- **Documentation**: Updated `README.md` and website components to reflect the new `npx` workflow.
+
+### Fixes
+- **Analytics**: Fixed a bug where `project_generated` events were not being tracked because the process exited before the event was sent. Added `await` to the tracking call.
+
 ## [2.0.9] - 2026-02-08
 ### Fixes
 - **Docker Compose Indentation**: Fixed a critical indentation issue in `docker-compose.yml.hbs` files across all templates. The `volumes` section is now correctly placed at the root level, and service definitions are properly nested.
