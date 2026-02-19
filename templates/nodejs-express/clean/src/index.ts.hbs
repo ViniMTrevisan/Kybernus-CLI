@@ -1,40 +1,36 @@
+import 'express-async-errors';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
-
-import authRoutes from './infrastructure/http/controllers/AuthController';
-
-dotenv.config();
+import { config } from './config';
+import { PrismaUserRepository } from './infrastructure/database/PrismaUserRepository';
+import { AuthController } from './infrastructure/http/controllers/AuthController';
+import { errorHandler } from './infrastructure/http/middlewares/errorHandler';
 
 const app = express();
 
-// Security
-app.use(helmet());
+// Middlewares
+app.use(express.json());
 app.use(cors());
+app.use(helmet());
 app.use(morgan('dev'));
 
-// Body parsing
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Health check
-app.get('/health', (_, res) => res.json({ status: 'ok' }));
+// Dependency Injection
+const userRepository = new PrismaUserRepository();
+const authController = new AuthController(userRepository);
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.post('/api/auth/register', authController.register);
+app.post('/api/auth/login', authController.login);
 
-// Error handling
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Internal server error' });
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', architecture: 'clean' });
 });
 
-const PORT = process.env.PORT || 3000;
+// Error Handler
+app.use(errorHandler);
 
-app.listen(PORT, () => {
-    console.log(`🚀 {{pascalCase projectName}} running on port ${PORT}`);
-    console.log(`📐 Architecture: Clean Architecture`);
-    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+app.listen(config.port, () => {
+  console.log(`🚀 Server running on port ${config.port}`);
 });

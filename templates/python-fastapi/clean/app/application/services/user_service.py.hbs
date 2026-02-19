@@ -1,0 +1,20 @@
+from typing import Optional
+from app.domain.entities.user import User
+from app.domain.repositories.user_repository import IUserRepository
+from app.domain.usecases.register_user import RegisterUserUseCase, IPasswordHasher, ITokenGenerator
+
+# In Clean Architecture, Services usually orchestrate Use Cases or coordinate cross-domain logic.
+# For simple CRUD, Use Cases might be sufficient, but here is a Service example.
+
+class UserService:
+    def __init__(self, repository: IUserRepository):
+        self.repository = repository
+
+    async def get_user(self, user_id: str) -> Optional[User]:
+        return await self.repository.find_by_id(user_id)
+
+    async def get_user_by_email(self, email: str) -> Optional[User]:
+        return await self.repository.find_by_email(email)
+
+# Note: Registration logic is handled by RegisterUserUseCase, aligning with Clean Architecture 
+# where specific complex actions are Use Cases.

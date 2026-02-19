@@ -1,19 +1,21 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './core/auth.service';
 import { HttpAdapter } from './adapters/inbound/http.adapter';
-import { PersistenceAdapter } from './adapters/outbound/persistence.adapter';
+import { PrismaUserAdapter } from './adapters/outbound/persistence/prisma.user.adapter';
+import { PrismaService } from './adapters/outbound/persistence/prisma.service';
 
 @Module({
-    providers: [
-        {
-            provide: 'IAuthPort',
-            useClass: AuthService,
-        },
-        {
-            provide: 'IUserRepositoryPort',
-            useClass: PersistenceAdapter,
-        },
-    ],
-    controllers: [HttpAdapter],
+  providers: [
+    PrismaService,
+    {
+      provide: 'IAuthPort',
+      useClass: AuthService,
+    },
+    {
+      provide: 'IUserRepositoryPort',
+      useClass: PrismaUserAdapter,
+    },
+  ],
+  controllers: [HttpAdapter],
 })
 export class AuthModule {}

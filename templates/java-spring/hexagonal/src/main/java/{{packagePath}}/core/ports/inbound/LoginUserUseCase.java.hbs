@@ -1,0 +1,36 @@
+package {{packageName}}.core.ports.inbound;
+
+import {{packageName}}.core.domain.User;
+import {{packageName}}.core.ports.outbound.UserRepository;
+
+/**
+* Login User Use Case - Inbound Port
+*/
+public class LoginUserUseCase {
+    private final UserRepository userRepository;
+    private final RegisterUserUseCase.PasswordEncoder passwordEncoder;
+    private final RegisterUserUseCase.TokenGenerator tokenGenerator;
+
+    public LoginUserUseCase(UserRepository userRepository,
+                            RegisterUserUseCase.PasswordEncoder passwordEncoder,
+                            RegisterUserUseCase.TokenGenerator tokenGenerator) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.tokenGenerator = tokenGenerator;
+    }
+
+    public record Input(String email, String password) {}
+    public record Output(User user, String token) {}
+
+    public Output execute(Input input) {
+        User user = userRepository.findByEmail(input.email())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+
+        if (!passwordEncoder.matches(input.password(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+
+        String token = tokenGenerator.generate(user.getId(), user.getEmail());
+        return new Output(user, token);
+    }
+}

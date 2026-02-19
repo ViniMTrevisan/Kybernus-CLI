@@ -1,48 +1,33 @@
-import { Router, Request, Response } from 'express';
-import { IAuthPort } from '../../../core/ports/inbound/IAuthPort';
+import { Request, Response, NextFunction } from 'express';
+import { IAuthService } from '../../../core/ports/inbound/IAuthService';
+import { z } from 'zod';
 
-/**
-* HTTP Auth Controller - Inbound Adapter
-* Adapts HTTP requests to the application port
-*/
-export function createAuthController(authService: IAuthPort): Router {
-    const router = Router();
+const registerSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(2),
+  password: z.string().min(6),
+});
 
-    router.post('/register', async (req: Request, res: Response) => {
-        try {
-            const { email, name, password } = req.body;
-            const result = await authService.register(email, name, password);
-            res.status(201).json({
-                token: result.token,
-                user: { id: result.user.id, email: result.user.email, name: result.user.name },
-            });
-        } catch (error: any) {
-            res.status(400).json({ error: error.message });
-        }
-    });
+export class AuthController {
+  constructor(private authService: IAuthService) {}
 
-    router.post('/login', async (req: Request, res: Response) => {
-        try {
-            const { email, password } = req.body;
-            const result = await authService.login(email, password);
-            res.json({
-                token: result.token,
-                user: { id: result.user.id, email: result.user.email, name: result.user.name },
-            });
-        } catch (error: any) {
-            res.status(401).json({ error: error.message });
-        }
-    });
+  register = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, name, password } = registerSchema.parse(req.body);
+      const result = await this.authService.register(email, name, password);
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 
-    router.get('/me', async (req: Request, res: Response) => {
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) return res.status(401).json({ error: 'No token' });
-
-        const user = await authService.validateToken(token);
-        if (!user) return res.status(401).json({ error: 'Invalid token' });
-
-        res.json({ user: { id: user.id, email: user.email, name: user.name } });
-    });
-
-    return router;
+  login = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password } = req.body;
+      const result = await this.authService.login(email, password);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

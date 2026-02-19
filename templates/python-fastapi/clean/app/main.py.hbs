@@ -1,10 +1,32 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.infrastructure.http import auth_controller
+from app.config import get_settings
+from app.infrastructure.database.session import engine, Base
 
-app = FastAPI(title="{{projectName}} - Clean Architecture")
+settings = get_settings()
 
-app.include_router(auth_controller.router, prefix="/api/auth", tags=["Auth"])
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Create tables on startup (for development)
+    # In production, use Alembic migrations
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    # Cleanup
+    await engine.dispose()
+
+app = FastAPI(
+    title="{{projectName}} - Clean Architecture",
+    lifespan=lifespan
+)
+
+app.include_router(auth_controller.router, prefix=settings.API_V1_STR + "/auth", tags=["Auth"])
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "architecture": "clean"}
+    return {
+        "status": "ok", 
+        "architecture": "clean",
+        "project": settings.PROJECT_NAME
+    }

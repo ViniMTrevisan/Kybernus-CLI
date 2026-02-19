@@ -1,6 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, EmailStr
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.ports import IAuthPort
+from app.core.domain.user import User as DomainUser
+from app.infrastructure.database.session import get_db
+from app.infrastructure.database.models import UserModel
+from app.adapters.outbound.postgres_user_repository import PostgresUserRepository 
+from app.core.service import AuthService
+from app.infrastructure.security.adapters import BcryptHasher, JwtTokenGenerator
 
 router = APIRouter()
 
@@ -9,21 +16,38 @@ class RegisterRequest(BaseModel):
     name: str
     password: str
 
+# Dependency Injection Factory
+def get_auth_service(db: AsyncSession = Depends(get_db)) -> IAuthPort:
+    repo = PostgresUserRepository(db)
+    hasher = BcryptHasher()
+    token_gen = JwtTokenGenerator()
+    return AuthService(repo, hasher, token_gen)
+
+@router.post("/register")
+async def register(
+    req: RegisterRequest,
+    service: IAuthPort = Depends(get_auth_service)
+):
+    try:
+        result = await service.register(req.email, req.name, req.password)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/login")
+async def login(
+    req: RegisterRequest,
+    service: IAuthPort = Depends(get_auth_service)
+):
+    try:
+        result = await service.login(req.email, req.password)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=str(e))
+
+# Setup function for backward compatibility or direct usage 
+# though router is preferred
 def setup_auth_routes(auth_service: IAuthPort):
-    @router.post("/register")
-    async def register(req: RegisterRequest):
-        try:
-            result = await auth_service.register(req.email, req.name, req.password)
-            return result
-        except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
-    
-    @router.post("/login")
-    async def login(req: RegisterRequest):
-        try:
-            result = await auth_service.login(req.email, req.password)
-            return result
-        except ValueError as e:
-            raise HTTPException(status_code=401, detail=str(e))
-    
+    # This pattern is tricky with FastAPIs dependency injection system
+    # It's better to rely on Depends() as implemented above
     return router

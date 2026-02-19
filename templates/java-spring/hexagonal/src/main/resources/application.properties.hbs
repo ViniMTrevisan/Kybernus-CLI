@@ -1,0 +1,18 @@
+spring.application.name={{projectNameKebabCase}}
+
+# Database Configuration
+spring.datasource.url=jdbc:postgresql://postgres:5432/{{projectNameKebabCase}}
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# JPA / Hibernate
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# JWT
+application.security.jwt.secret-key={{jwtSecretKey}}
+application.security.jwt.expiration=86400000
+application.security.jwt.refresh-token.expiration=604800000

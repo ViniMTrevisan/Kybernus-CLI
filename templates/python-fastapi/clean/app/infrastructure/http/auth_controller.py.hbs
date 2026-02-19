@@ -1,16 +1,19 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, EmailStr
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.usecases.register_user import RegisterUserUseCase
-from app.infrastructure.database.in_memory_repository import InMemoryUserRepository
+from app.infrastructure.database.postgres_repository import PostgresUserRepository
 from app.infrastructure.security.adapters import BcryptHasher, JwtTokenGenerator
+from app.infrastructure.database.session import get_db
 
 router = APIRouter()
 
-# Dependency Injection
-repo = InMemoryUserRepository()
-hasher = BcryptHasher()
-token_gen = JwtTokenGenerator()
-register_usecase = RegisterUserUseCase(repo, hasher, token_gen)
+# Dependency Injection Factory
+def get_register_usecase(db: AsyncSession = Depends(get_db)) -> RegisterUserUseCase:
+    repo = PostgresUserRepository(db)
+    hasher = BcryptHasher()
+    token_gen = JwtTokenGenerator()
+    return RegisterUserUseCase(repo, hasher, token_gen)
 
 class RegisterRequest(BaseModel):
     email: EmailStr
@@ -18,9 +21,12 @@ class RegisterRequest(BaseModel):
     password: str
 
 @router.post("/register")
-async def register(req: RegisterRequest):
+async def register(
+    req: RegisterRequest,
+    usecase: RegisterUserUseCase = Depends(get_register_usecase)
+):
     try:
-        result = await register_usecase.execute(req.email, req.name, req.password)
+        result = await usecase.execute(req.email, req.name, req.password)
         return result
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

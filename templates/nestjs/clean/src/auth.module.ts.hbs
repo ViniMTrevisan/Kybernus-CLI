@@ -1,17 +1,19 @@
 import { Module } from '@nestjs/common';
 import { RegisterUseCase } from './domain/use-cases/register.use-case';
 import { IUserRepository } from './domain/repositories/user.repository';
-import { InMemoryUserRepository } from './infrastructure/database/in-memory.repository';
+import { PrismaUserRepository } from './infrastructure/database/repositories/prisma.user.repository';
+import { PrismaService } from './infrastructure/database/prisma.service';
 import { AuthController } from './infrastructure/http/auth.controller';
 
 @Module({
-    providers: [
-        RegisterUseCase,
-        {
-            provide: IUserRepository,
-            useClass: InMemoryUserRepository,
-        },
-    ],
-    controllers: [AuthController],
+  providers: [
+    PrismaService,
+    RegisterUseCase,
+    {
+      provide: IUserRepository,
+      useClass: PrismaUserRepository,
+    },
+  ],
+  controllers: [AuthController],
 })
 export class AuthModule {}

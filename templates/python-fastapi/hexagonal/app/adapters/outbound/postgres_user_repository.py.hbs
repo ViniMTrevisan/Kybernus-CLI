@@ -1,0 +1,50 @@
+from typing import Optional
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from app.core.ports import IUserRepositoryPort
+from app.core.domain.user import User
+from app.infrastructure.database.models import UserModel
+
+class PostgresUserRepository(IUserRepositoryPort):
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    def _to_entity(self, model: UserModel) -> User:
+        return User(
+            id=model.id,
+            email=model.email,
+            name=model.name,
+            password=model.password,
+            stripe_customer_id=model.stripe_customer_id,
+            created_at=model.created_at
+        )
+
+    async def find_by_email(self, email: str) -> Optional[User]:
+        result = await self.session.execute(select(UserModel).where(UserModel.email == email))
+        model = result.scalars().first()
+        return self._to_entity(model) if model else None
+
+    async def save(self, user: User) -> User:
+        # Simplistic save/update logic
+        result = await self.session.execute(select(UserModel).where(UserModel.id == user.id))
+        model = result.scalars().first()
+        
+        if model:
+            model.email = user.email
+            model.name = user.name
+            model.password = user.password
+            model.stripe_customer_id = user.stripe_customer_id
+        else:
+            model = UserModel(
+                id=user.id,
+                email=user.email,
+                name=user.name,
+                password=user.password,
+                stripe_customer_id=user.stripe_customer_id,
+                created_at=user.created_at
+            )
+            self.session.add(model)
+            
+        await self.session.commit()
+        await self.session.refresh(model)
+        return self._to_entity(model)

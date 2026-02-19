@@ -1,22 +1,30 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.core.service import AuthService
-from app.adapters.inbound.http_adapter import setup_auth_routes
+from app.adapters.inbound.http_adapter import router as auth_router
+from app.infrastructure.database.session import engine, Base
+from app.config import get_settings
 
-app = FastAPI(title="{{projectName}} - Hexagonal Architecture")
+settings = get_settings()
 
-# Setup dependencies (in production use DI container)
-from app.infrastructure.database import InMemoryUserRepository
-from app.infrastructure.security import BcryptHasher, JwtGenerator
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Create tables on startup (for development)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    await engine.dispose()
 
-repo = InMemoryUserRepository()
-hasher = BcryptHasher()
-token_gen = JwtGenerator()
-auth_service = AuthService(repo, hasher, token_gen)
+app = FastAPI(
+    title="{{projectName}} - Hexagonal Architecture",
+    lifespan=lifespan
+)
 
-# Setup routes
-auth_router = setup_auth_routes(auth_service)
-app.include_router(auth_router, prefix="/api/auth", tags=["Auth"])
+app.include_router(auth_router, prefix=settings.API_V1_STR + "/auth", tags=["Auth"])
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "architecture": "hexagonal"}
+    return {
+        "status": "ok", 
+        "architecture": "hexagonal",
+        "project": settings.PROJECT_NAME
+    }

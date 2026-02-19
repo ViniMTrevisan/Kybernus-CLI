@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2026-02-18
+### Major Refactor
+- **Template Modernization**: Comprehensive update to all project templates (Python, Node.js, Next.js, NestJS, Java Spring) to align with industry best practices.
+- **Database Integration**: Added native PostgreSQL support across all templates using modern ORMs (Prisma, SQLAlchemy, JPA).
+- **Architecture Standardization**: improved Clean and Hexagonal architecture implementations with stricter segregation of concerns and consistent folder structures.
+
+### Improvements
+- **Python FastAPI**: Added `asyncpg` + `SQLAlchemy` (Async) support. Standardized `clean` vs `hexagonal` structures.
+- **Node.js / Express**: Migrated to Prisma ORM. Added `zod` validation and improved dependency injection wiring.
+- **Next.js**: Updated to React 18 and Next.js App Router. Added integrated Auth API routes with Prisma.
+- **NestJS**: Integrated `PrismaModule` and standardized Module/Adapter wiring for both architectures.
+- **Java Spring**: Added `application.properties` configuration, migrated to Spring Data JPA, and restructured Hexagonal architecture to strictly follow Core/Adapter patterns.
+
+### Fixes
+- **Dependency Issues**: Resolved missing dependencies and incorrect package versions across multiple templates.
+- **Wiring Bugs**: Fixed issues where Use Cases and Repositories were not incorrectly connected in Clean Architecture templates.
+
 ## [2.0.10] - 2026-02-13
 ### Improvements
 - **Zero-Friction Start**: Switched primary installation method to `npx kybernus@latest init`. This removes the need for global installation and ensures users always run the latest version.

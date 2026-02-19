@@ -1,45 +1,29 @@
-import { Router, Request, Response } from 'express';
-import { AuthService } from '../../../application/services/AuthService';
-import { InMemoryUserRepository } from '../../database/InMemoryUserRepository';
-import { bcryptPasswordHasher } from '../../providers/PasswordHasher';
-import { jwtTokenGenerator } from '../../providers/TokenGenerator';
-import { authMiddleware, AuthRequest } from '../middlewares/AuthMiddleware';
+import { Request, Response } from 'express';
+import { RegisterUserUseCase } from '../../../domain/usecases/RegisterUserUseCase';
+import { LoginUserUseCase } from '../../../domain/usecases/LoginUserUseCase';
+import { z } from 'zod';
 
-const router = Router();
-
-// Dependency Injection
-const userRepository = new InMemoryUserRepository();
-const authService = new AuthService(userRepository, bcryptPasswordHasher, jwtTokenGenerator);
-
-/**
-* @route POST /api/auth/register
-*/
-router.post('/register', async (req: Request, res: Response) => {
-    try {
-        const result = await authService.register(req.body);
-        res.status(201).json(result);
-    } catch (error: any) {
-        res.status(400).json({ error: error.message });
-    }
+const registerSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(2),
+  password: z.string().min(6),
 });
 
-/**
-* @route POST /api/auth/login
-*/
-router.post('/login', async (req: Request, res: Response) => {
-    try {
-        const result = await authService.login(req.body);
-        res.json(result);
-    } catch (error: any) {
-        res.status(401).json({ error: error.message });
-    }
-});
+export class AuthController {
+  constructor(
+    private registerUseCase: RegisterUserUseCase,
+    private loginUseCase: LoginUserUseCase
+  ) {}
 
-/**
-* @route GET /api/auth/me
-*/
-router.get('/me', authMiddleware, (req: AuthRequest, res: Response) => {
-    res.json({ user: req.user });
-});
+  register = async (req: Request, res: Response) => {
+    const { email, name, password } = registerSchema.parse(req.body);
+    const result = await this.registerUseCase.execute({ email, name, password });
+    res.status(201).json(result);
+  };
 
-export default router;
+  login = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    const result = await this.loginUseCase.execute({ email, password });
+    res.json(result);
+  };
+}

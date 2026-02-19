@@ -1,0 +1,40 @@
+package {{packageName}}.adapters.outbound.persistence;
+
+import {{packageName}}.core.domain.User;
+import {{packageName}}.core.ports.outbound.UserRepository;
+import {{packageName}}.adapters.outbound.persistence.entity.UserEntity;
+import {{packageName}}.adapters.outbound.persistence.repository.JpaUserRepository;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
+@Component
+public class JpaUserAdapter implements UserRepository {
+
+    private final JpaUserRepository jpaUserRepository;
+
+    public JpaUserAdapter(JpaUserRepository jpaUserRepository) {
+        this.jpaUserRepository = jpaUserRepository;
+    }
+
+    @Override
+    public Optional<User> findById(String id) {
+        return jpaUserRepository.findById(id).map(UserEntity::toDomain);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return jpaUserRepository.findByEmail(email).map(UserEntity::toDomain);
+    }
+
+    @Override
+    public User save(User user) {
+        UserEntity entity = UserEntity.fromDomain(user);
+        return jpaUserRepository.save(entity).toDomain();
+    }
+
+    @Override
+    public void delete(String id) {
+        jpaUserRepository.deleteById(id);
+    }
+}

@@ -1,0 +1,11 @@
+package {{packageName}}.adapters.outbound.persistence.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import {{packageName}}.adapters.outbound.persistence.entity.UserEntity;
+import java.util.Optional;
+
+@Repository
+public interface JpaUserRepository extends JpaRepository<UserEntity, String> {
+    Optional<UserEntity> findByEmail(String email);
+}

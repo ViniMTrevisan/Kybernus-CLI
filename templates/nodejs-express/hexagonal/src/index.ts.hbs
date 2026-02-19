@@ -1,41 +1,38 @@
+import 'express-async-errors';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
-
-// Core
-import { AuthService } from './core/AuthService';
-
-// Adapters
-import { InMemoryUserAdapter } from './adapters/outbound/persistence/InMemoryUserAdapter';
-import { bcryptAdapter, jwtAdapter } from './adapters/outbound/SecurityAdapters';
-import { createAuthController } from './adapters/inbound/http/AuthController';
-
-dotenv.config();
+import { config } from './config';
+import { PrismaUserAdapter } from './adapters/outbound/persistence/PrismaUserAdapter';
+import { AuthService } from './core/services/AuthService';
+import { AuthController } from './adapters/inbound/http/AuthController';
+import { errorHandler } from './adapters/inbound/http/middlewares/errorHandler';
 
 const app = express();
 
-// Middleware
-app.use(helmet());
-app.use(cors());
-app.use(morgan('dev'));
+// Middlewares
 app.use(express.json());
+app.use(cors());
+app.use(helmet());
+app.use(morgan('dev'));
 
-// Dependency Injection - Wire up the hexagon
-const userRepository = new InMemoryUserAdapter();
-const authService = new AuthService(userRepository, bcryptAdapter, jwtAdapter);
+// Dependency Injection
+const userRepository = new PrismaUserAdapter();
+const authService = new AuthService(userRepository);
+const authController = new AuthController(authService);
 
-// Mount adapters
-app.use('/api/auth', createAuthController(authService));
+// Routes
+app.post('/api/auth/register', (req, res, next) => authController.register(req, res, next));
+app.post('/api/auth/login', (req, res, next) => authController.login(req, res, next));
 
-// Health check
-app.get('/health', (_, res) => res.json({ status: 'ok' }));
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', architecture: 'hexagonal' });
+});
 
-const PORT = process.env.PORT || 3000;
+// Error Handler
+app.use(errorHandler);
 
-app.listen(PORT, () => {
-    console.log(`🚀 {{pascalCase projectName}} running on port ${PORT}`);
-    console.log(`⬡ Architecture: Hexagonal (Ports & Adapters)`);
-    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+app.listen(config.port, () => {
+  console.log(`🚀 Server running on port ${config.port}`);
 });

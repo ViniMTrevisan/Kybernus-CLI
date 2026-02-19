@@ -1,0 +1,32 @@
+import { Injectable } from '@nestjs/common';
+import { IUserRepositoryPort } from '../../../../core/ports/ports';
+import { User } from '../../../../core/domain/user.entity';
+import { PrismaService } from './prisma.service';
+
+@Injectable()
+export class PrismaUserAdapter implements IUserRepositoryPort {
+  constructor(private prisma: PrismaService) {}
+
+  async findByEmail(email: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    if (!user) return null;
+    return new User(user.id, user.name, user.email, user.password);
+  }
+
+  async save(user: User): Promise<User> {
+    const savedUser = await this.prisma.user.upsert({
+      where: { email: user.email },
+      update: {
+        name: user.name,
+        password: user.password,
+      },
+      create: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        password: user.password,
+      },
+    });
+    return new User(savedUser.id, savedUser.name, savedUser.email, savedUser.password);
+  }
+}
