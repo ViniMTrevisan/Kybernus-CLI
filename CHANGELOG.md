@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.1] - 2026-02-18
+### Fixes
+- **CI/CD**: Fixed `npm-shrinkwrap.json` syncing issue that caused build failures in CI environments.
+
 ## [2.1.0] - 2026-02-18
 ### Major Refactor
 - **Template Modernization**: Comprehensive update to all project templates (Python, Node.js, Next.js, NestJS, Java Spring) to align with industry best practices.
