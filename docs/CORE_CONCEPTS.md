@@ -2,32 +2,20 @@
 
 Understand the philosophy behind Kybernus and how it structures your applications for success.
 
-## 1. Tiers & Pricing
+## 1. 100% Free & Open Source
 
-Kybernus operates on a **Paid** model. We believe every developer should have access to professional-grade tools, while offered specialized features for enterprise and scaling teams.
-
-| Feature | Free Tier | Pro Tier 🌟 |
-| :--- | :--- | :--- |
-| **Philosophy** | "Get it working fast" | "Scale and maintain forever" |
-| **Best For** | MVPs, Hackathons, Learners | Enterprise, long-term SaaS, Teams |
-| **Stacks** | Node.js (Express), Java Spring Boot | **+ NestJS, Python FastAPI, Next.js** |
-| **Architectures** | MVC (Standard Layered) | **+ Clean Architecture, Hexagonal** |
-| **DevOps** | Basic `package.json` scripts | **Docker, CI/CD, Terraform** |
-| **AI Docs** | Manual | **Automated via Google Gemini** |
-| **Support** | Community | Priority Email |
+Kybernus is entirely **Free and Open Source**. We believe every developer should have access to professional-grade tools and industry-standard architectures without artificial paywalls. All stacks, all architectures (including Clean and Hexagonal), and all features are available out-of-the-box.
 
 ## 2. Architectures
 
 One size does not fit all. Kybernus allows you to choose the architectural pattern that fits your project's complexity.
 
 ### MVC (Model-View-Controller)
-*   **Available**: Free & Pro.
 *   **Structure**: Controllers handling requests, Services for logic, Repositories for data.
 *   **Pros**: Simple, familiar, fast to build.
 *   **Cons**: Can become "spaghetti code" in very large apps. Tight coupling between layers.
 
 ### Clean Architecture 
-*   **Available**: Pro Only.
 *   **Structure**: Based on Uncle Bob's principles. Domain-centric.
     *   `Domain`: Entities and Repository Interfaces (No dependencies).
     *   `UseCases`: Application business rules.
@@ -37,7 +25,6 @@ One size does not fit all. Kybernus allows you to choose the architectural patte
 *   **Cons**: More boilerplate code upfront.
 
 ### Hexagonal Architecture (Ports & Adapters) 
-*   **Available**: Pro Only.
 *   **Structure**:
     *   `Core`: Business domain.
     *   `Ports`: Interfaces defining input (Driver) and output (Driven).

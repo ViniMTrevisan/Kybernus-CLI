@@ -19,8 +19,9 @@ An opinionated framework for building efficient, scalable Node.js server-side ap
 *   **Language**: TypeScript.
 *   **Features**:
     *   `Dependency Injection` out of the box.
+    *   `Prisma ORM` + `PostgreSQL` native integration.
     *   `Modular architecture` (Modules, Controllers, Providers).
-    *   Available in all architectures.
+    *   Available in all architectures (MVC, Clean, Hexagonal).
 
 ## 3. Java Spring Boot
 The enterprise standard.

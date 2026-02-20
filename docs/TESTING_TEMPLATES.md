@@ -15,10 +15,10 @@ cd /Users/vinitrevisan/Documents/saas/kybernus
 # Simular o que será publicado no npm
 npm pack --dry-run > /tmp/npm-contents.txt
 
-# Verificar se tem templates anteriormente "pro"
-grep -i "templates.*pro" /tmp/npm-contents.txt
+# Verificar se todos os templates básicos estão incluídos (ex: nextjs-mvc, nestjs-clean)
+grep -i "templates.*nestjs" /tmp/npm-contents.txt
 
-# ✅ ESPERADO: Devem aparecer na lista (agora incluídos) (ou não, se a estrutura de pastas mudar, mas devem estar presentes)
+# ✅ ESPERADO: A lista deve conter todos os templates de todas as stacks suportadas.
 ```
 
 ---
@@ -36,7 +36,7 @@ kybernus init \
   --architecture clean \
   --non-interactive
 
-# ✅ ESPERADO: Projeto gerado SEM pedir login/upgrade
+# ✅ ESPERADO: Projeto gerado sem pedir validações extras
 # ✅ ESPERADO: Usar templates locais
 # ✅ ESPERADO: Mensagem "✅ Project created successfully!"
 
@@ -63,9 +63,8 @@ kybernus init --name java-test --stack java-spring --architecture clean --non-in
 ## ✅ Checklist Final
 
 ### CLI
-- [ ] `init` funciona para TODAS as stacks sem restrições
-- [ ] Não pede login/auth
-- [ ] Não menciona "Trial" ou "Pro"
+- [ ] `init` funciona para TODAS as stacks e arquiteturas (MVC, Clean, Hexagonal).
+- [ ] Não há solicitações de chave de licença ou tiers.
 
 ### NPM Package
 - [ ] `npm pack --dry-run` mostra todos os templates necessários

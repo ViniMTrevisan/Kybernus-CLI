@@ -162,7 +162,6 @@ open https://www.npmjs.com/package/kybernus
 - [ ] README.md tem badges e exemplos
 - [ ] LICENSE existe
 - [ ] `.gitignore` e `.npmignore` estão corretos
-- [ ] Templates NÃO contêm a pasta `pro/` (se for open source)
 
 ---
 
