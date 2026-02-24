@@ -29,18 +29,18 @@ public class StripeService {
 
     public Session createCheckoutSession(String customerId) throws StripeException {
         SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
-        .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-        .setSuccessUrl(frontendUrl + "/success?session_id={CHECKOUT_SESSION_ID}")
-        .setCancelUrl(frontendUrl + "/cancel")
-        .addLineItem(
-            SessionCreateParams.LineItem.builder()
-            .setPrice(priceId)
-            .setQuantity(1L)
-            .build()
-        );
+                .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
+                .setSuccessUrl(frontendUrl + "/success?session_id={CHECKOUT_SESSION_ID}")
+                .setCancelUrl(frontendUrl + "/cancel")
+                .addLineItem(
+                        SessionCreateParams.LineItem.builder()
+                                .setPrice(priceId)
+                                .setQuantity(1L)
+                                .build()
+                );
 
         if (customerId != null && !customerId.isEmpty()) {
-            paramsBuilder.setCustomer(customerId);
+             paramsBuilder.setCustomer(customerId);
         }
 
         return Session.create(paramsBuilder.build());
@@ -48,19 +48,19 @@ public class StripeService {
 
     public com.stripe.model.billingportal.Session createPortalSession(String customerId) throws StripeException {
         com.stripe.param.billingportal.SessionCreateParams params =
-        com.stripe.param.billingportal.SessionCreateParams.builder()
-        .setCustomer(customerId)
-        .setReturnUrl(frontendUrl + "/dashboard")
-        .build();
+                com.stripe.param.billingportal.SessionCreateParams.builder()
+                        .setCustomer(customerId)
+                        .setReturnUrl(frontendUrl + "/dashboard")
+                        .build();
 
         return com.stripe.model.billingportal.Session.create(params);
     }
 
     public Customer createCustomer(String email, String name) throws StripeException {
         CustomerCreateParams params = CustomerCreateParams.builder()
-        .setEmail(email)
-        .setName(name)
-        .build();
+                .setEmail(email)
+                .setName(name)
+                .build();
 
         return Customer.create(params);
     }

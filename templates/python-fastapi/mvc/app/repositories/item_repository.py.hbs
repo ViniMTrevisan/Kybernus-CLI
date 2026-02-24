@@ -1,0 +1,15 @@
+from sqlalchemy.orm import Session
+from app.models.item import Item
+
+class ItemRepository:
+    def get_all(self, db: Session) -> list[Item]:
+        return db.query(Item).all()
+
+    def get_by_id(self, db: Session, item_id: str) -> Item | None:
+        return db.query(Item).filter(Item.id == item_id).first()
+
+    def create(self, db: Session, item: Item) -> Item:
+        db.add(item)
+        db.commit()
+        db.refresh(item)
+        return item

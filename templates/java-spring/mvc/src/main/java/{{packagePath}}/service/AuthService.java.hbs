@@ -1,0 +1,62 @@
+package {{packageName}}.service;
+
+import {{packageName}}.dto.AuthRequest;
+import {{packageName}}.dto.AuthResponse;
+import {{packageName}}.model.User;
+import {{packageName}}.repository.UserRepository;
+import {{packageName}}.security.JwtTokenProvider;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+public class AuthService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider tokenProvider;
+
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtTokenProvider tokenProvider) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.tokenProvider = tokenProvider;
+    }
+
+    public AuthResponse register(AuthRequest request) {
+        if (userRepository.findByEmail(request.email()).isPresent()) {
+            throw new IllegalArgumentException("User already exists");
+        }
+
+        String hashedPassword = passwordEncoder.encode(request.password());
+
+        User user = User.builder()
+                .email(request.email())
+                .password(hashedPassword)
+                .build();
+
+        user = userRepository.save(user);
+
+        String token = tokenProvider.generateToken(user.getId(), user.getEmail());
+
+        return new AuthResponse(token, user.getId(), user.getEmail());
+    }
+
+    public AuthResponse login(AuthRequest request) {
+        Optional<User> userOptional = userRepository.findByEmail(request.email());
+
+        if (userOptional.isEmpty() || !passwordEncoder.matches(request.password(), userOptional.get().getPassword())) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+
+        User user = userOptional.get();
+        String token = tokenProvider.generateToken(user.getId(), user.getEmail());
+
+        return new AuthResponse(token, user.getId(), user.getEmail());
+    }
+
+    public User getMe(String userId) {
+        return userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+}

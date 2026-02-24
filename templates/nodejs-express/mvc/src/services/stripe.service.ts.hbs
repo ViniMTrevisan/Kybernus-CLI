@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { prisma } from '../config/database';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
     apiVersion: '2024-12-18.acacia',
@@ -13,8 +14,8 @@ export interface CreateCheckoutSessionParams {
 
 export class StripeService {
     /**
-    * Create a checkout session for subscription
-    */
+     * Create a checkout session for subscription
+     */
     async createCheckoutSession(params: CreateCheckoutSessionParams) {
         const session = await stripe.checkout.sessions.create({
             mode: 'subscription',
@@ -34,8 +35,8 @@ export class StripeService {
     }
 
     /**
-    * Create a customer portal session
-    */
+     * Create a customer portal session
+     */
     async createPortalSession(customerId: string, returnUrl: string) {
         const session = await stripe.billingPortal.sessions.create({
             customer: customerId,
@@ -46,8 +47,8 @@ export class StripeService {
     }
 
     /**
-    * Handle webhook event
-    */
+     * Handle webhook event
+     */
     async handleWebhook(rawBody: Buffer, signature: string) {
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
@@ -59,36 +60,45 @@ export class StripeService {
 
         switch (event.type) {
             case 'checkout.session.completed':
-            const session = event.data.object;
-            // Handle successful subscription
-            console.log('Checkout completed:', session.id);
-            break;
+                {
+                    const session = event.data.object as Stripe.Checkout.Session;
+                    // Handle successful subscription
+                    console.log('Checkout completed:', session.id);
+                    // Match to user and update DB, e.g., using session.client_reference_id
+                }
+                break;
 
             case 'customer.subscription.updated':
-            const subscription = event.data.object;
-            // Handle subscription update
-            console.log('Subscription updated:', subscription.id);
-            break;
+                {
+                     const subscription = event.data.object as Stripe.Subscription;
+                     // Handle subscription update in DB
+                     console.log('Subscription updated:', subscription.id);
+                }
+                break;
 
             case 'customer.subscription.deleted':
-            const deletedSubscription = event.data.object;
-            // Handle subscription cancellation
-            console.log('Subscription deleted:', deletedSubscription.id);
-            break;
+                {
+                     const deletedSubscription = event.data.object as Stripe.Subscription;
+                     // Handle subscription cancellation in DB
+                     console.log('Subscription deleted:', deletedSubscription.id);
+                }
+                break;
 
             case 'invoice.payment_failed':
-            const invoice = event.data.object;
-            // Handle failed payment
-            console.log('Payment failed:', invoice.id);
-            break;
+                {
+                     const invoice = event.data.object as Stripe.Invoice;
+                     // Handle failed payment
+                     console.log('Payment failed:', invoice.id);
+                }
+                break;
         }
 
         return { received: true };
     }
 
     /**
-    * Create a Stripe customer
-    */
+     * Create a Stripe customer
+     */
     async createCustomer(email: string, name?: string) {
         const customer = await stripe.customers.create({
             email,

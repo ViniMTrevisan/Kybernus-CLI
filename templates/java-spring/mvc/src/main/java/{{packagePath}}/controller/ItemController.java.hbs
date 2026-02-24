@@ -1,0 +1,42 @@
+package {{packageName}}.controller;
+
+import {{packageName}}.model.Item;
+import {{packageName}}.repository.ItemRepository;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/items")
+public class ItemController {
+
+    private final ItemRepository itemRepository;
+
+    public ItemController(ItemRepository itemRepository) {
+        this.itemRepository = itemRepository;
+    }
+
+    @GetMapping
+    public List<Item> getAllItems() {
+        return itemRepository.findAll();
+    }
+
+    @PostMapping
+    public Item createItem(@RequestBody Item item) {
+        return itemRepository.save(item);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Item> getItem(@PathVariable String id) {
+        return itemRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteItem(@PathVariable String id) {
+        itemRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+}

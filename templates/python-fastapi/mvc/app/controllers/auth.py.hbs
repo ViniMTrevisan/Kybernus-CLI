@@ -1,11 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 from app.middleware.security import hash_password, verify_password, create_access_token, get_current_user
+from app.database import get_db
+from app.models.user import User
+from app.repositories.user_repository import UserRepository
 
 router = APIRouter()
-
-# In-memory user store (replace with database)
-users_db: dict = {}
+user_repo = UserRepository()
 
 class UserRegister(BaseModel):
     email: EmailStr
@@ -21,26 +23,33 @@ class AuthResponse(BaseModel):
     user: dict
 
 @router.post("/register", response_model=AuthResponse)
-async def register(data: UserRegister):
-    if data.email in users_db:
+async def register(data: UserRegister, db: Session = Depends(get_db)):
+    existing_user = user_repo.get_by_email(db, data.email)
+    if existing_user:
         raise HTTPException(status_code=400, detail="User already exists")
     
     hashed = hash_password(data.password)
-    user = {"id": str(len(users_db) + 1), "email": data.email, "name": data.name, "password": hashed}
-    users_db[data.email] = user
+    new_user = User(email=data.email, name=data.name, password=hashed)
     
-    token = create_access_token({"sub": user["id"], "email": user["email"]})
-    return {"token": token, "user": {"id": user["id"], "email": user["email"], "name": user["name"]}}
+    user = user_repo.create(db, new_user)
+    
+    token = create_access_token({"sub": user.id, "email": user.email})
+    return {"token": token, "user": {"id": user.id, "email": user.email, "name": user.name}}
 
 @router.post("/login", response_model=AuthResponse)
-async def login(data: UserLogin):
-    user = users_db.get(data.email)
-    if not user or not verify_password(data.password, user["password"]):
+async def login(data: UserLogin, db: Session = Depends(get_db)):
+    user = user_repo.get_by_email(db, data.email)
+    
+    if not user or not verify_password(data.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    token = create_access_token({"sub": user["id"], "email": user["email"]})
-    return {"token": token, "user": {"id": user["id"], "email": user["email"], "name": user["name"]}}
+    token = create_access_token({"sub": user.id, "email": user.email})
+    return {"token": token, "user": {"id": user.id, "email": user.email, "name": user.name}}
 
 @router.get("/me")
-async def get_me(current_user: dict = Depends(get_current_user)):
-    return {"user": current_user}
+async def get_me(current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+    user = user_repo.get_by_id(db, current_user["id"])
+    if not user:
+         raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"user": {"id": user.id, "email": user.email, "name": user.name}}

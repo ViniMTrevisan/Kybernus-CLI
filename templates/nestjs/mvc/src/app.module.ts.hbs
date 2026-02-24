@@ -4,10 +4,12 @@ import { ItemsModule } from './modules/items.module';
 import { AuthModule } from './auth/auth.module';
 import { PaymentsModule } from './payments/payments.module';
 import { HealthController } from './controllers/health.controller';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
     imports: [
         ConfigModule.forRoot({ isGlobal: true }),
+        PrismaModule,
         AuthModule,
         PaymentsModule,
         ItemsModule,

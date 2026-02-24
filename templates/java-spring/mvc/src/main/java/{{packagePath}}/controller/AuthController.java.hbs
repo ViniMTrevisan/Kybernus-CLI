@@ -2,68 +2,64 @@ package {{packageName}}.controller;
 
 import {{packageName}}.dto.AuthRequest;
 import {{packageName}}.dto.AuthResponse;
-import {{packageName}}.security.JwtTokenProvider;
+import {{packageName}}.model.User;
+import {{packageName}}.service.AuthService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final JwtTokenProvider tokenProvider;
-    private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
-    // In-memory user store (replace with repository in production)
-    private final Map<String, Map<String, String>> users = new HashMap<>();
-
-    public AuthController(JwtTokenProvider tokenProvider, PasswordEncoder passwordEncoder) {
-        this.tokenProvider = tokenProvider;
-        this.passwordEncoder = passwordEncoder;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity
-    <?> register(@RequestBody AuthRequest request) {
-        if (users.containsKey(request.email())) {
-            return ResponseEntity.badRequest().body(Map.of("error", "User already exists"));
+    public ResponseEntity<?> register(@RequestBody AuthRequest request) {
+        try {
+            AuthResponse response = authService.register(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-
-        String userId = UUID.randomUUID().toString();
-        String hashedPassword = passwordEncoder.encode(request.password());
-
-        users.put(request.email(), Map.of(
-            "id", userId,
-            "email", request.email(),
-            "password", hashedPassword
-        ));
-
-        String token = tokenProvider.generateToken(userId, request.email());
-
-        return ResponseEntity.ok(new AuthResponse(token, userId, request.email()));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        Map<String, String> user = users.get(request.email());
-
-        if (user == null || !passwordEncoder.matches(request.password(), user.get("password"))) {
-            return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
+        try {
+            AuthResponse response = authService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
-
-        String token = tokenProvider.generateToken(user.get("id"), user.get("email"));
-
-        return ResponseEntity.ok(new AuthResponse(token, user.get("id"), user.get("email")));
     }
 
     @GetMapping("/me")
-    public ResponseEntity
-    <?> me(@RequestHeader("Authorization") String authHeader) {
-        // User is already authenticated by JWT filter
-        return ResponseEntity.ok(Map.of("message", "Authenticated"));
+    public ResponseEntity<?> me() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        
+        try {
+            String userId = (String) authentication.getPrincipal(); // Assuming custom jwt filter sets principal to id
+            User user = authService.getMe(userId);
+            return ResponseEntity.ok(Map.of(
+                "id", user.getId(),
+                "email", user.getEmail(),
+                "name", user.getName()
+            ));
+        } catch (Exception e) {
+            // Keep original behavior if principal isn't id 
+            return ResponseEntity.ok(Map.of("message", "Authenticated"));
+        }
     }
 }

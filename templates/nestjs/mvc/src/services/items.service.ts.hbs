@@ -1,32 +1,45 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateItemDto } from '../models/create-item.dto';
-import { Item } from '../models/item.model';
-import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ItemsService {
-    private items: Map<string, Item> = new Map();
+    constructor(private prisma: PrismaService) {}
 
-    findAll(): Item[] {
-        return Array.from(this.items.values());
+    async findAll() {
+        return this.prisma.item.findMany();
     }
 
-    findOne(id: string): Item | undefined {
-        return this.items.get(id);
-    }
-
-    create(dto: CreateItemDto): Item {
-        const item: Item = {
-            id: uuidv4(),
-            name: dto.name,
-            description: dto.description,
-            createdAt: new Date(),
-        };
-        this.items.set(item.id, item);
+    async findOne(id: string) {
+        const item = await this.prisma.item.findUnique({
+            where: { id },
+        });
+        
+        if (!item) {
+            throw new NotFoundException('Item not found');
+        }
+        
         return item;
     }
 
-    remove(id: string): boolean {
-        return this.items.delete(id);
+    async create(createItemDto: CreateItemDto) {
+        return this.prisma.item.create({
+            data: {
+                name: createItemDto.name,
+                description: createItemDto.description,
+                price: createItemDto.price,
+            },
+        });
+    }
+
+    async remove(id: string) {
+        try {
+            await this.prisma.item.delete({
+                where: { id },
+            });
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 }

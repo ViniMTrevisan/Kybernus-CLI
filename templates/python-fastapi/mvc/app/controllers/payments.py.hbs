@@ -1,8 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+import stripe
 import os
+from app.database import get_db
 
 router = APIRouter()
+
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
 
 class CheckoutRequest(BaseModel):
     price_id: str
@@ -10,23 +16,44 @@ class CheckoutRequest(BaseModel):
 
 @router.post("/checkout")
 async def create_checkout(data: CheckoutRequest):
-    # Stripe integration would go here
-    # For now, return mock data
-    return {
-        "checkout_url": f"https://checkout.stripe.com/session_{data.price_id}",
-        "session_id": "cs_test_1234567890"
-    }
+    try:
+        session = stripe.checkout.Session.create(
+            mode="subscription",
+            payment_method_types=["card"],
+            line_items=[{"price": data.price_id, "quantity": 1}],
+            customer=data.customer_id,
+            success_url=f"{os.getenv('FRONTEND_URL')}/success?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{os.getenv('FRONTEND_URL')}/cancel",
+        )
+        return {"checkout_url": session.url, "session_id": session.id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/webhook")
-async def stripe_webhook(payload: dict):
-    # Handle Stripe webhook events
-    event_type = payload.get("type")
+async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature")
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, webhook_secret
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail="Invalid payload")
+    except stripe.error.SignatureVerificationError as e:
+        raise HTTPException(status_code=400, detail="Invalid signature")
+
+    event_type = event.get("type")
     
     if event_type == "checkout.session.completed":
-        # Handle successful checkout
-        pass
+        session = event.get("data").get("object")
+        print(f"Checkout completed: {session.get('id')}")
+        # Update user in db
     elif event_type == "customer.subscription.updated":
-        # Handle subscription update
-        pass
-    
+        subscription = event.get("data").get("object")
+        print(f"Subscription updated: {subscription.get('id')}")
+    elif event_type == "customer.subscription.deleted":
+        subscription = event.get("data").get("object")
+        print(f"Subscription deleted: {subscription.get('id')}")
+        
     return {"received": True}

@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class PaymentsService {
     private stripe: Stripe;
 
-    constructor(private configService: ConfigService) {
+    constructor(
+        private configService: ConfigService,
+        private prisma: PrismaService,
+    ) {
         this.stripe = new Stripe(configService.get('STRIPE_SECRET_KEY', ''), {
             apiVersion: '2024-12-18.acacia',
         });
@@ -31,11 +35,27 @@ export class PaymentsService {
 
         switch (event.type) {
             case 'checkout.session.completed':
-            console.log('Checkout completed:', event.data.object);
-            break;
+                {
+                    const session = event.data.object as Stripe.Checkout.Session;
+                    console.log('Checkout completed:', session.id);
+                    // Match the session back to the user via client_reference_id or customer email
+                    // await this.prisma.user.update({...});
+                }
+                break;
             case 'customer.subscription.updated':
-            console.log('Subscription updated:', event.data.object);
-            break;
+                {
+                    const subscription = event.data.object as Stripe.Subscription;
+                    console.log('Subscription updated:', subscription.id);
+                    // Update user's subscription status in DB
+                }
+                break;
+            case 'customer.subscription.deleted':
+                {
+                    const subscription = event.data.object as Stripe.Subscription;
+                    console.log('Subscription deleted:', subscription.id);
+                    // Cancel user's subscription in DB
+                }
+                break;
         }
 
         return { received: true };

@@ -1,24 +1,22 @@
+from sqlalchemy.orm import Session
 from app.models.item import Item
 from app.schemas.item import ItemCreate
-from typing import List, Optional
+from app.repositories.item_repository import ItemRepository
 
 class ItemService:
     def __init__(self):
-        self.items: dict[str, Item] = {}
-    
-    def list_items(self) -> List[Item]:
-        return list(self.items.values())
-    
-    def create_item(self, item_data: ItemCreate) -> Item:
-        item = Item(name=item_data.name, description=item_data.description)
-        self.items[item.id] = item
-        return item
-    
-    def get_item(self, item_id: str) -> Optional[Item]:
-        return self.items.get(item_id)
-    
-    def delete_item(self, item_id: str) -> bool:
-        if item_id in self.items:
-            del self.items[item_id]
-            return True
-        return False
+        self.item_repo = ItemRepository()
+
+    def list_items(self, db: Session):
+        return self.item_repo.get_all(db)
+
+    def create_item(self, item_data: ItemCreate, db: Session):
+        db_item = Item(
+            name=item_data.name, 
+            description=item_data.description, 
+            price=item_data.price
+        )
+        return self.item_repo.create(db, db_item)
+
+    def get_item(self, item_id: str, db: Session):
+        return self.item_repo.get_by_id(db, item_id)

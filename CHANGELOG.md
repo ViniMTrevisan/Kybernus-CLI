@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0] - 2026-02-24
+### Major Refactor
+- **MVC Templates Upgrade**: Transformed all MVC templates (Java Spring, NestJS, Next.js, Node.js Express, Python FastAPI) from basic in-memory mocked structures into production-ready architectures supporting real databases out of the box (PostgreSQL via JPA, Prisma, SQLAlchemy).
+- **Architecture Standardization**: Extracted logic from Controllers to Services/Repositories across all stacks to enforce proper separation of concerns.
+
 ## [2.1.1] - 2026-02-18
 ### Fixes
 - **CI/CD**: Fixed `npm-shrinkwrap.json` syncing issue that caused build failures in CI environments.

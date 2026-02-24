@@ -1,11 +1,14 @@
-from dataclasses import dataclass, field
+from sqlalchemy import Column, String, Float, DateTime
+from app.database import Base
 from datetime import datetime
-from typing import Optional
 import uuid
 
-@dataclass
-class Item:
-    id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    name: str = ""
-    description: Optional[str] = None
-    created_at: datetime = field(default_factory=datetime.now)
+class Item(Base):
+    __tablename__ = "items"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    price = Column(Float, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

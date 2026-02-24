@@ -1,5 +1,9 @@
 from fastapi import FastAPI
 from app.controllers import health, auth, items, payments
+from app.database import engine, Base
+
+# Create tables (In production, use Alembic migrations instead)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="{{projectName}}")
 

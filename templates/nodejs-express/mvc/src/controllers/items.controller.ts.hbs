@@ -1,0 +1,29 @@
+import { Router, Request, Response } from 'express';
+import { prisma } from '../prisma/client';
+
+const router = Router();
+
+// Basic CRUD for Items using the new structure
+
+router.get('/', async (req: Request, res: Response) => {
+    try {
+        const items = await prisma.item.findMany();
+        res.json(items);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.post('/', async (req: Request, res: Response) => {
+    try {
+        const { name, description, price } = req.body;
+        const item = await prisma.item.create({
+            data: { name, description, price }
+        });
+        res.status(201).json(item);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+export default router;
