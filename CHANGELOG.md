@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.1] - 2026-03-02
+### Security & Infrastructure (Terraform)
+- **VPC Networking**: Fixed critical routing issues. Public subnets now have correct Route Tables directing to the Internet Gateway. Private subnets route to a newly provisioned NAT Gateway (with Elastic IP), enabling essential outbound internet access for containers.
+- **ECS Fargate Provisioning**: Completed the ECS setup across all templates. Added Application Load Balancer (ALB), Target Groups, Listeners, ECR Repository, and necessary IAM Roles (Task & Execution).
+- **RDS Security**: Hardened PostgreSQL database security. Ingress rules were updated to accept traffic *only* from the ECS Tasks Security Group, blocking unauthorized VPC-wide access.
+- **Unified Formatting**: Applied `terraform fmt` across all 13 Terraform project variants ensuring strict HashiCorp Configuration Language standards while preserving Handlebars interpolation.
+
 ## [2.2.0] - 2026-02-24
 ### Major Refactor
 - **MVC Templates Upgrade**: Transformed all MVC templates (Java Spring, NestJS, Next.js, Node.js Express, Python FastAPI) from basic in-memory mocked structures into production-ready architectures supporting real databases out of the box (PostgreSQL via JPA, Prisma, SQLAlchemy).
