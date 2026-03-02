@@ -1,12 +1,12 @@
 {
   "name": "kybernus",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
       "name": "kybernus",
-      "version": "2.2.0",
+      "version": "2.2.1",
       "bundleDependencies": [
         "@clack/prompts",
         "@google/genai",
