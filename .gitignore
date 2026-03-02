@@ -43,6 +43,7 @@ temp/
 # User data (for testing locally)
 .kybernus/
 npmjs.txt
+AGENT_SKILLS_REF.md
 
 old/
 
