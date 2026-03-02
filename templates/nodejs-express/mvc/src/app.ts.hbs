@@ -18,8 +18,12 @@ app.use(cors());
 // Logging
 app.use(morgan('dev'));
 
-// Body parsing (raw for Stripe webhooks)
+// Body parsing:
+// The Stripe webhook endpoint needs the raw body to verify the signature.
+// This middleware MUST be registered BEFORE express.json().
 app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
+
+// JSON parsing for all other routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -27,6 +31,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api', routes);
 app.use('/api/auth', authRoutes);
 app.use('/api/payments', paymentsRoutes);
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', architecture: 'mvc' });
+});
 
 // Error handling (must be last)
 app.use(errorHandler);

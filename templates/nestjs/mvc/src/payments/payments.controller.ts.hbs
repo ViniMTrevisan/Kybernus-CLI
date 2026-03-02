@@ -1,26 +1,51 @@
-import { Controller, Post, Body, Headers, UseGuards, RawBodyRequest, Req } from '@nestjs/common';
+import { Controller, Post, Body, Headers, UseGuards, Req, Request, BadRequestException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { IsString } from 'class-validator';
 import { PaymentsService } from './payments.service';
-import { Request } from 'express';
 
 class CreateCheckoutDto {
+    @IsString()
     priceId: string;
-    customerId?: string;
 }
 
 @Controller('payments')
 export class PaymentsController {
     constructor(private paymentsService: PaymentsService) {}
 
+    /**
+     * POST /api/payments/checkout
+     * Requires JWT authentication.
+     */
     @Post('checkout')
     @UseGuards(AuthGuard('jwt'))
-    async createCheckout(@Body() dto: CreateCheckoutDto) {
-        const session = await this.paymentsService.createCheckoutSession(dto.priceId, dto.customerId);
+    async createCheckout(@Req() req: Request, @Body() dto: CreateCheckoutDto) {
+        const userId = (req as any).user?.id;
+        const session = await this.paymentsService.createCheckoutSession(userId, dto.priceId);
         return { url: session.url };
     }
 
+    /**
+     * POST /api/payments/portal
+     * Requires JWT authentication.
+     */
+    @Post('portal')
+    @UseGuards(AuthGuard('jwt'))
+    async createPortal(@Req() req: Request) {
+        const userId = (req as any).user?.id;
+        const session = await this.paymentsService.createPortalSession(userId);
+        return { url: session.url };
+    }
+
+    /**
+     * POST /api/payments/webhook
+     * No authentication. Stripe sends a raw body – NestFactory must have rawBody: true.
+     */
     @Post('webhook')
-    async webhook(@Req() req: RawBodyRequest<Request>, @Headers('stripe-signature') signature: string) {
-        return this.paymentsService.handleWebhook(req.rawBody!, signature);
+    async webhook(
+        @Req() req: any,
+        @Headers('stripe-signature') signature: string,
+    ) {
+        if (!signature) throw new BadRequestException('Missing stripe-signature header');
+        return this.paymentsService.handleWebhook(req.rawBody, signature);
     }
 }

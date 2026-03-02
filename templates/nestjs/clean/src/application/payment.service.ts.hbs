@@ -1,0 +1,90 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import Stripe from 'stripe';
+import { UserRepository } from '../domain/repositories/user.repository';
+import { StripeProvider } from '../infrastructure/stripe.provider';
+
+@Injectable()
+export class PaymentService {
+    constructor(
+        private readonly userRepository: UserRepository,
+        private readonly stripeProvider: StripeProvider,
+        private readonly configService: ConfigService,
+    ) {}
+
+    async createCheckoutSession(userId: string, priceId: string) {
+        const user = await this.userRepository.findById(userId);
+        if (!user) throw new NotFoundException('User not found');
+
+        let customerId = user.stripeCustomerId;
+
+        if (!customerId) {
+            const customer = await this.stripeProvider.createCustomer(user.email, userId);
+            customerId = customer.id;
+            user.stripeCustomerId = customerId;
+            await this.userRepository.save(user);
+        }
+
+        return this.stripeProvider.createCheckoutSession(
+            customerId,
+            priceId,
+            userId,
+            `${this.configService.get('FRONTEND_URL')}/success?session_id={CHECKOUT_SESSION_ID}`,
+            `${this.configService.get('FRONTEND_URL')}/cancel`,
+        );
+    }
+
+    async createPortalSession(userId: string) {
+        const user = await this.userRepository.findById(userId);
+        if (!user?.stripeCustomerId) throw new NotFoundException('No Stripe customer found for this user');
+
+        return this.stripeProvider.createPortalSession(
+            user.stripeCustomerId,
+            `${this.configService.get('FRONTEND_URL')}/dashboard`,
+        );
+    }
+
+    async handleWebhook(payload: Buffer, signature: string) {
+        let event: Stripe.Event;
+        try {
+            event = this.stripeProvider.constructEvent(payload, signature);
+        } catch (err: any) {
+            throw new Error(`Webhook signature verification failed: ${err.message}`);
+        }
+
+        switch (event.type) {
+            case 'checkout.session.completed': {
+                const session = event.data.object as Stripe.Checkout.Session;
+                const userId = session.client_reference_id;
+                if (userId && session.customer) {
+                    const user = await this.userRepository.findById(userId);
+                    if (user) {
+                        user.stripeCustomerId = session.customer as string;
+                        await this.userRepository.save(user);
+                    }
+                }
+                console.log('Checkout completed for user:', userId);
+                break;
+            }
+            case 'customer.subscription.updated': {
+                const sub = event.data.object as Stripe.Subscription;
+                console.log('Subscription updated:', sub.id, '| Status:', sub.status);
+                break;
+            }
+            case 'customer.subscription.deleted': {
+                const sub = event.data.object as Stripe.Subscription;
+                console.log('Subscription deleted:', sub.id);
+                break;
+            }
+            case 'invoice.payment_failed': {
+                const invoice = event.data.object as Stripe.Invoice;
+                console.log('Payment failed for invoice:', invoice.id);
+                break;
+            }
+            default:
+                console.log('Unhandled Stripe event:', event.type);
+        }
+
+        return { received: true };
+    }
+}

@@ -1,30 +1,59 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { prisma } from "@/lib/prisma";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-    apiVersion: "2025-12-15.clover",
+    apiVersion: "2026-02-25.clover",
 });
 
 export async function POST(request: NextRequest) {
     try {
-        const { priceId, customerId } = await request.json();
+        const session = await getServerSession(authOptions);
+        if (!session?.user?.email) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
 
-        const session = await stripe.checkout.sessions.create({
+        const { priceId } = await request.json();
+        if (!priceId) {
+            return NextResponse.json({ error: "priceId is required" }, { status: 400 });
+        }
+
+        // Get or create Stripe customer
+        const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+        if (!user) {
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        let customerId = user.stripeCustomerId;
+
+        if (!customerId) {
+            const customer = await stripe.customers.create({
+                email: user.email,
+                name: user.name ?? undefined,
+                metadata: { userId: user.id },
+            });
+            customerId = customer.id;
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { stripeCustomerId: customerId },
+            });
+        }
+
+        const checkoutSession = await stripe.checkout.sessions.create({
             mode: "subscription",
             payment_method_types: ["card"],
-            line_items: [
-                {
-                    price: priceId || process.env.STRIPE_PRICE_ID,
-                    quantity: 1,
-                },
-            ],
-            customer: customerId || undefined,
-            success_url: ,
-            cancel_url: ,
+            line_items: [{ price: priceId, quantity: 1 }],
+            customer: customerId,
+            success_url: `${process.env.NEXTAUTH_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${process.env.NEXTAUTH_URL}/dashboard`,
+            client_reference_id: user.id,
         });
 
-        return NextResponse.json({ url: session.url });
+        return NextResponse.json({ url: checkoutSession.url });
     } catch (error: any) {
+        console.error("Checkout error:", error.message);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

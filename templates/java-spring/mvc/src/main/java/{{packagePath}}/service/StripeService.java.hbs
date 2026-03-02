@@ -3,65 +3,147 @@ package {{packageName}}.service;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
+import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
+import com.stripe.net.Webhook;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
+import {{packageName}}.model.User;
+import {{packageName}}.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class StripeService {
 
+    private static final Logger logger = LoggerFactory.getLogger(StripeService.class);
+
     @Value("${stripe.secret-key}")
     private String stripeSecretKey;
 
-    @Value("${stripe.price-id}")
-    private String priceId;
+    @Value("${stripe.webhook-secret}")
+    private String webhookSecret;
 
     @Value("${frontend.url}")
     private String frontendUrl;
+
+    private final UserRepository userRepository;
+
+    public StripeService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @PostConstruct
     public void init() {
         Stripe.apiKey = stripeSecretKey;
     }
 
-    public Session createCheckoutSession(String customerId) throws StripeException {
-        SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
-                .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-                .setSuccessUrl(frontendUrl + "/success?session_id={CHECKOUT_SESSION_ID}")
-                .setCancelUrl(frontendUrl + "/cancel")
-                .addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setPrice(priceId)
-                                .setQuantity(1L)
-                                .build()
-                );
+    /**
+     * Retrieve or create a Stripe customer for the given user, then open a checkout session.
+     */
+    public Session createCheckoutSession(String userId, String priceId) throws StripeException {
+        User user = userRepository.findById(java.util.UUID.fromString(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (customerId != null && !customerId.isEmpty()) {
-             paramsBuilder.setCustomer(customerId);
+        String customerId = user.getStripeCustomerId();
+
+        if (customerId == null || customerId.isEmpty()) {
+            CustomerCreateParams customerParams = CustomerCreateParams.builder()
+                    .setEmail(user.getEmail())
+                    .putMetadata("userId", userId)
+                    .build();
+            Customer customer = Customer.create(customerParams);
+            customerId = customer.getId();
+            user.setStripeCustomerId(customerId);
+            userRepository.save(user);
         }
 
-        return Session.create(paramsBuilder.build());
+        SessionCreateParams params = SessionCreateParams.builder()
+                .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
+                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
+                .addLineItem(SessionCreateParams.LineItem.builder()
+                        .setPrice(priceId)
+                        .setQuantity(1L)
+                        .build())
+                .setCustomer(customerId)
+                .setSuccessUrl(frontendUrl + "/success?session_id={CHECKOUT_SESSION_ID}")
+                .setCancelUrl(frontendUrl + "/cancel")
+                .setClientReferenceId(userId)
+                .build();
+
+        return Session.create(params);
     }
 
-    public com.stripe.model.billingportal.Session createPortalSession(String customerId) throws StripeException {
+    /**
+     * Open the Stripe Billing Portal for the given customer.
+     */
+    public com.stripe.model.billingportal.Session createPortalSession(String userId) throws StripeException {
+        User user = userRepository.findById(java.util.UUID.fromString(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getStripeCustomerId() == null) {
+            throw new RuntimeException("No Stripe customer found for this user");
+        }
+
         com.stripe.param.billingportal.SessionCreateParams params =
                 com.stripe.param.billingportal.SessionCreateParams.builder()
-                        .setCustomer(customerId)
+                        .setCustomer(user.getStripeCustomerId())
                         .setReturnUrl(frontendUrl + "/dashboard")
                         .build();
 
         return com.stripe.model.billingportal.Session.create(params);
     }
 
-    public Customer createCustomer(String email, String name) throws StripeException {
-        CustomerCreateParams params = CustomerCreateParams.builder()
-                .setEmail(email)
-                .setName(name)
-                .build();
+    /**
+     * Validate and handle a Stripe webhook event.
+     */
+    public void handleWebhook(String payload, String sigHeader) throws Exception {
+        Event event;
+        try {
+            event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
+        } catch (Exception e) {
+            throw new RuntimeException("Webhook signature verification failed: " + e.getMessage());
+        }
 
-        return Customer.create(params);
+        switch (event.getType()) {
+            case "checkout.session.completed": {
+                Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
+                if (session != null && session.getClientReferenceId() != null) {
+                    String userId = session.getClientReferenceId();
+                    userRepository.findById(java.util.UUID.fromString(userId)).ifPresent(user -> {
+                        user.setStripeCustomerId(session.getCustomer());
+                        userRepository.save(user);
+                    });
+                    logger.info("Checkout completed for user: {}", userId);
+                }
+                break;
+            }
+            case "customer.subscription.updated": {
+                com.stripe.model.Subscription sub =
+                        (com.stripe.model.Subscription) event.getDataObjectDeserializer().getObject().orElse(null);
+                if (sub != null) logger.info("Subscription updated: {} | Status: {}", sub.getId(), sub.getStatus());
+                // TODO: update subscriptionStatus field on user
+                break;
+            }
+            case "customer.subscription.deleted": {
+                com.stripe.model.Subscription sub =
+                        (com.stripe.model.Subscription) event.getDataObjectDeserializer().getObject().orElse(null);
+                if (sub != null) logger.info("Subscription deleted: {}", sub.getId());
+                // TODO: mark user as unsubscribed
+                break;
+            }
+            case "invoice.payment_failed": {
+                com.stripe.model.Invoice invoice =
+                        (com.stripe.model.Invoice) event.getDataObjectDeserializer().getObject().orElse(null);
+                if (invoice != null) logger.info("Payment failed for invoice: {}", invoice.getId());
+                // TODO: notify user via email
+                break;
+            }
+            default:
+                logger.info("Unhandled Stripe event: {}", event.getType());
+        }
     }
 }

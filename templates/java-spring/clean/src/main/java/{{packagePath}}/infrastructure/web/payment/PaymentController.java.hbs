@@ -1,6 +1,6 @@
-package {{packageName}}.controller;
+package {{packageName}}.infrastructure.web.payment;
 
-import {{packageName}}.service.StripeService;
+import {{packageName}}.application.usecase.PaymentUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -13,19 +13,19 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payments")
-public class PaymentsController {
+public class PaymentController {
 
-    private static final Logger logger = LoggerFactory.getLogger(PaymentsController.class);
+    private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
-    private final StripeService stripeService;
+    private final PaymentUseCase paymentUseCase;
 
-    public PaymentsController(StripeService stripeService) {
-        this.stripeService = stripeService;
+    public PaymentController(PaymentUseCase paymentUseCase) {
+        this.paymentUseCase = paymentUseCase;
     }
 
     /**
      * POST /api/payments/checkout
-     * Requires authentication. Creates a Stripe Checkout session.
+     * Requires authentication.
      */
     @PostMapping("/checkout")
     public ResponseEntity<?> createCheckout(
@@ -36,42 +36,39 @@ public class PaymentsController {
             if (priceId == null || priceId.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "priceId is required"));
             }
-            // userDetails.getUsername() returns the user ID (set in JWT filter)
-            com.stripe.model.checkout.Session session =
-                    stripeService.createCheckoutSession(userDetails.getUsername(), priceId);
-            return ResponseEntity.ok(Map.of("url", session.getUrl()));
+            String url = paymentUseCase.createCheckoutSession(userDetails.getUsername(), priceId);
+            return ResponseEntity.ok(Map.of("url", url));
         } catch (Exception e) {
-            logger.error("Error creating checkout session", e);
+            logger.error("Checkout error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
         }
     }
 
     /**
      * POST /api/payments/portal
-     * Requires authentication. Opens Stripe Billing Portal.
+     * Requires authentication.
      */
     @PostMapping("/portal")
     public ResponseEntity<?> createPortal(@AuthenticationPrincipal UserDetails userDetails) {
         try {
-            com.stripe.model.billingportal.Session session =
-                    stripeService.createPortalSession(userDetails.getUsername());
-            return ResponseEntity.ok(Map.of("url", session.getUrl()));
+            String url = paymentUseCase.createPortalSession(userDetails.getUsername());
+            return ResponseEntity.ok(Map.of("url", url));
         } catch (Exception e) {
-            logger.error("Error creating portal session", e);
+            logger.error("Portal error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
         }
     }
 
     /**
      * POST /api/payments/webhook
-     * No authentication. Stripe sends raw body + signature header.
+     * No authentication. Stripe sends raw body.
      */
     @PostMapping("/webhook")
-    public ResponseEntity<String> handleWebhook(
+    public ResponseEntity<String> webhook(
             @RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader) {
         try {
-            stripeService.handleWebhook(payload, sigHeader);
+            paymentUseCase.handleWebhook(payload, sigHeader);
             return ResponseEntity.ok("{\"received\": true}");
         } catch (Exception e) {
             logger.warn("Webhook error: {}", e.getMessage());

@@ -2,21 +2,39 @@ import Stripe from 'stripe';
 import { prisma } from '../config/database';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-    apiVersion: '2024-12-18.acacia',
+    apiVersion: '2026-02-25.clover',
 });
 
 export interface CreateCheckoutSessionParams {
+    userId: string;
     priceId: string;
-    customerId?: string;
     successUrl: string;
     cancelUrl: string;
 }
 
 export class StripeService {
     /**
-     * Create a checkout session for subscription
+     * Create or retrieve a Stripe customer for the user, then create a checkout session.
      */
     async createCheckoutSession(params: CreateCheckoutSessionParams) {
+        const user = await prisma.user.findUnique({ where: { id: params.userId } });
+        if (!user) throw new Error('User not found');
+
+        let customerId = user.stripeCustomerId;
+
+        if (!customerId) {
+            const customer = await stripe.customers.create({
+                email: user.email,
+                name: user.name ?? undefined,
+                metadata: { userId: user.id },
+            });
+            customerId = customer.id;
+            await prisma.user.update({
+                where: { id: params.userId },
+                data: { stripeCustomerId: customerId },
+            });
+        }
+
         const session = await stripe.checkout.sessions.create({
             mode: 'subscription',
             payment_method_types: ['card'],
@@ -26,20 +44,24 @@ export class StripeService {
                     quantity: 1,
                 },
             ],
-            customer: params.customerId,
+            customer: customerId,
             success_url: params.successUrl,
             cancel_url: params.cancelUrl,
+            client_reference_id: params.userId,
         });
 
         return session;
     }
 
     /**
-     * Create a customer portal session
+     * Create a Stripe customer portal session so the user can manage their subscription.
      */
-    async createPortalSession(customerId: string, returnUrl: string) {
+    async createPortalSession(userId: string, returnUrl: string) {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user?.stripeCustomerId) throw new Error('Stripe customer not found for this user');
+
         const session = await stripe.billingPortal.sessions.create({
-            customer: customerId,
+            customer: user.stripeCustomerId,
             return_url: returnUrl,
         });
 
@@ -47,65 +69,60 @@ export class StripeService {
     }
 
     /**
-     * Handle webhook event
+     * Validate the Stripe webhook signature and handle events.
      */
     async handleWebhook(rawBody: Buffer, signature: string) {
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
-        const event = stripe.webhooks.constructEvent(
-            rawBody,
-            signature,
-            webhookSecret
-        );
+        let event: Stripe.Event;
+        try {
+            event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+        } catch (err: any) {
+            throw new Error(`Webhook signature verification failed: ${err.message}`);
+        }
 
         switch (event.type) {
-            case 'checkout.session.completed':
-                {
-                    const session = event.data.object as Stripe.Checkout.Session;
-                    // Handle successful subscription
-                    console.log('Checkout completed:', session.id);
-                    // Match to user and update DB, e.g., using session.client_reference_id
+            case 'checkout.session.completed': {
+                const session = event.data.object as Stripe.Checkout.Session;
+                const userId = session.client_reference_id;
+                if (userId && session.customer) {
+                    await prisma.user.update({
+                        where: { id: userId },
+                        data: {
+                            stripeCustomerId: session.customer as string,
+                        },
+                    });
                 }
+                console.log('Checkout completed for user:', userId);
                 break;
+            }
 
-            case 'customer.subscription.updated':
-                {
-                     const subscription = event.data.object as Stripe.Subscription;
-                     // Handle subscription update in DB
-                     console.log('Subscription updated:', subscription.id);
-                }
+            case 'customer.subscription.updated': {
+                const subscription = event.data.object as Stripe.Subscription;
+                console.log('Subscription updated:', subscription.id, '| Status:', subscription.status);
+                // TODO: Update subscription status in DB (add subscriptionStatus field to User model)
                 break;
+            }
 
-            case 'customer.subscription.deleted':
-                {
-                     const deletedSubscription = event.data.object as Stripe.Subscription;
-                     // Handle subscription cancellation in DB
-                     console.log('Subscription deleted:', deletedSubscription.id);
-                }
+            case 'customer.subscription.deleted': {
+                const subscription = event.data.object as Stripe.Subscription;
+                console.log('Subscription deleted:', subscription.id);
+                // TODO: Mark user as unsubscribed in DB
                 break;
+            }
 
-            case 'invoice.payment_failed':
-                {
-                     const invoice = event.data.object as Stripe.Invoice;
-                     // Handle failed payment
-                     console.log('Payment failed:', invoice.id);
-                }
+            case 'invoice.payment_failed': {
+                const invoice = event.data.object as Stripe.Invoice;
+                console.log('Payment failed for invoice:', invoice.id);
+                // TODO: Notify user via email
                 break;
+            }
+
+            default:
+                console.log('Unhandled Stripe event:', event.type);
         }
 
         return { received: true };
-    }
-
-    /**
-     * Create a Stripe customer
-     */
-    async createCustomer(email: string, name?: string) {
-        const customer = await stripe.customers.create({
-            email,
-            name,
-        });
-
-        return customer;
     }
 }
 

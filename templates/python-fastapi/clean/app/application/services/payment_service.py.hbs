@@ -1,0 +1,85 @@
+import os
+from app.domain.repositories.user_repository import UserRepository
+from app.infrastructure.stripe_provider import StripeProvider
+
+
+class PaymentService:
+    def __init__(self, user_repository: UserRepository, stripe_provider: StripeProvider):
+        self.user_repository = user_repository
+        self.stripe_provider = stripe_provider
+
+    async def create_checkout_session(self, user_id: str, price_id: str) -> str:
+        """Return Stripe Checkout URL for the given user and price."""
+        user = await self.user_repository.find_by_id(user_id)
+        if not user:
+            raise ValueError("User not found")
+
+        customer_id = user.stripe_customer_id
+
+        if not customer_id:
+            customer = self.stripe_provider.create_customer(
+                email=user.email,
+                name=getattr(user, "name", None),
+                user_id=str(user.id),
+            )
+            customer_id = customer.id
+            user.stripe_customer_id = customer_id
+            await self.user_repository.save(user)
+
+        session = self.stripe_provider.create_checkout_session(
+            customer_id=customer_id,
+            price_id=price_id,
+            user_id=str(user_id),
+            success_url=f"{os.getenv('FRONTEND_URL')}/success?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{os.getenv('FRONTEND_URL')}/cancel",
+        )
+        return session.url
+
+    async def create_portal_session(self, user_id: str) -> str:
+        """Return Stripe Portal URL for the given user."""
+        user = await self.user_repository.find_by_id(user_id)
+        if not user or not user.stripe_customer_id:
+            raise ValueError("No Stripe customer found for this user")
+
+        session = self.stripe_provider.create_portal_session(
+            customer_id=user.stripe_customer_id,
+            return_url=f"{os.getenv('FRONTEND_URL')}/dashboard",
+        )
+        return session.url
+
+    async def handle_webhook(self, payload: bytes, sig_header: str) -> dict:
+        """Validate and process a Stripe webhook event."""
+        try:
+            event = self.stripe_provider.construct_event(payload, sig_header)
+        except Exception as e:
+            raise ValueError(f"Webhook signature verification failed: {e}")
+
+        event_type = event["type"]
+        data_object = event["data"]["object"]
+
+        if event_type == "checkout.session.completed":
+            user_id = data_object.get("client_reference_id")
+            customer_id = data_object.get("customer")
+            if user_id and customer_id:
+                user = await self.user_repository.find_by_id(user_id)
+                if user:
+                    user.stripe_customer_id = customer_id
+                    await self.user_repository.save(user)
+            print(f"Checkout completed for user: {user_id}")
+
+        elif event_type == "customer.subscription.updated":
+            print(f"Subscription updated: {data_object.get('id')} | Status: {data_object.get('status')}")
+            # TODO: Update subscriptionStatus field on user
+
+        elif event_type == "customer.subscription.deleted":
+            print(f"Subscription deleted: {data_object.get('id')}")
+            # TODO: Mark user as unsubscribed
+
+        elif event_type == "invoice.payment_failed":
+            print(f"Payment failed for invoice: {data_object.get('id')}")
+            # TODO: Notify user via email
+
+        else:
+            print(f"Unhandled Stripe event: {event_type}")
+
+        return {"received": True}

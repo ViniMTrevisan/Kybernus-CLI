@@ -1,0 +1,58 @@
+import stripe
+import os
+from sqlalchemy.orm import Session
+from app.models.user import User
+
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+stripe.api_version = "2026-02-25.clover"
+
+
+class StripeService:
+    def get_or_create_customer(self, db: Session, user: User) -> str:
+        """Return existing stripeCustomerId or create a new Stripe customer."""
+        if user.stripe_customer_id:
+            return user.stripe_customer_id
+
+        customer = stripe.Customer.create(
+            email=user.email,
+            name=getattr(user, "name", None),
+            metadata={"userId": str(user.id)},
+        )
+        user.stripe_customer_id = customer.id
+        db.commit()
+        db.refresh(user)
+        return customer.id
+
+    def create_checkout_session(
+        self,
+        customer_id: str,
+        price_id: str,
+        user_id: str,
+        success_url: str,
+        cancel_url: str,
+    ):
+        """Create a Stripe Checkout Session for a subscription."""
+        return stripe.checkout.Session.create(
+            mode="subscription",
+            payment_method_types=["card"],
+            line_items=[{"price": price_id, "quantity": 1}],
+            customer=customer_id,
+            success_url=success_url,
+            cancel_url=cancel_url,
+            client_reference_id=str(user_id),
+        )
+
+    def create_portal_session(self, customer_id: str, return_url: str):
+        """Create a Stripe Billing Portal session."""
+        return stripe.billing_portal.Session.create(
+            customer=customer_id,
+            return_url=return_url,
+        )
+
+    def construct_event(self, payload: bytes, sig_header: str):
+        """Validate and construct a Stripe webhook event."""
+        webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+        return stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+
+
+stripe_service = StripeService()

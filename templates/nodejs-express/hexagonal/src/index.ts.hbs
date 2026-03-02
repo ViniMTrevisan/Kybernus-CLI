@@ -5,34 +5,54 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { config } from './config';
 import { PrismaUserAdapter } from './adapters/outbound/persistence/PrismaUserAdapter';
-import { AuthService } from './core/services/AuthService';
+import { StripeAdapter } from './adapters/outbound/StripeAdapter';
+import { AuthService } from './core/AuthService';
+import { PaymentService } from './core/PaymentService';
 import { AuthController } from './adapters/inbound/http/AuthController';
+import { PaymentController } from './adapters/inbound/http/PaymentController';
 import { errorHandler } from './adapters/inbound/http/middlewares/errorHandler';
+import { authMiddleware } from './adapters/inbound/http/middlewares/authMiddleware';
 
 const app = express();
 
-// Middlewares
-app.use(express.json());
-app.use(cors());
+// Security middleware
 app.use(helmet());
+app.use(cors());
 app.use(morgan('dev'));
 
-// Dependency Injection
-const userRepository = new PrismaUserAdapter();
-const authService = new AuthService(userRepository);
-const authController = new AuthController(authService);
+// === IMPORTANT: raw body for Stripe webhook must come BEFORE express.json() ===
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 
-// Routes
+// JSON parsing for all other routes
+app.use(express.json());
+
+// --- Dependency Injection ---
+const userRepository = new PrismaUserAdapter();
+const stripeAdapter = new StripeAdapter();
+
+const authService = new AuthService(userRepository);
+const paymentService = new PaymentService(userRepository, stripeAdapter);
+
+const authController = new AuthController(authService);
+const paymentController = new PaymentController(paymentService);
+
+// --- Auth Routes ---
 app.post('/api/auth/register', (req, res, next) => authController.register(req, res, next));
 app.post('/api/auth/login', (req, res, next) => authController.login(req, res, next));
 
+// --- Payment Routes ---
+app.post('/api/payments/checkout', authMiddleware, paymentController.createCheckout);
+app.post('/api/payments/portal', authMiddleware, paymentController.createPortal);
+app.post('/api/payments/webhook', paymentController.handleWebhook);
+
+// --- Health Check ---
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', architecture: 'hexagonal' });
 });
 
-// Error Handler
+// --- Error Handler (must be last) ---
 app.use(errorHandler);
 
 app.listen(config.port, () => {
-  console.log(`🚀 Server running on port ${config.port}`);
+  console.log(`Server running on port ${config.port}`);
 });

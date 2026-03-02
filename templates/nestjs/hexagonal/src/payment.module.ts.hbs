@@ -1,0 +1,23 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { PaymentController } from './adapters/inbound/payment.controller';
+import { PaymentService } from './core/payment.service';
+import { StripeAdapter } from './adapters/outbound/stripe.adapter';
+import { UserPort } from './core/ports/user.port';
+import { PrismaUserAdapter } from './adapters/outbound/persistence/prisma.user.adapter';
+import { PrismaService } from './adapters/outbound/persistence/prisma.service';
+
+@Module({
+    imports: [ConfigModule],
+    controllers: [PaymentController],
+    providers: [
+        PaymentService,
+        StripeAdapter,
+        PrismaService,
+        {
+            provide: UserPort,
+            useClass: PrismaUserAdapter,
+        },
+    ],
+})
+export class PaymentModule {}

@@ -1,59 +1,94 @@
 from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-import stripe
 import os
 from app.database import get_db
+from app.services.stripe_service import stripe_service
+from app.models.user import User
+from app.middleware.auth import get_current_user
 
 router = APIRouter()
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
-webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
 
 class CheckoutRequest(BaseModel):
     price_id: str
-    customer_id: str | None = None
+
 
 @router.post("/checkout")
-async def create_checkout(data: CheckoutRequest):
-    try:
-        session = stripe.checkout.Session.create(
-            mode="subscription",
-            payment_method_types=["card"],
-            line_items=[{"price": data.price_id, "quantity": 1}],
-            customer=data.customer_id,
-            success_url=f"{os.getenv('FRONTEND_URL')}/success?session_id={{CHECKOUT_SESSION_ID}}",
-            cancel_url=f"{os.getenv('FRONTEND_URL')}/cancel",
-        )
-        return {"checkout_url": session.url, "session_id": session.id}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+async def create_checkout(
+    data: CheckoutRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Create a Stripe Checkout Session (authenticated)."""
+    customer_id = stripe_service.get_or_create_customer(db, current_user)
+
+    session = stripe_service.create_checkout_session(
+        customer_id=customer_id,
+        price_id=data.price_id,
+        user_id=str(current_user.id),
+        success_url=f"{os.getenv('FRONTEND_URL')}/success?session_id={'{CHECKOUT_SESSION_ID}'}",
+        cancel_url=f"{os.getenv('FRONTEND_URL')}/cancel",
+    )
+    return {"url": session.url}
+
+
+@router.post("/portal")
+async def create_portal(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Open Stripe Billing Portal (authenticated)."""
+    if not current_user.stripe_customer_id:
+        raise HTTPException(status_code=400, detail="No Stripe customer found for this user")
+
+    session = stripe_service.create_portal_session(
+        customer_id=current_user.stripe_customer_id,
+        return_url=f"{os.getenv('FRONTEND_URL')}/dashboard",
+    )
+    return {"url": session.url}
+
 
 @router.post("/webhook")
 async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
+    """Handle Stripe webhook events. No auth required – raw body."""
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature")
 
-    try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, webhook_secret
-        )
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail="Invalid payload")
-    except stripe.error.SignatureVerificationError as e:
-        raise HTTPException(status_code=400, detail="Invalid signature")
+    if not sig_header:
+        raise HTTPException(status_code=400, detail="Missing stripe-signature header")
 
-    event_type = event.get("type")
-    
+    try:
+        event = stripe_service.construct_event(payload, sig_header)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Webhook error: {str(e)}")
+
+    event_type = event["type"]
+    data_object = event["data"]["object"]
+
     if event_type == "checkout.session.completed":
-        session = event.get("data").get("object")
-        print(f"Checkout completed: {session.get('id')}")
-        # Update user in db
+        user_id = data_object.get("client_reference_id")
+        customer_id = data_object.get("customer")
+        if user_id and customer_id:
+            user = db.query(User).filter(User.id == user_id).first()
+            if user:
+                user.stripe_customer_id = customer_id
+                db.commit()
+        print(f"Checkout completed for user: {user_id}")
+
     elif event_type == "customer.subscription.updated":
-        subscription = event.get("data").get("object")
-        print(f"Subscription updated: {subscription.get('id')}")
+        print(f"Subscription updated: {data_object.get('id')} | Status: {data_object.get('status')}")
+        # TODO: Update subscription status in DB
+
     elif event_type == "customer.subscription.deleted":
-        subscription = event.get("data").get("object")
-        print(f"Subscription deleted: {subscription.get('id')}")
-        
+        print(f"Subscription deleted: {data_object.get('id')}")
+        # TODO: Mark user as unsubscribed in DB
+
+    elif event_type == "invoice.payment_failed":
+        print(f"Payment failed for invoice: {data_object.get('id')}")
+        # TODO: Notify user via email
+
+    else:
+        print(f"Unhandled Stripe event: {event_type}")
+
     return {"received": True}

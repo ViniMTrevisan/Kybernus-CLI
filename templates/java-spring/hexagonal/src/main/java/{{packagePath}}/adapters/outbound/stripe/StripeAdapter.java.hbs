@@ -1,0 +1,76 @@
+package {{packageName}}.adapters.outbound.stripe;
+
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
+import com.stripe.model.Event;
+import com.stripe.model.checkout.Session;
+import com.stripe.net.Webhook;
+import com.stripe.param.CustomerCreateParams;
+import com.stripe.param.checkout.SessionCreateParams;
+import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+/**
+ * Outbound adapter: wraps the Stripe SDK for use by core services.
+ */
+@Component
+public class StripeAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(StripeAdapter.class);
+
+    @Value("${stripe.secret-key}")
+    private String stripeSecretKey;
+
+    @Value("${stripe.webhook-secret}")
+    private String webhookSecret;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
+    @PostConstruct
+    public void init() {
+        Stripe.apiKey = stripeSecretKey;
+    }
+
+    public Customer createCustomer(String email, String userId) throws StripeException {
+        return Customer.create(CustomerCreateParams.builder()
+                .setEmail(email)
+                .putMetadata("userId", userId)
+                .build());
+    }
+
+    public Session createCheckoutSession(
+            String customerId, String priceId, String userId) throws StripeException {
+
+        return Session.create(SessionCreateParams.builder()
+                .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
+                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
+                .addLineItem(SessionCreateParams.LineItem.builder()
+                        .setPrice(priceId)
+                        .setQuantity(1L)
+                        .build())
+                .setCustomer(customerId)
+                .setSuccessUrl(frontendUrl + "/success?session_id={CHECKOUT_SESSION_ID}")
+                .setCancelUrl(frontendUrl + "/cancel")
+                .setClientReferenceId(userId)
+                .build());
+    }
+
+    public com.stripe.model.billingportal.Session createPortalSession(
+            String customerId) throws StripeException {
+
+        return com.stripe.model.billingportal.Session.create(
+                com.stripe.param.billingportal.SessionCreateParams.builder()
+                        .setCustomer(customerId)
+                        .setReturnUrl(frontendUrl + "/dashboard")
+                        .build());
+    }
+
+    public Event constructWebhookEvent(String payload, String sigHeader) throws Exception {
+        return Webhook.constructEvent(payload, sigHeader, webhookSecret);
+    }
+}

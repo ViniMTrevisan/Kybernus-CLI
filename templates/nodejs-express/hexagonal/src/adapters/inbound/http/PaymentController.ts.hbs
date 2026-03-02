@@ -1,0 +1,57 @@
+import { Request, Response, NextFunction } from 'express';
+import { PaymentService } from '../../../core/PaymentService';
+
+export class PaymentController {
+    constructor(private readonly paymentService: PaymentService) {}
+
+    /**
+     * POST /api/payments/checkout
+     * Requires authentication.
+     */
+    createCheckout = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = (req as any).userId as string;
+            const { priceId } = req.body;
+
+            if (!priceId) {
+                return res.status(400).json({ error: 'priceId is required' });
+            }
+
+            const session = await this.paymentService.createCheckoutSession(userId, priceId);
+            res.json({ url: session.url });
+        } catch (err) {
+            next(err);
+        }
+    };
+
+    /**
+     * POST /api/payments/portal
+     * Requires authentication.
+     */
+    createPortal = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = (req as any).userId as string;
+            const session = await this.paymentService.createPortalSession(userId);
+            res.json({ url: session.url });
+        } catch (err) {
+            next(err);
+        }
+    };
+
+    /**
+     * POST /api/payments/webhook
+     * No authentication – Stripe sends the raw body here.
+     */
+    handleWebhook = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const signature = req.headers['stripe-signature'] as string;
+            if (!signature) {
+                return res.status(400).json({ error: 'Missing stripe-signature header' });
+            }
+            const result = await this.paymentService.handleWebhook(req.body, signature);
+            res.json(result);
+        } catch (err) {
+            next(err);
+        }
+    };
+}

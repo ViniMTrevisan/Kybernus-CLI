@@ -1,0 +1,23 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { PaymentController } from './infrastructure/http/payment.controller';
+import { PaymentService } from './application/payment.service';
+import { StripeProvider } from './infrastructure/stripe.provider';
+import { UserRepository } from './domain/repositories/user.repository';
+import { PrismaUserRepository } from './infrastructure/database/prisma.user.repository';
+import { PrismaService } from './infrastructure/database/prisma.service';
+
+@Module({
+    imports: [ConfigModule],
+    controllers: [PaymentController],
+    providers: [
+        PaymentService,
+        StripeProvider,
+        PrismaService,
+        {
+            provide: UserRepository,
+            useClass: PrismaUserRepository,
+        },
+    ],
+})
+export class PaymentModule {}

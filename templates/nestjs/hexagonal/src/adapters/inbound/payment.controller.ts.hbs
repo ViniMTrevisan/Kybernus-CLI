@@ -1,0 +1,46 @@
+import { Controller, Post, Body, Headers, UseGuards, Req, BadRequestException } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { IsString } from 'class-validator';
+import { PaymentService } from '../../core/payment.service';
+
+class CreateCheckoutDto {
+    @IsString()
+    priceId: string;
+}
+
+@Controller('payments')
+export class PaymentController {
+    constructor(private readonly paymentService: PaymentService) {}
+
+    /**
+     * POST /api/payments/checkout
+     * Requires JWT authentication.
+     */
+    @Post('checkout')
+    @UseGuards(AuthGuard('jwt'))
+    async createCheckout(@Req() req: any, @Body() dto: CreateCheckoutDto) {
+        const session = await this.paymentService.createCheckoutSession(req.user.id, dto.priceId);
+        return { url: session.url };
+    }
+
+    /**
+     * POST /api/payments/portal
+     * Requires JWT authentication.
+     */
+    @Post('portal')
+    @UseGuards(AuthGuard('jwt'))
+    async createPortal(@Req() req: any) {
+        const session = await this.paymentService.createPortalSession(req.user.id);
+        return { url: session.url };
+    }
+
+    /**
+     * POST /api/payments/webhook
+     * No authentication. Stripe sends a raw body – NestFactory must have rawBody: true.
+     */
+    @Post('webhook')
+    async webhook(@Req() req: any, @Headers('stripe-signature') signature: string) {
+        if (!signature) throw new BadRequestException('Missing stripe-signature header');
+        return this.paymentService.handleWebhook(req.rawBody, signature);
+    }
+}

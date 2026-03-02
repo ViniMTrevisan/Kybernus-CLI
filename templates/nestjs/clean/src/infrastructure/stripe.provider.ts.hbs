@@ -1,0 +1,51 @@
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import Stripe from 'stripe';
+
+@Injectable()
+export class StripeProvider {
+    public readonly client: Stripe;
+
+    constructor(private configService: ConfigService) {
+        this.client = new Stripe(configService.get('STRIPE_SECRET_KEY', ''), {
+            apiVersion: '2026-02-25.clover',
+        });
+    }
+
+    async createCustomer(email: string, userId: string) {
+        return this.client.customers.create({
+            email,
+            metadata: { userId },
+        });
+    }
+
+    async createCheckoutSession(
+        customerId: string,
+        priceId: string,
+        userId: string,
+        successUrl: string,
+        cancelUrl: string,
+    ) {
+        return this.client.checkout.sessions.create({
+            mode: 'subscription',
+            payment_method_types: ['card'],
+            line_items: [{ price: priceId, quantity: 1 }],
+            customer: customerId,
+            success_url: successUrl,
+            cancel_url: cancelUrl,
+            client_reference_id: userId,
+        });
+    }
+
+    async createPortalSession(customerId: string, returnUrl: string) {
+        return this.client.billingPortal.sessions.create({
+            customer: customerId,
+            return_url: returnUrl,
+        });
+    }
+
+    constructEvent(payload: Buffer, signature: string) {
+        const webhookSecret = this.configService.get('STRIPE_WEBHOOK_SECRET', '');
+        return this.client.webhooks.constructEvent(payload, signature, webhookSecret);
+    }
+}

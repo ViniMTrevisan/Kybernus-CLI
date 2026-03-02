@@ -3,7 +3,10 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {
+        // rawBody is required so that the Stripe webhook can verify the signature
+        rawBody: true,
+    });
 
     app.enableCors();
     app.setGlobalPrefix('api');
@@ -12,6 +15,6 @@ async function bootstrap() {
     const port = process.env.PORT || 3000;
     await app.listen(port);
 
-    console.log(`🚀 {{pascalCase projectName}} running on port ${port}`);
+    console.log(`{{pascalCase projectName}} running on port ${port}`);
 }
 bootstrap();

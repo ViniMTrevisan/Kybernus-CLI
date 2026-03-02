@@ -16,3 +16,10 @@ spring.jpa.properties.hibernate.format_sql=true
 application.security.jwt.secret-key={{jwtSecretKey}}
 application.security.jwt.expiration=86400000
 application.security.jwt.refresh-token.expiration=604800000
+
+# Stripe
+stripe.secret-key=${STRIPE_SECRET_KEY}
+stripe.webhook-secret=${STRIPE_WEBHOOK_SECRET}
+
+# Frontend URL (for Stripe redirect URLs)
+frontend.url=${FRONTEND_URL:http://localhost:3000}

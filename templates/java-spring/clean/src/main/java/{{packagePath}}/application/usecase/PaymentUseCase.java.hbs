@@ -1,0 +1,89 @@
+package {{packageName}}.application.usecase;
+
+import {{packageName}}.domain.entity.User;
+import {{packageName}}.domain.repository.UserRepository;
+import {{packageName}}.infrastructure.stripe.StripeGateway;
+import com.stripe.model.Event;
+import com.stripe.model.checkout.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+@Service
+public class PaymentUseCase {
+
+    private static final Logger logger = LoggerFactory.getLogger(PaymentUseCase.class);
+
+    private final UserRepository userRepository;
+    private final StripeGateway stripeGateway;
+
+    public PaymentUseCase(UserRepository userRepository, StripeGateway stripeGateway) {
+        this.userRepository = userRepository;
+        this.stripeGateway = stripeGateway;
+    }
+
+    public String createCheckoutSession(String userId, String pricpackage {{packageName}}.application.usecase;
+
+import {{packageName}}.domain.l.UUID.fromString(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String customerId = user.getStripeCustomerId();
+
+        if (customerId == null || customerId.isEmpty()) {
+            cuimport com.stripeGateway.createCustomer(user.getEmail(), userId).getId();
+            user.setStripeCustomerId(customerId);
+            userRepository.save(user);
+        }
+
+        Session session = stripeGateway.createCheckoutSession(customerId, priceId, userId);
+        retu
+    private final UserRepository userRString createPortalSession(String userId) throws Exception {
+        User user = userRepository.findById(java.util.UUID.fromString(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getStripeCustomerId() == null) {
+            throw new RuntimeException("No Stripe customer found for this user");
+        }
+
+        return stripeGateway.createPortalSession(user.getStripeCustomerId()).getUrl();
+    }
+
+    public void handleWebhook(String payload, String sigHeader) throws Exception {
+        Event event = stripeGateway.constructWebhookEvent(payload, sigHeader);
+
+        switch (event.getType()) {
+            case "checkout.session.completed": {
+                Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
+                if (session != null && session.getClientReferenceId() != null) {
+                    String userId = session.getClientReferenceId();
+                    userRepository.findById(java.util.UUID.fromString(userId)).ifPresent(user -> {
+                        user.setStripeCustomerId(session.getCustomer());
+                        userRepository.save(user);
+                    });
+                    logger.info("Checkout completed for user: {}", userId);
+                }
+                break;
+            }
+            case "customer.subscription.updated": {
+                com.stripe.model.Subscription sub =
+                        (com.stripe.model.Subscription) event.getDataObjectDeserializer().getObject().orElse(null);
+                if (sub != null) logger.info("Subscription updated: {} | Status: {}", sub.getId(), sub.getStatus());
+                break;
+            }
+            case "customer.subscription.deleted": {
+                com.stripe.model.Subscription sub =
+                        (com.stripe.model.Subscription) event.getDataObjectDeserializer().getObject().orElse(null);
+                if (sub != null) logger.info("Subscription deleted: {}", sub.getId());
+                break;
+            }
+            case "invoice.payment_failed": {
+                com.stripe.model.Invoice invoice =
+                        (com.stripe.model.Invoice) event.getDataObjectDeserializer().getObject().orElse(null);
+                if (invoice != null) logger.info("Payment failed for invoice: {}", invoice.getId());
+                break;
+            }
+            default:
+                logger.info("Unhandled Stripe event: {}", event.getType());
+        }
+    }
+}

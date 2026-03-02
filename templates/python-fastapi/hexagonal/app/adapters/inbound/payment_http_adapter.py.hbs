@@ -1,0 +1,64 @@
+from fastapi import APIRouter, HTTPException, Header, Request, Depends
+from pydantic import BaseModel
+from app.core.payment_service import PaymentService
+from app.adapters.outbound.stripe_adapter import StripeAdapter
+from app.infrastructure.database.session import AsyncSessionLocal
+from app.infrastructure.database.user_repository import SQLAlchemyUserRepository
+from app.infrastructure.security.jwt import get_current_user_id
+
+router = APIRouter()
+
+
+def get_payment_service() -> PaymentService:
+    repo = SQLAlchemyUserRepository(AsyncSessionLocal())
+    adapter = StripeAdapter()
+    return PaymentService(user_repository=repo, stripe_adapter=adapter)
+
+
+class CheckoutRequest(BaseModel):
+    price_id: str
+
+
+@router.post("/checkout")
+async def create_checkout(
+    data: CheckoutRequest,
+    user_id: str = Depends(get_current_user_id),
+    service: PaymentService = Depends(get_payment_service),
+):
+    """Create a Stripe Checkout Session (authenticated)."""
+    try:
+        url = await service.create_checkout_session(user_id=user_id, price_id=data.price_id)
+        return {"url": url}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/portal")
+async def create_portal(
+    user_id: str = Depends(get_current_user_id),
+    service: PaymentService = Depends(get_payment_service),
+):
+    """Open Stripe Billing Portal (authenticated)."""
+    try:
+        url = await service.create_portal_session(user_id=user_id)
+        return {"url": url}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/webhook")
+async def stripe_webhook(
+    request: Request,
+    stripe_signature: str = Header(None, alias="stripe-signature"),
+    service: PaymentService = Depends(get_payment_service),
+):
+    """Handle Stripe webhook events. No auth required – raw body."""
+    if not stripe_signature:
+        raise HTTPException(status_code=400, detail="Missing stripe-signature header")
+
+    payload = await request.body()
+    try:
+        result = await service.handle_webhook(payload=payload, sig_header=stripe_signature)
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

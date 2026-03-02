@@ -5,32 +5,53 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { config } from './config';
 import { PrismaUserRepository } from './infrastructure/database/PrismaUserRepository';
+import { jwtTokenGenerator } from './infrastructure/providers/TokenGenerator';
+import { PasswordHasher } from './infrastructure/providers/PasswordHasher';
+import { StripeProvider } from './infrastructure/providers/StripeProvider';
 import { AuthController } from './infrastructure/http/controllers/AuthController';
+import { PaymentController } from './infrastructure/http/controllers/PaymentController';
+import { authMiddleware } from './infrastructure/http/middlewares/authMiddleware';
+import { PaymentService } from './application/services/PaymentService';
 import { errorHandler } from './infrastructure/http/middlewares/errorHandler';
 
 const app = express();
 
-// Middlewares
-app.use(express.json());
-app.use(cors());
+// Security middleware
 app.use(helmet());
+app.use(cors());
 app.use(morgan('dev'));
 
-// Dependency Injection
-const userRepository = new PrismaUserRepository();
-const authController = new AuthController(userRepository);
+// === IMPORTANT: raw body for Stripe webhook must come BEFORE express.json() ===
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 
-// Routes
+// JSON parsing for all other routes
+app.use(express.json());
+
+// --- Dependency Injection ---
+const userRepository = new PrismaUserRepository();
+const stripeProvider = new StripeProvider();
+
+const authController = new AuthController(userRepository, jwtTokenGenerator, new PasswordHasher());
+const paymentService = new PaymentService(userRepository, stripeProvider);
+const paymentController = new PaymentController(paymentService);
+
+// --- Auth Routes ---
 app.post('/api/auth/register', authController.register);
 app.post('/api/auth/login', authController.login);
 
+// --- Payment Routes ---
+app.post('/api/payments/checkout', authMiddleware, paymentController.createCheckout);
+app.post('/api/payments/portal', authMiddleware, paymentController.createPortal);
+app.post('/api/payments/webhook', paymentController.handleWebhook);
+
+// --- Health Check ---
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', architecture: 'clean' });
 });
 
-// Error Handler
+// --- Error Handler (must be last) ---
 app.use(errorHandler);
 
 app.listen(config.port, () => {
-  console.log(`🚀 Server running on port ${config.port}`);
+  console.log(`Server running on port ${config.port}`);
 });
