@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.0] - 2026-03-02
+### Features
+- **Full Stripe Integration**: Added complete Stripe payment support across all 5 stacks and 14 architecture variants (MVC, Clean, Hexagonal).
+  - `POST /api/payments/checkout` — creates a Stripe Checkout session; auto-creates the Stripe customer and links it to the user in the database.
+  - `POST /api/payments/portal` — opens the Stripe Billing Portal for subscription management.
+  - `POST /api/payments/webhook` — validates signatures and handles `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, and `invoice.payment_failed` events with real database updates.
+- **Stripe API version**: `2026-02-25.clover` used across all templates.
+- **Raw body middleware** correctly configured for webhook signature verification in all stacks (Express `express.raw()`, NestJS `rawBody: true`, Next.js `request.text()`, FastAPI `request.body()`, Spring Boot `@RequestBody String`).
+
+### Stacks Updated
+| Stack | MVC | Clean | Hexagonal |
+|---|---|---|---|
+| Node.js Express | ✅ | ✅ | ✅ |
+| Python FastAPI | ✅ | ✅ | ✅ |
+| NestJS | ✅ | ✅ | ✅ |
+| Java Spring Boot | ✅ | ✅ | ✅ |
+| Next.js | ✅ | — | — |
+
 ## [2.2.1] - 2026-03-02
 ### Security & Infrastructure (Terraform)
 - **VPC Networking**: Fixed critical routing issues. Public subnets now have correct Route Tables directing to the Internet Gateway. Private subnets route to a newly provisioned NAT Gateway (with Elastic IP), enabling essential outbound internet access for containers.
