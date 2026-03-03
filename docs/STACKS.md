@@ -52,3 +52,18 @@ The React Framework for the Web.
     *   `Prisma ORM` integration.
     *   `NextAuth.js` (Auth.js) setup.
     *   Hexagonal and Clean Architecture implementation.
+
+## 6. n8n Automation Engine
+The scalable, enterprise-grade workflow automation platform.
+*   **Environment**: Node.js + Python 3 + Pip.
+*   **Features**:
+    *   `PostgreSQL 16` pre-configured for heavy concurrent execution.
+    *   `Filesystem Binary Data Mode` via local persistent volumes.
+    *   Custom `Dockerfile` extending the base image to support execution of complex Python scripts (e.g. pandas, requests) natively.
+    *   `Global Error Handling` pre-configured to alert on failures.
+    *   `Auto Backups` daily workflow out of the box.
+*   **Use-Case Templates**:
+    *   `Default`: Clean infra base ready for anything.
+    *   `AI Assistant`: Webhook + OpenAI architecture.
+    *   `CRM Tracker`: Google Sheets to HubSpot via Schedule.
+    *   `System Monitor`: Uptime monitoring + Discord Webhook alerts.

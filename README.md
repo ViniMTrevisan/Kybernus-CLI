@@ -37,6 +37,7 @@ All stacks and architectures are **100% FREE** and Open Source.
 | **Java Spring Boot** | MVC, Clean, Hexagonal |
 | **NestJS** | MVC, Clean, Hexagonal |
 | **Python FastAPI** | MVC, Clean, Hexagonal |
+| **n8n Automation Engine** | Default, AI Assistant, CRM Tracker, System Monitor |
 
 ---
 
@@ -99,7 +100,8 @@ kybernus init
 ## What's Included
 
 ### 100% Free & Open Source
-- **All stacks** including NestJS and FastAPI
+- **All backend stacks** including NestJS, FastAPI and Spring Boot
+- **n8n Enterprise Automation Engine** with templates
 - **Clean & Hexagonal Architecture** patterns
 - **Docker & docker-compose** configurations
 - **CI/CD pipelines** (GitHub Actions)

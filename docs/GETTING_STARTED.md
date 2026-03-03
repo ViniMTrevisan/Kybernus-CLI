@@ -17,7 +17,7 @@ npm install -g kybernus
 If you prefer not to install it globally, you can run the latest version on demand:
 
 ```bash
-npx kybernus init
+npx kybernus@latest init
 ```
 
 ## 2. Creating Your First Project
@@ -36,10 +36,10 @@ kybernus init
     *   Next.js
     *   NestJS
     *   Python FastAPI
-3.  **Architecture**:
-    *   MVC (Model-View-Controller)
-    *   Clean Architecture
-    *   Hexagonal Architecture
+    *   **Automation Engine (n8n)**
+3.  **Architecture / Use Case**:
+    *   For Code Stacks: MVC, Clean Architecture, Hexagonal Architecture
+    *   For n8n: Default, AI Assistant, CRM Tracker, System Monitor
 4.  **DevOps & Extras**:
     *   Docker & Docker Compose.
     *   CI/CD Pipelines (GitHub Actions).
