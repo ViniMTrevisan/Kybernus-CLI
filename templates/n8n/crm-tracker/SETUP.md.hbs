@@ -1,0 +1,59 @@
+# {{projectName}} — CRM Enrichment Setup Guide
+
+> Tempo estimado: **15 minutos**
+
+## Passo 1: Configure o ambiente
+
+```bash
+cp .env.example .env
+```
+
+Edite o `.env` com suas senhas.
+
+## Passo 2: Suba os containers
+
+```bash
+docker-compose up -d --build
+```
+
+## Passo 3: Acesse o n8n
+
+Abra **http://localhost:5678** e faça login.
+
+## Passo 4: Importe os workflows
+
+1. Vá em **Workflows → Import from File**
+2. Importe:
+   - `workflows/global-error-handler.json`
+   - `workflows/auto-backup.json`
+   - `workflows/crm-enrichment.json`
+
+## Passo 5: Configure o Google Sheets
+
+1. Abra o workflow `CRM Enrichment`
+2. Clique no nó **Google Sheets**
+3. Em **Credential**, clique em **Add Credential → Google Sheets OAuth2**
+4. Siga o fluxo de autorização do Google
+5. Em **Document ID**, cole o ID da sua planilha (está na URL: `docs.google.com/spreadsheets/d/**SEU_ID**/edit`)
+6. Em **Sheet Name**, coloque o nome da aba que contém os leads (ex: `Leads`)
+
+> A planilha deve ter pelo menos uma coluna **Company** na primeira linha.
+
+## Passo 6: Configure o HubSpot (ou outro CRM)
+
+1. Clique no nó **HubSpot**
+2. Em **Credential**, clique em **Add Credential → HubSpot API**
+3. Cole seu **Private App Token** do HubSpot (Settings → Integrations → Private Apps)
+4. No campo **Company Name**, clique no ícone de expressão (`=`) e selecione a coluna `Company` vinda do Google Sheets
+
+> Prefere outro CRM? Substitua o nó HubSpot por **Pipedrive**, **Notion**, **Trello** ou qualquer outro disponível.
+
+## Passo 7: Ajuste a frequência
+
+1. Clique no nó **Schedule**
+2. Ajuste o intervalo para sua necessidade (padrão: a cada 24 horas)
+
+## Passo 8: Ative e teste
+
+1. Clique em **Activate**
+2. Para testar manualmente sem esperar o Schedule, clique em **Test Workflow**

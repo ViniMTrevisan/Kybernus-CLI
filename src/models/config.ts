@@ -3,7 +3,8 @@ export type Stack =
     | 'java-spring'
     | 'nodejs-express'
     | 'python-fastapi'
-    | 'nestjs';
+    | 'nestjs'
+    | 'n8n';
 
 export type Architecture = 'mvc' | 'clean' | 'hexagonal' | 'default';
 

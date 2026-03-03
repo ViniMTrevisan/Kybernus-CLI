@@ -1,0 +1,66 @@
+{
+  "name": "System Health Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "minutes", "minutesInterval": 5 }]
+        }
+      },
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "CONFIGURE: Replace with your website URL e.g. https://myapp.com/health",
+        "method": "GET",
+        "allowUnauthorizedCerts": true
+      },
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "CONFIGURE: Wire statusCode from HTTP Request here",
+              "operation": "notEqual",
+              "value2": "200"
+            }
+          ]
+        }
+      },
+      "name": "IF Error",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "webhookUri": "CONFIGURE: Paste your Discord Webhook URL here",
+        "text": "🚨 Website is DOWN! Check it immediately."
+      },
+      "name": "Discord",
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 1,
+      "position": [850, 200]
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [[{ "node": "HTTP Request", "type": "main", "index": 0 }]]
+    },
+    "HTTP Request": {
+      "main": [[{ "node": "IF Error", "type": "main", "index": 0 }]]
+    },
+    "IF Error": {
+      "main": [[{ "node": "Discord", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {}
+}

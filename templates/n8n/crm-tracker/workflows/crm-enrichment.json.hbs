@@ -1,0 +1,46 @@
+{
+  "name": "CRM Enrichment (Sheets -> HTTP -> CRM)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 24 }]
+        }
+      },
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": "CONFIGURE: Paste your Google Sheet ID here",
+        "sheetName": "Leads"
+      },
+      "name": "Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "companyName": "CONFIGURE: Wire to Google Sheets Company column"
+      },
+      "name": "HubSpot",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [[{ "node": "Google Sheets", "type": "main", "index": 0 }]]
+    },
+    "Google Sheets": {
+      "main": [[{ "node": "HubSpot", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {}
+}

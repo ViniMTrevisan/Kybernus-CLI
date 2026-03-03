@@ -1,0 +1,38 @@
+{
+  "name": "Auto Backup Workflows",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 24 }]
+        }
+      },
+      "name": "Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "resource": "workflow",
+        "operation": "getAll"
+      },
+      "name": "n8n API - Get Workflows",
+      "type": "n8n-nodes-base.n8nApi",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "n8nApi": {
+          "id": "1",
+          "name": "n8n default API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [[{ "node": "n8n API - Get Workflows", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {}
+}

@@ -1,0 +1,32 @@
+{
+  "name": "AI Assistant (Webhook -> OpenAI)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-chat",
+        "responseMode": "lastNode"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o",
+        "prompt": "CONFIGURE: Wire this to the Webhook output field containing the user message"
+      },
+      "name": "OpenAI",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [450, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "OpenAI", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {}
+}

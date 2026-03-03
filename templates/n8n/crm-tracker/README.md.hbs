@@ -1,0 +1,11 @@
+# {{projectName}} - CRM Enrichment (n8n)
+
+This is a ready-to-use n8n template for B2B Lead Enrichment using Google Sheets and your CRM (e.g. HubSpot).
+
+## Getting Started
+1. `cp .env.example .env` and adjust your database and basic auth passwords.
+2. Start the setup: `docker-compose up -d --build`
+3. Access n8n at `http://localhost:5678`.
+4. Import `workflows/crm-enrichment.json` and the global error handler into n8n.
+5. Set up your Google Sheets credentials and CRM credentials inside the respective n8n nodes.
+6. Configure the schedule trigger for how often it should fetch new leads.

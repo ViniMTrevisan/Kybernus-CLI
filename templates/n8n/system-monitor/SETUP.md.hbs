@@ -1,0 +1,59 @@
+# {{projectName}} — System Monitor Setup Guide
+
+> Tempo estimado: **5 minutos**
+
+## Passo 1: Configure o ambiente
+
+```bash
+cp .env.example .env
+```
+
+Edite o `.env` com suas senhas.
+
+## Passo 2: Suba os containers
+
+```bash
+docker-compose up -d --build
+```
+
+## Passo 3: Acesse o n8n
+
+Abra **http://localhost:5678** e faça login.
+
+## Passo 4: Importe os workflows
+
+1. Vá em **Workflows → Import from File**
+2. Importe:
+   - `workflows/global-error-handler.json`
+   - `workflows/auto-backup.json`
+   - `workflows/health-check.json`
+
+## Passo 5: Configure a URL a monitorar
+
+1. Abra o workflow `System Health Monitor`
+2. Clique no nó **HTTP Request**
+3. No campo **URL**, substitua o placeholder pela URL do seu site ou API:
+   - Ex: `https://meuapp.com/health`
+   - Ex: `https://api.meuapp.com/ping`
+
+> **Dica:** Crie um endpoint `/health` no seu backend que retorne `{"status":"ok"}` com status `200`. O monitor verifica qualquer status diferente de 200.
+
+## Passo 6: Configure o alerta no Discord
+
+1. No seu servidor Discord, vá em **Configurações do Servidor → Integrações → Webhooks → Novo Webhook**
+2. Copie a URL do Webhook
+3. No n8n, clique no nó **Discord**
+4. Cole a URL no campo **Webhook URI**
+
+> Prefere Slack ou Telegram? Substitua o nó Discord pelo correspondente. A lógica é a mesma.
+
+## Passo 7: Ajuste a frequência de verificação
+
+1. Clique no nó **Schedule**
+2. Ajuste o intervalo (padrão: **a cada 5 minutos**)
+
+## Passo 8: Ative e teste
+
+1. Clique em **Activate**
+2. Para simular um erro, troque a URL para uma inválida e clique **Test Workflow** — você deverá receber o alerta no Discord
+3. Restaure a URL correta e pronto!

@@ -1,0 +1,11 @@
+# {{projectName}} - System Monitor (n8n)
+
+This is a ready-to-use n8n template to monitor API/website uptime and alert via Discord or Slack.
+
+## Getting Started
+1. `cp .env.example .env` and adjust your database and basic auth passwords.
+2. Start the setup: `docker-compose up -d --build`
+3. Access n8n at `http://localhost:5678`.
+4. Import `workflows/health-check.json` and the global error handler into n8n.
+5. Replace the URL in the HTTP Node to the website you want to monitor.
+6. Replace the Discord Webhook URL in the Discord node with your own server's webhook.

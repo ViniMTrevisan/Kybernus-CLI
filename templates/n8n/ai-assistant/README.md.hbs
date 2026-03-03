@@ -1,0 +1,11 @@
+# {{projectName}} - AI Assistant (n8n)
+
+This is a ready-to-use n8n template for an AI Customer Support Assistant using OpenAI.
+
+## Getting Started
+1. `cp .env.example .env` and adjust your database and basic auth passwords.
+2. Start the setup: `docker-compose up -d --build`
+3. Access n8n at `http://localhost:5678` using your basic auth credentials.
+4. Import `workflows/ai-assistant.json` and the global error handler into n8n.
+5. In n8n, create an OpenAI Credential and paste your API Key.
+6. Copy the Webhook URL from the trigger node and point your frontend or chat API to it.

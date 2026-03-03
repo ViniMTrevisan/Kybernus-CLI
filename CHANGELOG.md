@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.0] - 2026-03-03
+### Features
+- **n8n Automation Engine**: Added a brand new stack to generate enterprise-grade n8n environments.
+  - **Infrastructure**: Includes PostgreSQL 16, Redis, custom Dockerfile with Python 3 / pip / npm support, and persistent volumes for filesystem binary data mode.
+  - **Use Cases**: Four templates are available out of the box:
+    - `default`: Base infrastructure with golden workflows.
+    - `ai-assistant`: Webhook + OpenAI integration.
+    - `crm-tracker`: Schedule + Google Sheets + HubSpot integration.
+    - `system-monitor`: Uptime checker + Discord alerts.
+  - **Golden Workflows**: Auto-backup and Global Error Handlers automatically injected into all templates.
+  - **Specific Setup Guides**: Auto-generated `SETUP.md` with exactly what credentials to fill out based on the chosen use case.
+  - **Handlebars Compatibility**: Escaped internal n8n syntax to prevent compiler clashes during template generation.
+
 ## [2.3.0] - 2026-03-02
 ### Features
 - **Full Stripe Integration**: Added complete Stripe payment support across all 5 stacks and 14 architecture variants (MVC, Clean, Hexagonal).

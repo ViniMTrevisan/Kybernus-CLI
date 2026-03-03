@@ -84,7 +84,7 @@ export class ProjectGenerator {
         const templatesRoot = path.join(__dirname, '../../../templates');
 
         // Architecture defaults
-        const architecture = config.architecture || (config.stack === 'nextjs' ? 'mvc' : 'mvc');
+        const architecture = config.architecture || (config.stack === 'nextjs' ? 'mvc' : (config.stack === 'n8n' ? 'default' : 'mvc'));
 
         // Check path directly under stack/architecture
         const templatePath = path.join(templatesRoot, config.stack, architecture);
@@ -185,6 +185,11 @@ export class ProjectGenerator {
                 return {
                     install: 'Install dependencies:\n   npm install',
                     run: 'Start the server:\n   npm run start:dev',
+                };
+            case 'n8n':
+                return {
+                    install: 'Configure your .env file with appropriate credentials',
+                    run: 'Start the automation engine:\n   docker-compose up -d --build',
                 };
             default:
                 return {

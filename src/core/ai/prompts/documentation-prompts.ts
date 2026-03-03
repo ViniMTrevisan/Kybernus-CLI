@@ -99,6 +99,12 @@ function getStackDetails(stack: Stack): string {
 - **Auth**: Passport + JWT
 - **Validation**: class-validator
 - **Testing**: Jest
+`,
+        'n8n': `
+- **Engine**: n8n core
+- **Runtime**: Node.js + Python 3 support
+- **Database**: PostgreSQL
+- **Infrastructure**: Docker, Docker Compose, Redis
 `
     };
 

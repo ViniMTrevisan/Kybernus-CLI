@@ -1,0 +1,60 @@
+# {{projectName}} — AI Assistant Setup Guide
+
+> Tempo estimado: **10 minutos**
+
+## Passo 1: Configure o ambiente
+
+```bash
+cp .env.example .env
+```
+
+Edite o `.env` com suas senhas e credenciais (veja a tabela no `README.md`).
+
+## Passo 2: Suba os containers
+
+```bash
+docker-compose up -d --build
+```
+
+## Passo 3: Acesse o n8n
+
+Abra **http://localhost:5678** e faça login com as credenciais do `.env`.
+
+## Passo 4: Importe os workflows
+
+1. Vá em **Workflows → Import from File**
+2. Importe nesta ordem:
+   - `workflows/global-error-handler.json`
+   - `workflows/auto-backup.json`
+   - `workflows/ai-assistant.json`
+
+## Passo 5: Configure a credencial da OpenAI
+
+1. Vá em **Settings → Credentials → Add Credential**
+2. Selecione **OpenAI**
+3. Cole sua **API Key** (obtenha em https://platform.openai.com/api-keys)
+4. Salve como `OpenAI account`
+
+## Passo 6: Configure o workflow AI Assistant
+
+1. Abra o workflow `AI Assistant (Webhook -> OpenAI)`
+2. Clique no nó **OpenAI**
+3. Em **Credential**, selecione a que você acabou de criar
+4. Em **Prompt**, clique no ícone de expressão (`=`) e selecione o campo da mensagem vindo do Webhook (ex: `{{ $json.body.message }}`)
+5. Ajuste o **Model** para o modelo desejado (ex: `gpt-4o`)
+
+## Passo 7: Copie a URL do Webhook
+
+1. Clique no nó **Webhook**
+2. Copie a **Production URL** exibida
+3. Configure seu frontend ou sistema de mensagens para fazer `POST` nessa URL com o body: `{ "message": "texto aqui" }`
+
+## Passo 8: Ative o workflow e teste
+
+1. Clique em **Activate** (toggle superior direito)
+2. Faça um `POST` de teste via curl ou Postman:
+```bash
+curl -X POST https://SEU_WEBHOOK_URL \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Olá, como posso ser ajudado?"}'
+```

@@ -1,6 +1,6 @@
 import * as clack from '@clack/prompts';
 import { ProjectConfig, Stack, Architecture, BuildTool } from '../../models/config.js';
-import { toKebabCase } from '../../core/generator/context-builder.js';
+
 
 export interface ConfigOptions {
   name?: string;
@@ -70,6 +70,7 @@ export async function runWizard(options: ConfigOptions = {}): Promise<ProjectCon
             { value: 'nodejs-express', label: 'Node.js + Express' },
             { value: 'python-fastapi', label: 'Python FastAPI' },
             { value: 'nestjs', label: 'NestJS' },
+            { value: 'n8n', label: 'Automation Engine (n8n)' },
           ],
         }),
 
@@ -116,6 +117,19 @@ export async function runWizard(options: ConfigOptions = {}): Promise<ProjectCon
           });
         }
 
+        if (results.stack === 'n8n') {
+          return clack.select({
+            message: 'Template / Use Case:',
+            initialValue: options.architecture || 'default',
+            options: [
+              { value: 'default', label: 'Clean Infrastructure + Error Handler' },
+              { value: 'ai-assistant', label: 'AI Support Assistant (OpenAI)' },
+              { value: 'crm-tracker', label: 'CRM Enrichment (Google Sheets + CRM)' },
+              { value: 'system-monitor', label: 'System Health Monitor (Discord Alerts)' }
+            ],
+          });
+        }
+
         // Backend stacks support MVC/Clean/Hexagonal
         return clack.select({
           message: 'Architecture:',
@@ -128,11 +142,15 @@ export async function runWizard(options: ConfigOptions = {}): Promise<ProjectCon
         });
       },
 
-      useAI: () =>
-        clack.confirm({
+      useAI: ({ results }) => {
+        // Disable AI documentation prompt for n8n as it generates very specific workflows
+        if (results.stack === 'n8n') return;
+
+        return clack.confirm({
           message: 'Generate AI documentation (Google Gemini)?',
           initialValue: options.ai || false,
-        }),
+        });
+      },
 
       geminiKey: ({ results }) => {
         if (!results.useAI) return;

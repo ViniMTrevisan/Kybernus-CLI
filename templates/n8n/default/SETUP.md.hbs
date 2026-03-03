@@ -1,0 +1,52 @@
+# {{projectName}} — Setup Guide
+
+> Tempo estimado: **5 minutos**
+
+## Passo 1: Configure o ambiente
+
+```bash
+cp .env.example .env
+```
+
+Abra o `.env` e altere os seguintes valores:
+
+| Variável | O que colocar |
+|---|---|
+| `N8N_BASIC_AUTH_USER` | Seu usuário de login do n8n (ex: `admin`) |
+| `N8N_BASIC_AUTH_PASSWORD` | Uma senha forte para proteger o painel |
+| `POSTGRES_PASSWORD` | Uma senha forte para o banco de dados |
+| `WEBHOOK_URL` | URL pública do seu servidor (se tiver domínio) |
+
+## Passo 2: Suba os containers
+
+```bash
+docker-compose up -d --build
+```
+
+Aguarde ~30 segundos. O PostgreSQL precisa inicializar antes do n8n conectar.
+
+## Passo 3: Acesse o n8n
+
+Abra no navegador: **http://localhost:5678**
+
+Faça login com as credenciais definidas no `.env`.
+
+## Passo 4: Importe os workflows de base
+
+1. No menu lateral, vá em **Workflows → Import from File**
+2. Importe `workflows/global-error-handler.json`
+3. Dentro do workflow, abra o nó **Telegram Alert**:
+   - Crie uma credencial do Telegram (precisará de um Bot Token)
+   - Ajuste o `chatId` para o seu Chat ID
+4. Ative o workflow (toggle no canto superior direito)
+5. Repita o processo para `workflows/auto-backup.json`:
+   - Crie uma credencial de **n8n API** (Settings → API → Create new key)
+   - O workflow salva a lista de workflows automaticamente a cada 24h
+
+## Passo 5: Pronto!
+
+Seu motor de automação está rodando. Crie seus workflows em **Workflows → New**.
+
+---
+
+> Para subir em produção com domínio próprio, ajuste `N8N_HOST`, `N8N_PROTOCOL=https` e `WEBHOOK_URL` no `.env`, e configure um reverse proxy (ex: Nginx ou Traefik) apontando para a porta `5678`.

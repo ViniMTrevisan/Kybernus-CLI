@@ -1,0 +1,17 @@
+FROM n8nio/n8n:latest
+
+USER root
+
+# Install Python 3, pip, and clean up
+RUN apk add --no-cache python3 py3-pip && \
+    python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip setuptools wheel && \
+    /opt/venv/bin/pip install requests pandas numpy python-dateutil
+
+# Make sure the virtualenv is in PATH
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Example: Install global node modules if needed
+# RUN npm install -g axios
+
+USER node
