@@ -5,7 +5,6 @@
 Build production-ready applications in minutes. Kybernus generates robust, scalable backend projects with industry best practices built-in.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Discord](https://img.shields.io/discord/1234567890?color=5865F2&label=discord&logo=discord&logoColor=white)](https://discord.gg/u5ANEpAAhT)
 
 ---
 
