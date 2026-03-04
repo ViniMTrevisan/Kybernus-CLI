@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { Check, Lock, Info } from "lucide-react";
 
-type Stack = "nextjs" | "nodejs-express" | "java-spring" | "python-fastapi" | "nestjs";
-type ArchitectureSlot = "slot1" | "slot2" | "slot3";
+type Stack = "nextjs" | "nodejs-express" | "java-spring" | "python-fastapi" | "nestjs" | "n8n";
+type ArchitectureSlot = "slot1" | "slot2" | "slot3" | "slot4";
 
 interface ArchTemplate {
     name: string;
@@ -20,6 +20,7 @@ const stacks: { id: Stack; name: string }[] = [
     { id: "java-spring", name: "Java Spring Boot" },
     { id: "python-fastapi", name: "Python FastAPI" },
     { id: "nestjs", name: "NestJS" },
+    { id: "n8n", name: "n8n Automation" },
 ];
 
 // Configuration for what to show for each stack
@@ -28,6 +29,13 @@ const getStackConfig = (stack: Stack): { id: ArchitectureSlot; label: string }[]
         case "nextjs":
             return [
                 { id: "slot1", label: "Production Structure" },
+            ];
+        case "n8n":
+            return [
+                { id: "slot1", label: "AI Assistant" },
+                { id: "slot2", label: "CRM-Tracker" },
+                { id: "slot3", label: "System Monitor" },
+                { id: "slot4", label: "Default" }
             ];
         default:
             return [
@@ -43,75 +51,97 @@ const templates: Record<Stack, Record<string, ArchTemplate>> = {
         "slot1": {
             name: "Next.js Enterprise",
             description: "Production-ready structure with Auth, Dashboard, Infra, and Docker configured.",
-            screenshot: "/next-pro.png",
+            screenshot: "/next-mvc-2.png",
         },
     },
     "nodejs-express": {
         "slot1": {
             name: "Node.js MVC",
             description: "Classic Model-View-Controller with routes, controllers, and middleware.",
-            screenshot: "/node-mvc-new.png",
+            screenshot: "/node-mvc-2.png",
         },
         "slot2": {
             name: "Node.js Clean",
             description: "Use case-driven architecture with domain isolation and dependency injection.",
-            screenshot: "/node-clean.png",
+            screenshot: "/node-clean-2.png",
         },
         "slot3": {
             name: "Node.js Hexagonal",
             description: "Port-based design with interchangeable adapters for databases and APIs.",
-            screenshot: "/node-hexagonal.png",
+            screenshot: "/node-hexagonal-2.png",
         },
     },
     "java-spring": {
         "slot1": {
             name: "Java Spring MVC",
             description: "Standard Spring MVC with controllers, services, and repository pattern.",
-            screenshot: "/java-mvc-new.png"
+            screenshot: "/java-mvc-2.png"
         },
         "slot2": {
             name: "Java Spring Clean",
             description: "Domain-centric Spring architecture with clear separation of concerns.",
-            screenshot: "/java-clean.png"
+            screenshot: "/java-clean-2.png"
         },
         "slot3": {
             name: "Java Spring Hexagonal",
             description: "Ports & adapters pattern with Spring dependency injection.",
-            screenshot: "/java-hexagonal.png"
+            screenshot: "/java-hexagonal-2.png"
         },
     },
     "python-fastapi": {
         "slot1": {
             name: "FastAPI MVC",
             description: "FastAPI with routers, services, and async repository pattern.",
-            screenshot: "/python-mvc.png"
+            screenshot: "/fastapi-mvc-2.png"
         },
         "slot2": {
             name: "FastAPI Clean",
             description: "Clean architecture with domain entities and use cases.",
-            screenshot: "/python-clean.png"
+            screenshot: "/fastapi-clean-2.png"
         },
         "slot3": {
             name: "FastAPI Hexagonal",
             description: "Hexagonal pattern with ports and adapters for FastAPI.",
-            screenshot: "/python-hexagonal.png"
+            screenshot: "/fastapi-hexagonal-2.png"
         },
     },
     "nestjs": {
         "slot1": {
             name: "NestJS MVC",
             description: "NestJS with controllers, services, and module organization.",
-            screenshot: "/nest-mvc.png"
+            screenshot: "/nest-mvc-2.png"
         },
         "slot2": {
             name: "NestJS Clean",
             description: "Domain-driven NestJS with clean architecture principles.",
-            screenshot: "/nest-clean.png"
+            screenshot: "/nest-clean-2.png"
         },
         "slot3": {
             name: "NestJS Hexagonal",
             description: "Ports & adapters with NestJS modules and providers.",
-            screenshot: "/nest-hexagonal.png"
+            screenshot: "/nest-hexagonal-2.png"
+        },
+    },
+    "n8n": {
+        "slot1": {
+            name: "AI Assistant",
+            description: "This is a ready-to-use n8n template for an AI Customer Support Assistant using OpenAI",
+            screenshot: "/n8n-ai-assistant.png"
+        },
+        "slot2": {
+            name: "CRM Tracker",
+            description: "This is a ready-to-use n8n template for B2B Lead Enrichment using Google Sheets and your CRM (e.g. HubSpot).",
+            screenshot: "/n8n-crm-tracker.png"
+        },
+        "slot3": {
+            name: "System Monitor",
+            description: "This is a ready-to-use n8n template to monitor API/website uptime and alert via Discord or Slack..",
+            screenshot: "/n8n-system-monitor.png"
+        },
+        "slot4": {
+            name: "Default",
+            description: "This repository contains a default n8n (Automation Engine) setup",
+            screenshot: "/n8n-default.png"
         },
     },
 };
@@ -133,7 +163,7 @@ export function ArchitectureExplorer() {
                     </h2>
                     <p className="text-xl font-mono text-muted-foreground max-w-3xl mx-auto">
                         // Inspect every folder structure before you generate. <br />
-                        <span className="text-tech-success">15 production templates</span>, 100% transparent.
+                        <span className="text-tech-success">17 production templates</span>, 100% transparent.
                     </p>
                 </div>
 
