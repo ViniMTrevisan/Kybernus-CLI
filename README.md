@@ -1,5 +1,6 @@
-# Kybernus CLI 🚀
+# Kybernus CLI - 3.0.0 🚀
 
+**Make sure you always have the most updated version**
 **The Ultimate Backend Scaffolding Tool for Modern Developers.**
 
 Build production-ready applications in minutes. Kybernus generates robust, scalable backend projects with industry best practices built-in.
