@@ -8,6 +8,7 @@ export interface ConfigOptions {
   architecture?: string;
   buildTool?: string;
   packageName?: string;
+  template?: string;
   ai?: boolean;
   geminiKey?: string;
   nonInteractive?: boolean;
@@ -32,8 +33,9 @@ export async function runWizard(options: ConfigOptions = {}): Promise<ProjectCon
 
     return {
       projectName: options.name,
-      stack: options.stack as Stack,
-      architecture: (options.architecture as Architecture) || 'mvc',
+      stack: (options.stack as Stack) || 'custom',
+      customTemplate: options.template,
+      architecture: options.template ? undefined : ((options.architecture as Architecture) || 'mvc'),
       buildTool: (options.buildTool as BuildTool) || 'npm',
       packageName: options.packageName,
       useAI: options.ai || false,
@@ -60,8 +62,10 @@ export async function runWizard(options: ConfigOptions = {}): Promise<ProjectCon
           },
         }),
 
-      stack: () =>
-        clack.select({
+      stack: async () => {
+        if (options.template) return 'custom';
+
+        return clack.select({
           message: 'Choose your stack:',
           initialValue: options.stack,
           options: [
@@ -72,7 +76,8 @@ export async function runWizard(options: ConfigOptions = {}): Promise<ProjectCon
             { value: 'nestjs', label: 'NestJS' },
             { value: 'n8n', label: 'Automation Engine (n8n)' },
           ],
-        }),
+        });
+      },
 
       buildTool: ({ results }) => {
         if (results.stack !== 'java-spring') return;
@@ -102,7 +107,9 @@ export async function runWizard(options: ConfigOptions = {}): Promise<ProjectCon
         });
       },
 
-      architecture: ({ results }) => {
+      architecture: async ({ results }) => {
+        if (options.template) return 'custom';
+
         // Next.js has different architecture options (default vs mvc)
         if (results.stack === 'nextjs') {
           return clack.select({
@@ -183,6 +190,7 @@ export async function runWizard(options: ConfigOptions = {}): Promise<ProjectCon
 
         return selected;
       },
+
     },
     {
       onCancel: () => {
@@ -195,6 +203,7 @@ export async function runWizard(options: ConfigOptions = {}): Promise<ProjectCon
   return {
     projectName: answers.projectName as string,
     stack: answers.stack as Stack,
+    customTemplate: options.template,
     architecture: answers.architecture as Architecture | undefined,
     buildTool: answers.buildTool as BuildTool | undefined,
     packageName: answers.packageName as string | undefined,

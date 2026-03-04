@@ -22,6 +22,7 @@
         "@google/genai": "^1.40.0",
         "commander": "^14.0.2",
         "conf": "^15.0.2",
+        "degit": "^2.8.4",
         "fs-extra": "^11.3.3",
         "handlebars": "^4.7.8",
         "posthog-node": "^5.21.2"
@@ -30,6 +31,7 @@
         "kybernus": "dist/index.js"
       },
       "devDependencies": {
+        "@types/degit": "^2.8.6",
         "@types/fs-extra": "^11.0.4",
         "@types/node": "^25.0.9",
         "rimraf": "^6.1.2",
@@ -995,6 +997,13 @@
       "dev": true,
       "license": "MIT"
     },
+    "node_modules/@types/degit": {
+      "version": "2.8.6",
+      "resolved": "https://registry.npmjs.org/@types/degit/-/degit-2.8.6.tgz",
+      "integrity": "sha512-y0M7sqzsnHB6cvAeTCBPrCQNQiZe8U4qdzf8uBVmOWYap5MMTN/gB2iEqrIqFiYcsyvP74GnGD5tgsHttielFw==",
+      "dev": true,
+      "license": "MIT"
+    },
     "node_modules/@types/estree": {
       "version": "1.0.8",
       "resolved": "https://registry.npmjs.org/@types/estree/-/estree-1.0.8.tgz",
@@ -1372,6 +1381,18 @@
         "supports-color": {
           "optional": true
         }
+      }
+    },
+    "node_modules/degit": {
+      "version": "2.8.4",
+      "resolved": "https://registry.npmjs.org/degit/-/degit-2.8.4.tgz",
+      "integrity": "sha512-vqYuzmSA5I50J882jd+AbAhQtgK6bdKUJIex1JNfEUPENCgYsxugzKVZlFyMwV4i06MmnV47/Iqi5Io86zf3Ng==",
+      "license": "MIT",
+      "bin": {
+        "degit": "degit"
+      },
+      "engines": {
+        "node": ">=8.0.0"
       }
     },
     "node_modules/dot-prop": {

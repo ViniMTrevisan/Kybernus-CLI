@@ -1,6 +1,6 @@
 {
   "name": "kybernus",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "type": "module",
   "description": "The Ultimate Scaffolding CLI for Modern Developers",
   "main": "dist/index.js",
@@ -44,6 +44,7 @@
   "files": [
     "dist",
     "templates",
+    "add-features",
     "README.md",
     "LICENSE"
   ],
@@ -52,6 +53,7 @@
     "@google/genai": "^1.40.0",
     "commander": "^14.0.2",
     "conf": "^15.0.2",
+    "degit": "^2.8.4",
     "fs-extra": "^11.3.3",
     "handlebars": "^4.7.8",
     "posthog-node": "^5.21.2"
@@ -66,6 +68,7 @@
     "posthog-node"
   ],
   "devDependencies": {
+    "@types/degit": "^2.8.6",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^25.0.9",
     "rimraf": "^6.1.2",
@@ -75,5 +78,14 @@
   },
   "overrides": {
     "rimraf": "^6.1.2"
-  }
+  },
+  "bundleDependencies": [
+    "@clack/prompts",
+    "@google/genai",
+    "commander",
+    "conf",
+    "fs-extra",
+    "handlebars",
+    "posthog-node"
+  ]
 }

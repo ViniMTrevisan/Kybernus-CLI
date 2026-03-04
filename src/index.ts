@@ -3,6 +3,10 @@
 import { Command } from 'commander';
 import { initCommand } from './cli/commands/init.js';
 import { analyticsCommand } from './cli/commands/analytics.js';
+import { doctorCommand } from './cli/commands/doctor.js';
+import { addCommand } from './cli/commands/add.js';
+import { authCommand } from './cli/commands/auth.js';
+import { deployCommand } from './cli/commands/deploy.js';
 import { createRequire } from 'module';
 
 const requirePkg = createRequire(import.meta.url);
@@ -21,11 +25,16 @@ program
     .option('-n, --name <name>', 'Project name')
     .option('-s, --stack <stack>', 'Technology stack (nextjs, java-spring, nodejs-express, python-fastapi, nestjs, n8n)')
     .option('-a, --architecture <arch>', 'Architecture or Template/Use-case (mvc, clean, hexagonal, default, ai-assistant, crm-tracker, system-monitor)')
+    .option('-t, --template <repo>', 'Use a custom template from a Git repository (e.g., github:user/repo)')
     .option('-b, --build-tool <tool>', 'Build tool (maven, gradle, npm, pnpm, yarn)')
     .option('--no-ai', 'Skip AI documentation generation')
     .option('--non-interactive', 'Run in non-interactive mode (requires all options)')
     .action(initCommand);
 
 program.addCommand(analyticsCommand);
+program.addCommand(doctorCommand);
+program.addCommand(addCommand);
+program.addCommand(authCommand);
+program.addCommand(deployCommand);
 
 program.parse();

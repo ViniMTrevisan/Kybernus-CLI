@@ -55,6 +55,11 @@ export class TemplateEngine {
             // Renderiza o template
             const content = await this.renderFile(file, context);
 
+            // Skip files that rendered to nothing (e.g. wrapped in {{#if false}})
+            if (!content || !content.trim()) {
+                continue;
+            }
+
             // Escreve o arquivo
             await fs.ensureDir(path.dirname(outputPath));
             await fs.writeFile(outputPath, content, 'utf-8');

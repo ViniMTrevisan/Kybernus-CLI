@@ -1,0 +1,16 @@
+{
+    "version": 2,
+    "name": "my-nextjs-app",
+    "builds": [
+        {
+            "src": "next.config.*",
+            "use": "@vercel/next"
+        }
+    ],
+    "env": {
+        "DATABASE_URL": "@database_url",
+        "JWT_SECRET": "@jwt_secret",
+        "NEXTAUTH_SECRET": "@nextauth_secret",
+        "NEXTAUTH_URL": "@nextauth_url"
+    }
+}

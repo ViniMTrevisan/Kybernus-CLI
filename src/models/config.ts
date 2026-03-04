@@ -13,6 +13,7 @@ export type BuildTool = 'maven' | 'gradle' | 'npm' | 'pnpm' | 'yarn';
 export interface ProjectConfig {
     projectName: string;
     stack: Stack;
+    customTemplate?: string;
     architecture?: Architecture;
     buildTool?: BuildTool;
     packageName?: string; // Para Java: com.usuario.projeto

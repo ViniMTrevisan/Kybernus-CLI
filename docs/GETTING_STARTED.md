@@ -1,6 +1,6 @@
 # Getting Started with Kybernus
 
-Welcome to Kybernus! This guide will help you install the CLI and generate your first production-ready backend project in minutes.
+Welcome to Kybernus! This guide will help you install the CLI and generate your first production-ready backend project in minutes—or enhance an existing one.
 
 ## 1. Installation
 
@@ -46,14 +46,25 @@ kybernus init
     *   Terraform (AWS Infrastructure).
     *   AI Documentation (Gemini).
 
-## 3. Next Steps
+### Different Flow: Enhancing Existing Projects
+Kybernus isn't just for new projects. You can run commands inside **any** project (even if not made with Kybernus) to add professional features.
 
-Once generated, navigate into your project folder. You'll find a fully configured codebase ready to run.
+# Add Swagger, Redis, Websockets...
+kybernus add swagger
 
-```bash
-cd my-awesome-api
-npm install
-npm run dev
+# Add complete JWT Authentication 
+kybernus auth
+
+# Generate deployment configurations
+kybernus deploy
 ```
 
-Check out the `README.md` inside your generated project for specific build and run instructions tailored to the stack you chose.
+## 3. Next Steps
+
+Once you've initialized or enhanced your project:
+
+1.  **Check Environment**: Run `kybernus doctor` to ensure your system is ready.
+2.  **Install Deps**: Run the install command for your stack (`npm install`, `pip install`, etc).
+3.  **Configure `.env`**: Fill in secrets like `DATABASE_URL` or `JWT_SECRET`.
+4.  **Go Live**: Use `kybernus deploy` to generate cloud config files.
+

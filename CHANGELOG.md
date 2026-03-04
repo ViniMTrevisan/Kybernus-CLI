@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - 2026-03-04
+### Major Features
+- **Standalone Project Support**: Kybernus can now be used in any project! Commands like `add`, `auth`, and `deploy` will guide you to select your stack and architecture if a `.kybernusrc.json` is not found.
+- **New Modular Pillars**:
+  - **`kybernus auth`**: Injects complete JWT Authentication logic (MVC/Clean) for all supported stacks.
+  - **`kybernus deploy`**: Generates production-ready configurations for **Vercel**, **Railway**, **Fly.io**, and **Render**.
+  - **`kybernus add`**: On-demand feature injection for Swagger, Redis, Websocket Server, and Husky + Commitlint.
+- **Custom Templates**: Added support for the `--template` flag in `init`, allowing users to scaffold projects directly from any GitHub repository.
+- **`kybernus doctor`**: New diagnostic command to verify system requirements (Node, Python, Java, Docker) and configuration health.
+
+### Internal & UI
+- **Generator Engine Refactor**: Applied SOLID and DRY principles to the core generation logic for better maintainability and extensibility.
+- **Shared CLI Utilities**: Centralized common CLI patterns (prompts, configuration reading, error handling) in a new `cli-helpers` module.
+- **Comprehensive Testing Suite**: Added 37 unit tests covering all generator logic, CLI commands, and edge cases.
+- **Improved UI/UX**: Enhanced interactive prompts and spinners using `@clack/prompts` for a more premium experience.
+
+
 ## [2.4.0] - 2026-03-03
 ### Features
 - **n8n Automation Engine**: Added a brand new stack to generate enterprise-grade n8n environments.

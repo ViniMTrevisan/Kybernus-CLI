@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as clack from '@clack/prompts';
+import degit from 'degit';
 import { ProjectConfig } from '../../models/config.js';
 import { TemplateEngine } from '../templates/engine.js';
 import { buildTemplateContext } from './context-builder.js';
@@ -39,8 +40,33 @@ export class ProjectGenerator {
                 throw new Error(`Directory "${config.projectName}" already exists!`);
             }
 
-            // 2. Determine template path (Always use local templates)
-            const templatePath = await this.getLocalTemplatePath(config);
+            // 2. Determine template path (Local or Custom Repo)
+            let templatePath: string;
+            let tempDir: string | null = null;
+
+            if (config.customTemplate) {
+                spinner.message(`📥 Downloading custom template: ${config.customTemplate}...`);
+                const tmpName = `.kybernus-tmp-${Date.now()}`;
+                tempDir = path.join(outputDir, tmpName);
+
+                try {
+                    const emitter = degit(config.customTemplate, {
+                        cache: false,
+                        force: true,
+                        verbose: true
+                    });
+
+                    await emitter.clone(tempDir);
+                    templatePath = tempDir;
+                    spinner.message('🏗️  Gerando projeto a partir do template customizado...');
+                } catch (err: any) {
+                    if (tempDir) await fs.remove(tempDir);
+                    spinner.stop('❌ Erro ao baixar template');
+                    throw new Error(`Failed to download template "${config.customTemplate}": ${err.message}`);
+                }
+            } else {
+                templatePath = await this.getLocalTemplatePath(config);
+            }
 
             // Check if template exists
             if (!templatePath || !(await fs.pathExists(templatePath))) {
@@ -56,6 +82,26 @@ export class ProjectGenerator {
 
             // 4. Render all templates
             await this.engine.renderTree(templatePath, projectPath, context);
+
+            // Cleanup temp directory immediately after generation
+            if (tempDir) {
+                await fs.remove(tempDir);
+            }
+
+            // 4.5 Save Project Context (.kybernusrc.json) for future commands like "add"
+            const rcContent = {
+                projectName: config.projectName,
+                stack: config.stack,
+                architecture: config.architecture || 'mvc',
+                buildTool: config.buildTool || 'npm',
+                customTemplate: config.customTemplate || null,
+                createdAt: new Date().toISOString()
+            };
+            await fs.writeFile(
+                path.join(projectPath, '.kybernusrc.json'),
+                JSON.stringify(rcContent, null, 2),
+                'utf-8'
+            );
 
             // 5. Generate AI documentation (if enabled)
             if (config.useAI && config.geminiKey) {

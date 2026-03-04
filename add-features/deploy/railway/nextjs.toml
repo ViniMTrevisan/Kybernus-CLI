@@ -1,0 +1,14 @@
+[build]
+builder = "nixpacks"
+buildCommand = "npm install && npm run build"
+
+[deploy]
+startCommand = "npm start"
+restartPolicyType = "on-failure"
+restartPolicyMaxRetries = 5
+
+[env]
+# Add your env variables in the Railway dashboard under Variables
+# DATABASE_URL =
+# JWT_SECRET =
+# NEXTAUTH_URL =

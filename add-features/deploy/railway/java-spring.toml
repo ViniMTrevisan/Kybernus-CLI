@@ -1,0 +1,16 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "java -jar target/*.jar"
+restartPolicyType = "on-failure"
+restartPolicyMaxRetries = 5
+healthcheckPath = "/actuator/health"
+healthcheckTimeout = 100
+
+[env]
+# Add your env variables in the Railway dashboard under Variables
+# DATABASE_URL =
+# JWT_SECRET =
+# SPRING_PROFILES_ACTIVE = "prod"

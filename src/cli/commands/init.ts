@@ -7,6 +7,7 @@ import { AnalyticsClient } from '../services/AnalyticsClient.js';
 interface InitOptions {
     name?: string;
     stack?: string;
+    template?: string;
     architecture?: string;
     buildTool?: string;
     ai?: boolean;
@@ -36,6 +37,7 @@ export async function initCommand(options: InitOptions) {
         name: config.projectName,
         stack: config.stack,
         architecture: config.architecture,
+        customTemplate: config.customTemplate,
         tier: 'opensource',
         command: 'init'
     });

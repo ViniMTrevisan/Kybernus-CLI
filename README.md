@@ -43,9 +43,13 @@ All stacks and architectures are **100% FREE** and Open Source.
 
 ## Commands
 
-```bash
-kybernus init       # Generate a new project
-```
+| Command | Description | Standalone Support |
+|:---|:---|:---:|
+| `kybernus init` | Generate a new backend project from scratch | - |
+| `kybernus add` | Add features (Redis, Swagger, Websocket, Husky - stack dependent) | ✅ |
+| `kybernus auth` | Add complete JWT Authentication logic | ✅ |
+| `kybernus deploy` | Generate deployment configs (Vercel, Railway, etc.) | ✅ |
+| `kybernus doctor` | Check your environment for required tools | ✅ |
 
 ---
 
@@ -103,6 +107,9 @@ kybernus init
 - **All backend stacks** including NestJS, FastAPI and Spring Boot
 - **n8n Enterprise Automation Engine** with templates
 - **Clean & Hexagonal Architecture** patterns
+- **Kybernus Add**: Inject features like Redis, Websocket and Swagger into any project
+- **Kybernus Auth**: Complete Authentication boilerplate (MVC/Clean)
+- **Kybernus Deploy**: Configs for Vercel, Railway, Fly.io and Render
 - **Docker & docker-compose** configurations
 - **CI/CD pipelines** (GitHub Actions)
 - **Terraform** infrastructure configs

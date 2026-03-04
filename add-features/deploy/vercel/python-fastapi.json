@@ -1,0 +1,21 @@
+{
+    "version": 2,
+    "name": "my-fastapi-app",
+    "builds": [
+        {
+            "src": "app/main.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "app/main.py"
+        }
+    ],
+    "env": {
+        "DATABASE_URL": "@database_url",
+        "JWT_SECRET": "@jwt_secret",
+        "PYTHON_VERSION": "3.11"
+    }
+}
