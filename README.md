@@ -1,4 +1,4 @@
-# Kybernus CLI - 3.0.0 🚀
+# Kybernus CLI - 3.1.0 🚀
 
 **Make sure you always have the most updated version**
 **The Ultimate Backend Scaffolding Tool for Modern Developers.**

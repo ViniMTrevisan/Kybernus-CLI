@@ -8,16 +8,16 @@ import { PrismaUserRepository } from './infrastructure/database/prisma.user.repo
 import { PrismaService } from './infrastructure/database/prisma.service';
 
 @Module({
-    imports: [ConfigModule],
-    controllers: [PaymentController],
-    providers: [
-        PaymentService,
-        StripeProvider,
-        PrismaService,
-        {
-            provide: UserRepository,
-            useClass: PrismaUserRepository,
-        },
-    ],
+imports: [ConfigModule],
+controllers: [PaymentController],
+providers: [
+PaymentService,
+StripeProvider,
+PrismaService,
+{
+provide: UserRepository,
+useClass: PrismaUserRepository,
+},
+],
 })
 export class PaymentModule {}

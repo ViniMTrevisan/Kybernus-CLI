@@ -1,0 +1,23 @@
+from fastapi import HTTPException, Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jose import jwt, JWTError
+import os
+
+security = HTTPBearer()
+
+SECRET_KEY = os.getenv("JWT_SECRET", "secret")
+ALGORITHM = "HS256"
+
+
+def get_current_user_id(
+    credentials: HTTPAuthorizationCredentials = Security(security),
+) -> str:
+    try:
+        token = credentials.credentials
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+        return user_id
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")

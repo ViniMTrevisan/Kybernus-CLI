@@ -1,4 +1,5 @@
 import os
+import dataclasses
 from app.core.ports.user_repository import UserRepository
 from app.adapters.outbound.stripe_adapter import StripeAdapter
 
@@ -18,22 +19,28 @@ class PaymentService:
         customer_id = user.stripe_customer_id
 
         if not customer_id:
-            customer = self.stripe_adapter.create_customer(
-                email=user.email,
-                name=getattr(user, "name", None),
-                user_id=str(user.id),
-            )
+            try:
+                customer = self.stripe_adapter.create_customer(
+                    email=user.email,
+                    name=getattr(user, "name", None),
+                    user_id=str(user.id),
+                )
+            except ValueError as e:
+                raise ValueError(f"Failed to create Stripe customer: {e}")
             customer_id = customer.id
-            user.stripe_customer_id = customer_id
+            user = dataclasses.replace(user, stripe_customer_id=customer_id)
             await self.user_repository.save(user)
 
-        session = self.stripe_adapter.create_checkout_session(
-            customer_id=customer_id,
-            price_id=price_id,
-            user_id=str(user_id),
-            success_url=f"{os.getenv('FRONTEND_URL')}/success?session_id={{CHECKOUT_SESSION_ID}}",
-            cancel_url=f"{os.getenv('FRONTEND_URL')}/cancel",
-        )
+        try:
+            session = self.stripe_adapter.create_checkout_session(
+                customer_id=customer_id,
+                price_id=price_id,
+                user_id=str(user_id),
+                success_url=f"{os.getenv('FRONTEND_URL')}/success?session_id={'{CHECKOUT_SESSION_ID}'}",
+                cancel_url=f"{os.getenv('FRONTEND_URL')}/cancel",
+            )
+        except ValueError as e:
+            raise ValueError(f"Failed to create checkout session: {e}")
         return session.url
 
     async def create_portal_session(self, user_id: str) -> str:
@@ -41,10 +48,13 @@ class PaymentService:
         if not user or not user.stripe_customer_id:
             raise ValueError("No Stripe customer found for this user")
 
-        session = self.stripe_adapter.create_portal_session(
-            customer_id=user.stripe_customer_id,
-            return_url=f"{os.getenv('FRONTEND_URL')}/dashboard",
-        )
+        try:
+            session = self.stripe_adapter.create_portal_session(
+                customer_id=user.stripe_customer_id,
+                return_url=f"{os.getenv('FRONTEND_URL')}/dashboard",
+            )
+        except ValueError as e:
+            raise ValueError(f"Failed to create portal session: {e}")
         return session.url
 
     async def handle_webhook(self, payload: bytes, sig_header: str) -> dict:
@@ -62,7 +72,7 @@ class PaymentService:
             if user_id and customer_id:
                 user = await self.user_repository.find_by_id(user_id)
                 if user:
-                    user.stripe_customer_id = customer_id
+                    user = dataclasses.replace(user, stripe_customer_id=customer_id)
                     await self.user_repository.save(user)
             print(f"Checkout completed for user: {user_id}")
 

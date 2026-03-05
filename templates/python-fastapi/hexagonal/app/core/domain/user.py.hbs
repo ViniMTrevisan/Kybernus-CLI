@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional
 
 @dataclass(frozen=True)
@@ -9,7 +10,8 @@ class User:
     password: str
     id: Optional[str] = None
     stripe_customer_id: Optional[str] = None
-    
+    created_at: Optional[datetime] = None
+
     def __post_init__(self):
         if "@" not in self.email:
             raise ValueError("Invalid email")

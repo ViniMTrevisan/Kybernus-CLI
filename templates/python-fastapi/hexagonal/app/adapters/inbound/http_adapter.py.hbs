@@ -5,7 +5,7 @@ from app.core.ports import IAuthPort
 from app.core.domain.user import User as DomainUser
 from app.infrastructure.database.session import get_db
 from app.infrastructure.database.models import UserModel
-from app.adapters.outbound.postgres_user_repository import PostgresUserRepository 
+from app.adapters.outbound.postgres_user_repository import PostgresUserRepository
 from app.core.service import AuthService
 from app.infrastructure.security.adapters import BcryptHasher, JwtTokenGenerator
 
@@ -14,6 +14,10 @@ router = APIRouter()
 class RegisterRequest(BaseModel):
     email: EmailStr
     name: str
+    password: str
+
+class LoginRequest(BaseModel):
+    email: EmailStr
     password: str
 
 # Dependency Injection Factory
@@ -36,7 +40,7 @@ async def register(
 
 @router.post("/login")
 async def login(
-    req: RegisterRequest,
+    req: LoginRequest,
     service: IAuthPort = Depends(get_auth_service)
 ):
     try:
@@ -44,10 +48,3 @@ async def login(
         return result
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e))
-
-# Setup function for backward compatibility or direct usage 
-# though router is preferred
-def setup_auth_routes(auth_service: IAuthPort):
-    # This pattern is tricky with FastAPIs dependency injection system
-    # It's better to rely on Depends() as implemented above
-    return router

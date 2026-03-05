@@ -1,9 +1,9 @@
-import { UserRepository } from './ports/UserRepository';
+import { IUserRepositoryPort } from './ports/outbound/IUserRepositoryPort';
 import { StripeAdapter } from '../adapters/outbound/StripeAdapter';
 
 export class PaymentService {
     constructor(
-        private readonly userRepository: UserRepository,
+        private readonly userRepository: IUserRepositoryPort,
         private readonly stripeAdapter: StripeAdapter,
     ) {}
 
@@ -17,11 +17,11 @@ export class PaymentService {
             const customer = await this.stripeAdapter.createCustomer(
                 user.email,
                 user.name,
-                user.id,
+                user.id!,
             );
             customerId = customer.id;
-            user.stripeCustomerId = customerId;
-            await this.userRepository.save(user);
+            const updatedUser = user.withStripeCustomerId(customerId);
+            await this.userRepository.save(updatedUser);
         }
 
         return this.stripeAdapter.createCheckoutSession(
@@ -58,26 +58,11 @@ export class PaymentService {
                 if (userId && session.customer) {
                     const user = await this.userRepository.findById(userId);
                     if (user) {
-                        user.stripeCustomerId = session.customer as string;
-                        await this.userRepository.save(user);
+                        const updatedUser = user.withStripeCustomerId(session.customer as string);
+                        await this.userRepository.save(updatedUser);
                     }
                 }
                 console.log('Checkout completed for user:', userId);
-                break;
-            }
-            case 'customer.subscription.updated': {
-                const sub = event.data.object as any;
-                console.log('Subscription updated:', sub.id, '| Status:', sub.status);
-                break;
-            }
-            case 'customer.subscription.deleted': {
-                const sub = event.data.object as any;
-                console.log('Subscription deleted:', sub.id);
-                break;
-            }
-            case 'invoice.payment_failed': {
-                const invoice = event.data.object as any;
-                console.log('Payment failed for invoice:', invoice.id);
                 break;
             }
             default:

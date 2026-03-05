@@ -1,10 +1,10 @@
 import os
-from app.domain.repositories.user_repository import UserRepository
+from app.domain.repositories.user_repository import IUserRepository
 from app.infrastructure.stripe_provider import StripeProvider
 
 
 class PaymentService:
-    def __init__(self, user_repository: UserRepository, stripe_provider: StripeProvider):
+    def __init__(self, user_repository: IUserRepository, stripe_provider: StripeProvider):
         self.user_repository = user_repository
         self.stripe_provider = stripe_provider
 
@@ -30,7 +30,7 @@ class PaymentService:
             customer_id=customer_id,
             price_id=price_id,
             user_id=str(user_id),
-            success_url=f"{os.getenv('FRONTEND_URL')}/success?session_id={{CHECKOUT_SESSION_ID}}",
+            success_url=f"{os.getenv('FRONTEND_URL')}/success?session_id={'{CHECKOUT_SESSION_ID}'}",
             cancel_url=f"{os.getenv('FRONTEND_URL')}/cancel",
         )
         return session.url

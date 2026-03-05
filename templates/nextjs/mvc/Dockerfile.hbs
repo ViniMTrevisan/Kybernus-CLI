@@ -7,14 +7,18 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
+COPY prisma ./prisma/
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci
+
+# Generate Prisma Client
+RUN npx prisma generate
 
 # Copy source code
 COPY . .
 
-# Build TypeScript
+# Build Next.js application
 RUN npm run build
 
 # Production stage
@@ -22,14 +26,25 @@ FROM node:20-alpine AS production
 
 WORKDIR /app
 
+# Copy package files for production install
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Install only production dependencies
+RUN npm ci --omit=dev
+
+# Generate Prisma Client for production
+RUN npx prisma generate
+
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Copy built application
-COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nodejs:nodejs /app/package.json ./
+# Copy built application and config
+COPY --from=builder --chown=nodejs:nodejs /app/.next ./.next
+COPY --from=builder --chown=nodejs:nodejs /app/public ./public
+COPY --from=builder --chown=nodejs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nodejs:nodejs /app/next.config.js ./next.config.js
 
 # Switch to non-root user
 USER nodejs
@@ -39,7 +54,7 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
 # Start application
-CMD ["node", "dist/index.js"]
+CMD ["npm", "start"]

@@ -1,19 +1,24 @@
 import stripe
 import os
 
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 stripe.api_version = "2026-02-25.clover"
 
 
 class StripeAdapter:
     """Outbound adapter: wraps the Stripe SDK for use by the core domain."""
 
+    def __init__(self):
+        stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+
     def create_customer(self, email: str, name: str | None = None, user_id: str | None = None):
-        return stripe.Customer.create(
-            email=email,
-            name=name,
-            metadata={"userId": user_id} if user_id else {},
-        )
+        try:
+            return stripe.Customer.create(
+                email=email,
+                name=name,
+                metadata={"userId": user_id} if user_id else {},
+            )
+        except stripe.StripeError as e:
+            raise ValueError(f"Stripe error creating customer: {e.user_message or str(e)}")
 
     def create_checkout_session(
         self,
@@ -23,21 +28,27 @@ class StripeAdapter:
         success_url: str,
         cancel_url: str,
     ):
-        return stripe.checkout.Session.create(
-            mode="subscription",
-            payment_method_types=["card"],
-            line_items=[{"price": price_id, "quantity": 1}],
-            customer=customer_id,
-            success_url=success_url,
-            cancel_url=cancel_url,
-            client_reference_id=str(user_id),
-        )
+        try:
+            return stripe.checkout.Session.create(
+                mode="subscription",
+                payment_method_types=["card"],
+                line_items=[{"price": price_id, "quantity": 1}],
+                customer=customer_id,
+                success_url=success_url,
+                cancel_url=cancel_url,
+                client_reference_id=str(user_id),
+            )
+        except stripe.StripeError as e:
+            raise ValueError(f"Stripe error creating checkout session: {e.user_message or str(e)}")
 
     def create_portal_session(self, customer_id: str, return_url: str):
-        return stripe.billing_portal.Session.create(
-            customer=customer_id,
-            return_url=return_url,
-        )
+        try:
+            return stripe.billing_portal.Session.create(
+                customer=customer_id,
+                return_url=return_url,
+            )
+        except stripe.StripeError as e:
+            raise ValueError(f"Stripe error creating portal session: {e.user_message or str(e)}")
 
     def construct_event(self, payload: bytes, sig_header: str):
         webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET", "")

@@ -1,0 +1,52 @@
+package {{packageName}}.infrastructure.persistence.entity;
+
+import {{packageName}}.domain.entity.User;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserEntity {
+
+    @Id
+    private String id;
+
+    private String email;
+    private String name;
+    private String password;
+    private String stripeCustomerId;
+    private LocalDateTime createdAt;
+
+    public static UserEntity fromDomain(User user) {
+        return UserEntity.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .password(user.getPassword())
+                .stripeCustomerId(user.getStripeCustomerId())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
+
+    public User toDomain() {
+        return User.restore(
+                this.id,
+                this.email,
+                this.name,
+                this.password,
+                this.stripeCustomerId,
+                this.createdAt
+        );
+    }
+}

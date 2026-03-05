@@ -4,7 +4,7 @@ export class User {
         public readonly email: string,
         public readonly name: string,
         public readonly password: string,
-        public readonly stripeCustomerId?: string,
+        public stripeCustomerId?: string,
         public readonly createdAt: Date = new Date(),
     ) {
         if (!email.includes('@')) throw new Error('Invalid email');

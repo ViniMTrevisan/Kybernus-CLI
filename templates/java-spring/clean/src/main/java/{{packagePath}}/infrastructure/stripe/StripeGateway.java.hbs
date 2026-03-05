@@ -1,0 +1,63 @@
+package {{packageName}}.infrastructure.stripe;
+
+import com.stripe.model.Customer;
+import com.stripe.model.Event;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.CustomerCreateParams;
+import com.stripe.param.checkout.SessionCreateParams;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+@Service
+public class StripeGateway {
+
+    @Value("${stripe.secret-key:sk_test_dummy}")
+    private String secretKey;
+
+    @Value("${stripe.webhook-secret:whsec_dummy}")
+    private String webhookSecret;
+
+    @Value("${frontend.url:http://localhost:3000}")
+    private String frontendUrl;
+
+    @jakarta.annotation.PostConstruct
+    public void init() {
+        com.stripe.Stripe.apiKey = secretKey;
+    }
+
+    public Customer createCustomer(String email, String userId) throws Exception {
+        CustomerCreateParams params = CustomerCreateParams.builder()
+                .setEmail(email)
+                .putMetadata("userId", userId)
+                .build();
+        return Customer.create(params);
+    }
+
+    public Session createCheckoutSession(String customerId, String priceId, String userId) throws Exception {
+        SessionCreateParams params = SessionCreateParams.builder()
+                .setCustomer(customerId)
+                .setSuccessUrl(frontendUrl + "/success?session_id={CHECKOUT_SESSION_ID}")
+                .setCancelUrl(frontendUrl + "/cancel")
+                .addLineItem(SessionCreateParams.LineItem.builder()
+                        .setPrice(priceId)
+                        .setQuantity(1L)
+                        .build())
+                .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
+                .setClientReferenceId(userId)
+                .build();
+        return Session.create(params);
+    }
+
+    public com.stripe.model.billingportal.Session createPortalSession(String customerId) throws Exception {
+        com.stripe.param.billingportal.SessionCreateParams params =
+                com.stripe.param.billingportal.SessionCreateParams.builder()
+                        .setCustomer(customerId)
+                        .setReturnUrl(frontendUrl + "/account")
+                        .build();
+        return com.stripe.model.billingportal.Session.create(params);
+    }
+
+    public Event constructWebhookEvent(String payload, String sigHeader) throws Exception {
+        return com.stripe.net.Webhook.constructEvent(payload, sigHeader, webhookSecret);
+    }
+}

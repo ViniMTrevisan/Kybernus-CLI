@@ -22,7 +22,27 @@ export class User {
     }
 
     private validatePassword(password: string): void {
-        if (!password || password.length < 8) { throw new Error('Password must be at least 8 characters'); } } withId(id:
-        string): User { return new User(id, this.email, this.name, this.password, this.stripeCustomerId, this.createdAt); }
-        withStripeCustomerId(customerId: string): User { return new User(this.id, this.email, this.name, this.password,
-        customerId, this.createdAt); } }
+        if (!password || password.length < 8) {
+            throw new Error('Password must be at least 8 characters');
+        }
+    }
+
+    static restore(data: any): User {
+        return new User(
+            data.id, 
+            data.email, 
+            data.name, 
+            data.password, 
+            data.stripeCustomerId, 
+            data.createdAt
+        );
+    }
+
+    withId(id: string): User {
+        return new User(id, this.email, this.name, this.password, this.stripeCustomerId, this.createdAt);
+    }
+
+    withStripeCustomerId(customerId: string): User {
+        return new User(this.id, this.email, this.name, this.password, customerId, this.createdAt);
+    }
+}

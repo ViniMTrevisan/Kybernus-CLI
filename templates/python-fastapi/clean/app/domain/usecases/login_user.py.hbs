@@ -1,0 +1,15 @@
+from app.domain.repositories.user_repository import IUserRepository
+
+
+class LoginUserUseCase:
+    def __init__(self, repo: IUserRepository, hasher, token_gen):
+        self.repo = repo
+        self.hasher = hasher
+        self.token_gen = token_gen
+
+    async def execute(self, email: str, password: str) -> dict:
+        user = await self.repo.find_by_email(email)
+        if not user or not self.hasher.verify(password, user.password):
+            raise ValueError("Invalid email or password")
+        token = self.token_gen.generate(user.id, user.email)
+        return {"user": user, "token": token}

@@ -2,7 +2,113 @@
 
 All notable changes to this project will be documented in this file.
 
-## [3.0.0] - 2026-03-04
+## [3.1.0] - 2026-03-05
+
+### Bug Fixes & Improvements — Template Quality Pass
+
+This release is a comprehensive template quality pass across all stacks and architectures, fixing real bugs discovered during manual walkthrough testing. No CLI behaviour changed.
+
+#### Java Spring Boot (MVC, Hexagonal, Clean)
+
+**MVC**
+- `application.yml` — full rewrite: fixed catastrophic YAML indentation cascade (all blocks were nested inside each other); restored `stripe.*`, `frontend.url`, and `jwt.*` top-level properties
+- `StripeService` — `UUID.fromString(userId)` → `userId` (user ID is stored/retrieved as `String`, not `UUID`)
+- `PaymentsController` — `@AuthenticationPrincipal UserDetails` → `@AuthenticationPrincipal String userId` to match what the JWT filter actually sets as principal
+- `SecurityConfig` — added `.requestMatchers("/api/health").permitAll()`
+- `AuthController` — replaced `Map.of(...)` with `HashMap` to safely handle `null` name on registration
+- `docker-compose.yml` — removed deprecated `version` field, renamed service `postgres → db`, added `pg_isready` healthcheck
+
+**Hexagonal**
+- `application.properties` — fixed datasource URL `${DB_HOST:localhost}`, JWT secret default, Stripe placeholder values
+- `PaymentService` — `UUID.fromString(userId)` → `userId`
+- `docker-compose.yml` — DB-only (removed `app` service), healthcheck, port `5432:5432`
+- *(new)* `JwtFilter.java` — was missing; Bearer token parser, sets `UserDetails` principal on `SecurityContext`
+- *(new)* `SecurityConfig.java` — was missing; stateless session, CSRF disabled, permits `/auth/**`, `/payments/webhook`, `/actuator/**`
+
+**Clean**
+- `application.properties` — fixed datasource URL, `jwt.secret` key aligned to `SecurityAdapters`, Stripe placeholder values
+- `PaymentUseCase` — full rewrite; file was corrupted with garbled text; also fixed `UUID.fromString(userId)` → `userId`
+- `docker-compose.yml` — DB-only, healthcheck, port `5432:5432`
+- *(new)* `JwtAuthenticationFilter.java` — was missing
+- *(new)* `SecurityConfig.java` — was missing
+- *(new)* `JpaUserRepository.java` — was referenced but missing from the template
+- *(new)* `UserEntity.java` — was referenced but missing from the template
+- *(new)* `StripeGateway.java` — was referenced but missing from the template
+
+---
+
+#### Python FastAPI (MVC, Hexagonal, Clean)
+
+**MVC**
+- `docker-compose.yml` — DB-only (removed `app` service), removed `version`, added `pg_isready` healthcheck
+- `requirements.txt` — added `pydantic[email]>=2.5.0`, pinned `bcrypt>=3.0.0,<4.0.0` (bcrypt 4.x breaks passlib 1.7.4)
+- `app/middleware/security.py` — added `get_current_db_user()` dependency that returns an ORM `User` instance (previously only `get_current_user()` existed, returning a plain dict)
+- `app/controllers/payments.py` — fixed import `middleware.auth` → `middleware.security`; both `/checkout` and `/portal` now use `get_current_db_user` so Stripe operations receive the real ORM object
+- `app/schemas/item.py` — added `price: Optional[float] = None` to both `ItemCreate` and `ItemResponse`
+
+**Hexagonal**
+- `docker-compose.yml` — DB-only, removed `version`, added healthcheck
+- `requirements.txt` — added `pydantic[email]`, `email-validator>=2.1.0`, `greenlet>=3.0.0`, pinned `bcrypt<4.0.0`
+- `app/core/domain/user.py` — added `from datetime import datetime` import and `created_at: Optional[datetime] = None` field to the frozen dataclass
+- `app/core/payment_service.py` — added `import dataclasses`; replaced two `user.stripe_customer_id = x` frozen-dataclass mutations with `dataclasses.replace(user, stripe_customer_id=x)` to fix `FrozenInstanceError`; wrapped Stripe SDK calls in `try/except stripe.StripeError`
+- `app/config.py` — added `load_dotenv()` at module top; added `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `FRONTEND_URL` settings fields; fixed DB name default; added `extra="ignore"` to prevent `ValidationError` on startup when `.env` contains undeclared vars
+- `app/adapters/inbound/http_adapter.py` — added `LoginRequest(email, password)` model; `/login` endpoint was incorrectly using `RegisterRequest` (which has a mandatory `name` field), now correctly uses `LoginRequest`
+- `app/adapters/outbound/stripe_adapter.py` — moved `stripe.api_key` assignment from module level into `__init__` (module-level assignment ran before `load_dotenv()`, always resulting in `None` key)
+- `app/infrastructure/database/session.py` — added `async def get_db()` async generator (was imported throughout the app but never defined)
+- `app/adapters/inbound/payment_http_adapter.py` — `get_payment_service` now uses `Depends(get_db)` instead of bare `AsyncSessionLocal()` to prevent session leaks
+- *(new)* `app/core/ports/__init__.py` — re-exports `IAuthPort`, `IUserRepositoryPort`
+- *(new)* `app/core/ports/user_repository.py` — abstract `UserRepository` port with `find_by_id` + `save`
+- *(new)* `app/infrastructure/security/__init__.py` — package marker
+- *(new)* `app/infrastructure/security/adapters.py` — `BcryptHasher` + `JwtTokenGenerator`
+- *(new)* `app/infrastructure/security/jwt.py` — `get_current_user_id` FastAPI dependency
+- *(new)* `app/infrastructure/database/user_repository.py` — `SQLAlchemyUserRepository` async implementation
+
+**Clean**
+- `docker-compose.yml` — DB-only, removed `version`, added healthcheck
+- `requirements.txt` — added `pydantic[email]>=2.5.0`, `greenlet>=3.0.0`, pinned `bcrypt<4.0.0`
+- `app/config.py` — fixed default DB name (`{{projectName}}_db` → `{{projectName}}`); added `extra="ignore"`
+- `app/main.py` — added `load_dotenv()` before all app imports so settings are populated before `get_settings()` is called at import time
+- `app/infrastructure/http/auth_controller.py` — added `UserResponse` + `AuthResponse` Pydantic response models (previously endpoints had no `response_model`, leaking password hashes); added `LoginRequest` + `POST /login` endpoint which was entirely missing
+- `app/infrastructure/http/payment_controller.py` — fixed import `SQLAlchemyUserRepository` → `PostgresUserRepository`; `get_payment_service` now uses `Depends(get_db)` to prevent session leaks
+- `app/application/services/payment_service.py` — fixed import `UserRepository` → `IUserRepository` (the interface lives under that name in the domain layer)
+- *(new)* `app/infrastructure/security/jwt.py` — `get_current_user_id` FastAPI dependency
+- *(new)* `app/domain/usecases/login_user.py` — `LoginUserUseCase.execute(email, password)` → verifies credentials, returns `{user, token}`
+
+---
+
+#### NestJS (MVC, Hexagonal, Clean)
+- `docker-compose.yml` — DB-only (removed `app` service), removed `version`, added `pg_isready` healthcheck across all archs
+- `Dockerfile` — improvements and corrections across all archs
+- MVC: fixed `auth.controller.ts`, `auth.service.ts`, `main.ts`, `create-item.dto.ts`, `prisma.service.ts`; *(new)* `health.controller.ts`
+- Hexagonal: fixed `user.entity.ts`, `ports.ts`, `main.ts`, `app.module.ts`; *(new)* `health.controller.ts`
+- Clean: fixed `payment.service.ts`, `user.entity.ts`, `user.repository.ts`, `prisma.user.repository.ts`, `main.ts`, `app.module.ts`, `payment.module.ts`; *(new)* `health.controller.ts`
+
+#### Node.js Express (MVC, Hexagonal, Clean)
+- `docker-compose.yml` — DB-only, removed `version`, added healthcheck across all archs
+- `Dockerfile` — improvements across all archs
+- `package.json` — dependency corrections across all archs
+- Hexagonal: fixed `PaymentController.ts`, `AuthService.ts`, `PaymentService.ts`, `User.ts`; *(new)* `config.ts`, `prisma.ts.hbs` (renamed from unprocessed `prisma.ts`)
+- Clean: fixed `User.ts`; *(new)* `config.ts`
+
+#### Next.js (MVC)
+- `docker-compose.yml` — DB-only, removed `version`, added healthcheck
+- `Dockerfile` — improvements
+
+---
+
+#### All Stacks — `.gitignore` Added
+Added `.gitignore.hbs` to the 12 template directories that were missing it:
+
+| Stack | Archs | Key ignores |
+|---|---|---|
+| Java Spring Boot | mvc, hexagonal, clean | `target/`, `*.class`, `*.jar`, `.idea/`, `.env*`, `application-local.*` |
+| NestJS | mvc, hexagonal, clean | `node_modules/`, `dist/`, `*.tsbuildinfo`, `.env*`, `coverage/` |
+| Node.js Express | mvc, hexagonal, clean | same as NestJS |
+| Python FastAPI | mvc, hexagonal, clean | `__pycache__/`, `.venv/`, `.env*`, `.pytest_cache/`, `.coverage`, `.mypy_cache/` |
+
+---
+
+## [3.0.1] - 2026-03-04
 ### Major Features
 - **Standalone Project Support**: Kybernus can now be used in any project! Commands like `add`, `auth`, and `deploy` will guide you to select your stack and architecture if a `.kybernusrc.json` is not found.
 - **New Modular Pillars**:

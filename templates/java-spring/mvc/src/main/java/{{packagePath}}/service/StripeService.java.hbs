@@ -45,7 +45,7 @@ public class StripeService {
      * Retrieve or create a Stripe customer for the given user, then open a checkout session.
      */
     public Session createCheckoutSession(String userId, String priceId) throws StripeException {
-        User user = userRepository.findById(java.util.UUID.fromString(userId))
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         String customerId = user.getStripeCustomerId();
@@ -81,7 +81,7 @@ public class StripeService {
      * Open the Stripe Billing Portal for the given customer.
      */
     public com.stripe.model.billingportal.Session createPortalSession(String userId) throws StripeException {
-        User user = userRepository.findById(java.util.UUID.fromString(userId))
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (user.getStripeCustomerId() == null) {
@@ -113,7 +113,7 @@ public class StripeService {
                 Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
                 if (session != null && session.getClientReferenceId() != null) {
                     String userId = session.getClientReferenceId();
-                    userRepository.findById(java.util.UUID.fromString(userId)).ifPresent(user -> {
+                    userRepository.findById(userId).ifPresent(user -> {
                         user.setStripeCustomerId(session.getCustomer());
                         userRepository.save(user);
                     });

@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,16 +28,16 @@ public class PaymentsController {
      */
     @PostMapping("/checkout")
     public ResponseEntity<?> createCheckout(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal String userId,
             @RequestBody Map<String, String> body) {
         try {
             String priceId = body.get("priceId");
             if (priceId == null || priceId.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "priceId is required"));
             }
-            // userDetails.getUsername() returns the user ID (set in JWT filter)
+            // userId is set directly in SecurityContextHolder by JwtAuthenticationFilter
             com.stripe.model.checkout.Session session =
-                    stripeService.createCheckoutSession(userDetails.getUsername(), priceId);
+                    stripeService.createCheckoutSession(userId, priceId);
             return ResponseEntity.ok(Map.of("url", session.getUrl()));
         } catch (Exception e) {
             logger.error("Error creating checkout session", e);
@@ -51,10 +50,10 @@ public class PaymentsController {
      * Requires authentication. Opens Stripe Billing Portal.
      */
     @PostMapping("/portal")
-    public ResponseEntity<?> createPortal(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> createPortal(@AuthenticationPrincipal String userId) {
         try {
             com.stripe.model.billingportal.Session session =
-                    stripeService.createPortalSession(userDetails.getUsername());
+                    stripeService.createPortalSession(userId);
             return ResponseEntity.ok(Map.of("url", session.getUrl()));
         } catch (Exception e) {
             logger.error("Error creating portal session", e);

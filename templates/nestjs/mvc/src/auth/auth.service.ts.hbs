@@ -39,7 +39,7 @@ export class AuthService {
             where: { email },
         });
 
-        if (users || !(await bcrypt.compare(password, user.password))) {
+        if (!user || !(await bcrypt.compare(password, user.password))) {
             throw new UnauthorizedException('Invalid credentials');
         }
 
@@ -52,6 +52,8 @@ export class AuthService {
             where: { id: userId },
             select: { id: true, email: true, name: true }
         });
+        
+        if (!user) return null;
         
         return user;
     }

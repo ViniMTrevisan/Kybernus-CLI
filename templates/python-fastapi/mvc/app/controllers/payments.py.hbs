@@ -5,7 +5,7 @@ import os
 from app.database import get_db
 from app.services.stripe_service import stripe_service
 from app.models.user import User
-from app.middleware.auth import get_current_user
+from app.middleware.security import get_current_db_user
 
 router = APIRouter()
 
@@ -18,7 +18,7 @@ class CheckoutRequest(BaseModel):
 async def create_checkout(
     data: CheckoutRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_db_user),
 ):
     """Create a Stripe Checkout Session (authenticated)."""
     customer_id = stripe_service.get_or_create_customer(db, current_user)
@@ -36,7 +36,7 @@ async def create_checkout(
 @router.post("/portal")
 async def create_portal(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_db_user),
 ):
     """Open Stripe Billing Portal (authenticated)."""
     if not current_user.stripe_customer_id:
@@ -78,17 +78,3 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
 
     elif event_type == "customer.subscription.updated":
         print(f"Subscription updated: {data_object.get('id')} | Status: {data_object.get('status')}")
-        # TODO: Update subscription status in DB
-
-    elif event_type == "customer.subscription.deleted":
-        print(f"Subscription deleted: {data_object.get('id')}")
-        # TODO: Mark user as unsubscribed in DB
-
-    elif event_type == "invoice.payment_failed":
-        print(f"Payment failed for invoice: {data_object.get('id')}")
-        # TODO: Notify user via email
-
-    else:
-        print(f"Unhandled Stripe event: {event_type}")
-
-    return {"received": True}

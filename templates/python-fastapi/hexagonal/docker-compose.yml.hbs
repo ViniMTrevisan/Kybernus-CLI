@@ -1,16 +1,4 @@
-version: '3.8'
-
 services:
-  app:
-    build: .
-    container_name: {{kebabCase projectName}}-app
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/{{snakeCase projectName}}
-    depends_on:
-      - db
-
   db:
     image: postgres:15-alpine
     container_name: {{kebabCase projectName}}-db
@@ -23,6 +11,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:

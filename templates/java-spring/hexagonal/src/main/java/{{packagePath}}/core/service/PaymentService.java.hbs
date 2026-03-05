@@ -23,7 +23,7 @@ public class PaymentService {
     }
 
     public String createCheckoutSession(String userId, String priceId) throws Exception {
-        User user = userRepository.findById(java.util.UUID.fromString(userId))
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         String customerId = user.getStripeCustomerId();
@@ -39,7 +39,7 @@ public class PaymentService {
     }
 
     public String createPortalSession(String userId) throws Exception {
-        User user = userRepository.findById(java.util.UUID.fromString(userId))
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (user.getStripeCustomerId() == null) {
@@ -57,7 +57,7 @@ public class PaymentService {
                 Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
                 if (session != null && session.getClientReferenceId() != null) {
                     String userId = session.getClientReferenceId();
-                    userRepository.findById(java.util.UUID.fromString(userId)).ifPresent(user -> {
+                    userRepository.findById(userId).ifPresent(user -> {
                         user.setStripeCustomerId(session.getCustomer());
                         userRepository.save(user);
                     });

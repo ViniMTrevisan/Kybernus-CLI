@@ -22,23 +22,24 @@ public class PaymentUseCase {
         this.stripeGateway = stripeGateway;
     }
 
-    public String createCheckoutSession(String userId, String pricpackage {{packageName}}.application.usecase;
-
-import {{packageName}}.domain.l.UUID.fromString(userId))
+    public String createCheckoutSession(String userId, String priceId) throws Exception {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         String customerId = user.getStripeCustomerId();
 
         if (customerId == null || customerId.isEmpty()) {
-            cuimport com.stripeGateway.createCustomer(user.getEmail(), userId).getId();
+            customerId = stripeGateway.createCustomer(user.getEmail(), userId).getId();
             user.setStripeCustomerId(customerId);
             userRepository.save(user);
         }
 
         Session session = stripeGateway.createCheckoutSession(customerId, priceId, userId);
-        retu
-    private final UserRepository userRString createPortalSession(String userId) throws Exception {
-        User user = userRepository.findById(java.util.UUID.fromString(userId))
+        return session.getUrl();
+    }
+
+    public String createPortalSession(String userId) throws Exception {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (user.getStripeCustomerId() == null) {
@@ -56,7 +57,7 @@ import {{packageName}}.domain.l.UUID.fromString(userId))
                 Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
                 if (session != null && session.getClientReferenceId() != null) {
                     String userId = session.getClientReferenceId();
-                    userRepository.findById(java.util.UUID.fromString(userId)).ifPresent(user -> {
+                    userRepository.findById(userId).ifPresent(user -> {
                         user.setStripeCustomerId(session.getCustomer());
                         userRepository.save(user);
                     });
@@ -65,21 +66,24 @@ import {{packageName}}.domain.l.UUID.fromString(userId))
                 break;
             }
             case "customer.subscription.updated": {
-                com.stripe.model.Subscription sub =
-                        (com.stripe.model.Subscription) event.getDataObjectDeserializer().getObject().orElse(null);
-                if (sub != null) logger.info("Subscription updated: {} | Status: {}", sub.getId(), sub.getStatus());
+                com.stripe.model.Subscription sub = (com.stripe.model.Subscription) event.getDataObjectDeserializer()
+                        .getObject().orElse(null);
+                if (sub != null)
+                    logger.info("Subscription updated: {} | Status: {}", sub.getId(), sub.getStatus());
                 break;
             }
             case "customer.subscription.deleted": {
-                com.stripe.model.Subscription sub =
-                        (com.stripe.model.Subscription) event.getDataObjectDeserializer().getObject().orElse(null);
-                if (sub != null) logger.info("Subscription deleted: {}", sub.getId());
+                com.stripe.model.Subscription sub = (com.stripe.model.Subscription) event.getDataObjectDeserializer()
+                        .getObject().orElse(null);
+                if (sub != null)
+                    logger.info("Subscription deleted: {}", sub.getId());
                 break;
             }
             case "invoice.payment_failed": {
-                com.stripe.model.Invoice invoice =
-                        (com.stripe.model.Invoice) event.getDataObjectDeserializer().getObject().orElse(null);
-                if (invoice != null) logger.info("Payment failed for invoice: {}", invoice.getId());
+                com.stripe.model.Invoice invoice = (com.stripe.model.Invoice) event.getDataObjectDeserializer()
+                        .getObject().orElse(null);
+                if (invoice != null)
+                    logger.info("Payment failed for invoice: {}", invoice.getId());
                 break;
             }
             default:

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -48,17 +49,17 @@ public class AuthController {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
+
         try {
-            String userId = (String) authentication.getPrincipal(); // Assuming custom jwt filter sets principal to id
+            String userId = (String) authentication.getPrincipal();
             User user = authService.getMe(userId);
-            return ResponseEntity.ok(Map.of(
-                "id", user.getId(),
-                "email", user.getEmail(),
-                "name", user.getName()
-            ));
+            // Use HashMap instead of Map.of() — tolerates null values (e.g. name may be null)
+            Map<String, Object> result = new HashMap<>();
+            result.put("id", user.getId());
+            result.put("email", user.getEmail());
+            result.put("name", user.getName());
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
-            // Keep original behavior if principal isn't id 
             return ResponseEntity.ok(Map.of("message", "Authenticated"));
         }
     }

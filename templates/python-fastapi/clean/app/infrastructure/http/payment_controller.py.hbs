@@ -1,16 +1,17 @@
 from fastapi import APIRouter, HTTPException, Header, Request, Depends
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.application.services.payment_service import PaymentService
-from app.infrastructure.database.session import AsyncSessionLocal
-from app.infrastructure.database.user_repository import SQLAlchemyUserRepository
+from app.infrastructure.database.session import get_db
+from app.infrastructure.database.postgres_repository import PostgresUserRepository
 from app.infrastructure.stripe_provider import StripeProvider
 from app.infrastructure.security.jwt import get_current_user_id
 
 router = APIRouter()
 
 
-def get_payment_service() -> PaymentService:
-    repo = SQLAlchemyUserRepository(AsyncSessionLocal())
+def get_payment_service(db: AsyncSession = Depends(get_db)) -> PaymentService:
+    repo = PostgresUserRepository(db)
     provider = StripeProvider()
     return PaymentService(user_repository=repo, stripe_provider=provider)
 
