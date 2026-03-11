@@ -7,6 +7,7 @@ import { doctorCommand } from './cli/commands/doctor.js';
 import { addCommand } from './cli/commands/add.js';
 import { authCommand } from './cli/commands/auth.js';
 import { deployCommand } from './cli/commands/deploy.js';
+import { ecommerceCommand } from './cli/commands/ecommerce.js';
 import { createRequire } from 'module';
 
 const requirePkg = createRequire(import.meta.url);
@@ -36,5 +37,6 @@ program.addCommand(doctorCommand);
 program.addCommand(addCommand);
 program.addCommand(authCommand);
 program.addCommand(deployCommand);
+program.addCommand(ecommerceCommand);
 
 program.parse();

@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── API tests (unit + mocks — sem banco real) ───────────────────────────────
+  test-api:
+    name: API Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        working-directory: apps/api
+        run: npx prisma generate
+
+      - name: Run API tests
+        working-directory: apps/api
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci-jwt-secret-at-least-32-chars-long
+          JWT_REFRESH_SECRET: ci-refresh-secret-at-least-32-chars-long
+          JWT_RESET_SECRET: ci-reset-secret-at-least-32-chars-long
+          STRIPE_SECRET_KEY: sk_test_dummy
+          STRIPE_WEBHOOK_SECRET: whsec_dummy
+        run: npm test -- --ci --forceExit --runInBand
+
+  # ── Web tests (Jest + jsdom — sem servidor) ─────────────────────────────────
+  test-web:
+    name: Web Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Web tests
+        working-directory: apps/web
+        env:
+          NODE_ENV: test
+        run: npm test -- --ci --watchAll=false
+
+  # ── TypeScript build check ──────────────────────────────────────────────────
+  typecheck:
+    name: TypeScript Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        working-directory: apps/api
+        run: npx prisma generate
+
+      - name: Typecheck API
+        working-directory: apps/api
+        run: npx tsc --noEmit
+
+      - name: Build Web
+        working-directory: apps/web
+        env:
+          # Vite precisa de algum valor para não falhar no build
+          VITE_STRIPE_PUBLIC_KEY: pk_test_dummy
+        run: npm run build

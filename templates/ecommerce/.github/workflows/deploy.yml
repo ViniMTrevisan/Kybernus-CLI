@@ -1,0 +1,31 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+# Só roda se o CI passou
+# (GitHub Actions não tem dependência cross-workflow nativa sem workarounds;
+#  use branch protection rules no GitHub para exigir que o CI passe antes de merge em main)
+
+jobs:
+  deploy:
+    name: Deploy (placeholder)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        run: |
+          echo "✅ CI passou. Deploy pendente de configuração."
+          echo ""
+          echo "Opções de deploy sugeridas:"
+          echo "  - Railway:  railway up"
+          echo "  - Fly.io:   flyctl deploy"
+          echo "  - VPS/SSH:  ssh user@host 'cd /app && git pull && docker compose up -d --build'"
+          echo ""
+          echo "Configure os secrets necessários em:"
+          echo "  GitHub → Settings → Secrets and variables → Actions"
