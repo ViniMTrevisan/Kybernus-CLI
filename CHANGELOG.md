@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.2.0] - 2026-03-11
+
+### Features
+- **E-Commerce White-Label Template**: Added the new `kybernus ecommerce` command to scaffold a fully-featured, production-ready white-label e-commerce platform.
+  - **Tech Stack**: Backend in Express.js + Prisma + PostgreSQL + Redis, Frontend in React 18 + Vite, Infra with Docker + MinIO + Mailpit.
+  - **Features**: Dynamic branding, integrated payments (Stripe: Card, Pix, Boleto), shopping cart, admin dashboard, and image uploads.
+  - **Quality Driven**: Built with TDD, includes comprehensive test suites (Jest, Supertest, RTL), and CI/CD ready.
+  - **Customization Engine**: Interactive CLI setup that dynamically injects store credentials (Name, CNPJ, Colors, URLs) into the project configuration (`siteConfig.ts` and `tokens.ts`) out of the box.
+
 ## [3.1.0] - 2026-03-05
 
 ### Bug Fixes & Improvements — Template Quality Pass
